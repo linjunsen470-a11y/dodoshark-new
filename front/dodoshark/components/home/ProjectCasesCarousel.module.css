@@ -1,0 +1,291 @@
+.carousel {
+  overflow: visible;
+}
+
+.slide {
+  height: auto;
+}
+
+.cardLink {
+  position: relative;
+  display: block;
+  height: 100%;
+  min-height: 360px;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  box-shadow: 0 25px 50px -12px rgb(15 23 42 / 0.28);
+}
+
+.image {
+  object-fit: cover;
+  transition: transform 900ms ease;
+}
+
+.cardLink:hover .image {
+  transform: scale(1.04);
+}
+
+.logoBadge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 2;
+  display: inline-flex;
+  max-width: min(180px, calc(100% - 2rem));
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.92);
+  padding: 0.75rem 1rem;
+  box-shadow: 0 18px 40px -20px rgb(15 23 42 / 0.45);
+  backdrop-filter: blur(10px);
+}
+
+.logoImage {
+  width: auto;
+  height: 1.8rem;
+  object-fit: contain;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(15 23 42 / 0.08) 0%, rgb(15 23 42 / 0.22) 40%, rgb(15 23 42 / 0.9) 100%);
+}
+
+.content {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1.5rem;
+}
+
+.title {
+  max-width: 36rem;
+  color: #fff;
+  font-size: 1.95rem;
+  font-weight: 700;
+  line-height: 1.12;
+}
+
+.description {
+  max-width: 36rem;
+  margin-top: 1rem;
+  color: rgb(255 255 255 / 0.82);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.cta {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 3rem;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+  border-radius: 9999px;
+  background: #fff;
+  color: #0f172a;
+  padding: 0.75rem 2rem;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.cardLink:hover .cta {
+  background: #f97316;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.arrow {
+  width: 1rem;
+  height: 1rem;
+}
+
+.paginationWrap {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  min-height: 3rem;
+  align-items: center;
+}
+
+.navButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border: 1px solid rgb(226 232 240 / 0.95);
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.94);
+  color: #0f172a;
+  box-shadow: 0 10px 24px -16px rgb(15 23 42 / 0.55);
+  transition: transform 180ms ease, background 180ms ease, color 180ms ease, border-color 180ms ease, opacity 180ms ease;
+}
+
+.navButton:hover {
+  transform: translateY(-1px);
+  background: #f97316;
+  border-color: #f97316;
+  color: #fff;
+}
+
+.navButtonDisabled {
+  opacity: 0.4;
+}
+
+.navIcon {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.footerBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.carousel :global(.swiper-pagination-bullet) {
+  width: 0.625rem;
+  height: 0.625rem;
+  opacity: 1;
+  background: rgb(148 163 184 / 0.55);
+  transition: transform 180ms ease, background 180ms ease;
+}
+
+.carousel :global(.swiper-pagination-bullet-active) {
+  transform: scale(1.18);
+  background: #f97316;
+}
+
+@media (max-width: 1023px) {
+  .cardLink {
+    min-height: 420px;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .cardLink {
+    min-height: 390px;
+    border-radius: 1.25rem;
+  }
+
+  .logoBadge {
+    top: 0.875rem;
+    left: 0.875rem;
+    max-width: 124px;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .logoImage {
+    height: 1.15rem;
+  }
+
+  .content {
+    padding: 1rem;
+  }
+
+  .title {
+    max-width: 15rem;
+    font-size: 1.12rem;
+    line-height: 1.2;
+  }
+
+  .description {
+    max-width: 16rem;
+    margin-top: 0.625rem;
+    font-size: 0.84rem;
+    line-height: 1.55;
+  }
+
+  .cta {
+    width: auto;
+    min-height: 2.75rem;
+    justify-content: center;
+    margin-top: 1rem;
+    padding: 0.7rem 1.15rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+  }
+
+  .navButton {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .footerBar {
+    justify-content: center;
+    gap: 0.75rem;
+    align-items: center;
+    margin-top: 0.85rem;
+  }
+
+  .paginationWrap {
+    order: 2;
+    flex: 0 0 auto;
+    min-height: auto;
+  }
+
+  .controls {
+    order: 1;
+    gap: 0.5rem;
+  }
+
+  .carousel :global(.swiper-pagination-bullet) {
+    width: 0.48rem;
+    height: 0.48rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .cardLink {
+    min-height: 370px;
+  }
+
+  .title {
+    max-width: 14rem;
+    font-size: 1.02rem;
+  }
+
+  .description {
+    max-width: 14.5rem;
+    font-size: 0.8rem;
+  }
+
+  .cta {
+    min-height: 2.6rem;
+    padding-inline: 1rem;
+    font-size: 0.58rem;
+  }
+}
+
+@media (hover: none) {
+  .cardLink:hover .image {
+    transform: none;
+  }
+
+  .cardLink:hover .cta {
+    transform: none;
+  }
+}

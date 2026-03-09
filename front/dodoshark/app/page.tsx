@@ -1,0 +1,738 @@
+import type { Metadata } from 'next'
+import Image from 'next/image'
+import Link from 'next/link'
+
+import { client, urlFor } from '@/app/lib/sanity'
+import DeferredLiteYouTube from '@/components/home/DeferredLiteYouTube'
+import HeroCarousel, { type HeroCarouselImage } from '@/components/home/HeroCarousel'
+import HomeBlogCarousel from '@/components/home/HomeBlogCarousel'
+import ProjectCasesCarousel from '@/components/home/ProjectCasesCarousel'
+
+type SanityImage = {
+  asset?: {
+    _id?: string
+    _ref?: string
+    url?: string
+  }
+  alt?: string
+  imageUrl?: string
+}
+
+type SeoMeta = {
+  title?: string
+  description?: string
+  keywords?: string[]
+  canonicalUrl?: string
+  noIndex?: boolean
+}
+
+type HomePageData = {
+  seo?: SeoMeta
+  heroBackgrounds?: SanityImage[]
+  whyChooseUsVideoUrl?: string
+}
+
+const homeQuery = `coalesce(
+  *[_type == "homePage" && _id == "homePage"][0],
+  *[_type == "homePage"][0]
+){
+  seo {
+    title,
+    description,
+    keywords,
+    canonicalUrl,
+    noIndex
+  },
+  heroBackgrounds[] {
+    asset,
+    alt,
+    "imageUrl": asset->url
+  },
+  whyChooseUsVideoUrl
+}`
+
+const stats = [
+  { value: '55', suffix: 'Years', label: 'Industry History' },
+  { value: '10,000', suffix: 'sqm', label: 'Factory Area' },
+  { value: '1,000', suffix: '+', label: 'Export Regions' },
+  { value: '10,000', suffix: '+', label: 'Annual Yield' },
+]
+
+const aboutFeatures = [
+  {
+    title: 'Est. 1970',
+    description:
+      'Formerly a state-owned mill factory, DoDoShark was established in 2019 after restructuring. Anchored by the mission of "Empowering Productivity," we began a new brand journey.',
+    image: '/assets/images/图标-始于1970年.png',
+  },
+  {
+    title: 'Three Production Bases',
+    description:
+      'A modern production network delivers stable output, standardized manufacturing, and the flexibility required for custom industrial projects.',
+    image: '/assets/images/图标-三大生产基地.png',
+  },
+  {
+    title: 'Two Product Lines',
+    description:
+      'Agri-processing and food-processing machinery operate as dual growth engines, covering crushing, grinding, mixing, and integrated line solutions.',
+    image: '/assets/images/图标-两大产品线.png',
+  },
+]
+
+const confidenceCards = [
+  {
+    title: 'Technical Lead',
+    subtitle: 'Continuous Innovation as Industry Model',
+    points: ['Grain grinding fineness up to 150 mesh', 'Uniform mixing of dozens of powders in 15 min', 'Dust suppression ratio up to 99.99%'],
+    image: '/assets/images/技术领先.png',
+  },
+  {
+    title: 'Rigorous Delivery',
+    subtitle: 'Factory Inspection on Every Critical Detail',
+    points: ['Strict process inspection before shipment', 'Stable structure for long-cycle operation', 'Delivery quality controlled by full-line checks'],
+    image: '/assets/images/出厂严格.png',
+  },
+  {
+    title: 'Beyond Single Products',
+    subtitle: 'Integrated Equipment for Complete Workflows',
+    points: ['Single-machine and line integration available', 'Flexible matching for powders and granules', 'One supplier for equipment and process support'],
+    image: '/assets/images/不止单品.png',
+  },
+]
+
+const agriProducts = [
+  {
+    title: 'Iron Hammer Mill',
+    description: 'Suitable for grain, corn, and tuber crops, with fineness reaching 10-150 mesh.',
+    series: 'SFSP Series',
+    image: '/assets/images/粉碎大分类.png',
+    badge: { label: 'Hot', className: 'bg-orange-500' },
+  },
+  {
+    title: 'Wheat Grinder',
+    description: 'Handles wheat, corn, and sorghum with efficiency, fineness up to 40-100 mesh.',
+    series: '9FZ Series',
+    image: '/assets/images/玉米物料.png',
+    badge: { label: 'New', className: 'bg-green-500' },
+  },
+  {
+    title: 'Mixer Machine',
+    description: 'For feed, chemical, and building materials. High uniformity with variation coefficient under 5.',
+    series: 'SJHS Series',
+    image: '/assets/images/机械大板块.png',
+  },
+]
+
+const foodProducts = [
+  {
+    title: 'SUS304 Grinder',
+    description: 'For food, herbs, and corrosive materials. Dust-free, fineness up to 10-150 mesh.',
+    series: 'SUS Series',
+    image: '/assets/images/玉米物料.png',
+  },
+  {
+    title: 'SUS304 Mixer',
+    description: 'Highly uniform mixing for powders and fine particles in food and chemical sectors.',
+    series: 'SLJH Series',
+    image: '/assets/images/手动50型.png',
+  },
+  {
+    title: 'Dough Mixer',
+    description: 'Fast and durable for large batches, ideal for eateries and food factories.',
+    series: 'PSJ Series',
+    image: '/assets/images/出厂严格.png',
+  },
+]
+
+const grindingSolutions = [
+  {
+    title: 'Corn Milling Solution',
+    description: 'Efficient corn crushing and milling for individuals to large factories.',
+    image: '/assets/images/粉碎大分类.png',
+  },
+  {
+    title: 'Grain Milling Solution',
+    description: 'Dust-free grain processing for agricultural and industrial sectors.',
+    image: '/assets/images/粉碎大分类.png',
+  },
+  {
+    title: 'Salt & Sugar Milling',
+    description: 'Precise milling for spice, salt, and sugar with dust control.',
+    image: '/assets/images/机械大板块.png',
+  },
+]
+
+const mixingSolutions = [
+  {
+    title: 'Powder Mixing Solution',
+    description: 'High-uniformity mixing for fine powders in industrial sectors.',
+    image: '/assets/images/谷物加工.png',
+  },
+  {
+    title: 'Granule Mixing Solution',
+    description: 'Stable mixing performance for diverse granular materials.',
+    image: '/assets/images/手动50型.png',
+  },
+  {
+    title: 'Fertilizer Mixing',
+    description: 'Massive throughput for agricultural compound fertilizer production.',
+    image: '/assets/images/混合设备.png',
+  },
+]
+
+const projectCaseItems = [
+  {
+    title: 'New Hope Group',
+    description: 'Complete 100-mesh dust-free corn processing line for international export standard.',
+    image: '/assets/images/showroom-1.jpg',
+    logo: '/assets/images/优秀项目-logo-新希望.png',
+    href: '#',
+  },
+  {
+    title: 'Uni-President Milling Upgrade',
+    description: 'Integrated grinding workflow designed for stable output and cleaner industrial processing conditions.',
+    image: '/assets/images/showroom-1.jpg',
+    logo: '/assets/images/优秀项目-logo-统一.png',
+    href: '#',
+  },
+  {
+    title: 'Angel Yeast Powder System',
+    description: 'Customized stainless processing solution balancing food-grade standards with long-cycle plant operation.',
+    image: '/assets/images/showroom-1.jpg',
+    logo: '/assets/images/优秀项目-logo-安琪.png',
+    href: '#',
+  },
+  {
+    title: 'Changming Pharma Material Line',
+    description: 'Precision handling and low-dust conveying for fine pharmaceutical material preparation workflows.',
+    image: '/assets/images/showroom-1.jpg',
+    logo: '/assets/images/优秀项目-logo-昌明药业.png',
+    href: '#',
+  },
+  {
+    title: 'New Hope Overseas Delivery',
+    description: 'Benchmark export project built around dependable commissioning, throughput stability, and after-sales support.',
+    image: '/assets/images/showroom-1.jpg',
+    logo: '/assets/images/优秀项目-logo-新希望.png',
+    href: '#',
+  },
+]
+
+const blogItems = [
+  { title: 'Hammer Mill Operation Demo', views: '25K Views', image: '/assets/images/技术领先.png' },
+  { title: 'Grinder Maintenance Guide', views: '18K Views', image: '/assets/images/不止单品.png' },
+  { title: 'Rice Mill Working Principles', views: '32K Views', image: '/assets/images/出厂严格.png' },
+  { title: 'Client Field Footage', views: '15K Views', image: '/assets/images/产品灰底图.png' },
+  { title: 'Factory Showroom Tour', views: '10K Views', image: '/assets/images/技术领先.png' },
+]
+
+const advantages = [
+  {
+    title: 'Smart Mfg. Strength',
+    description: 'Scale efficiency balanced with bespoke innovation.',
+    image: '/assets/images/图标-专业技术.png',
+  },
+  {
+    title: 'Total Range Strategy',
+    description: 'One-stop solutions reducing costs and boosting speed.',
+    image: '/assets/images/图标-匠心精工.png',
+  },
+  {
+    title: 'Full-Life Service',
+    description: 'From process design to training, we navigate with you.',
+    image: '/assets/images/图标-个性定制.png',
+  },
+  {
+    title: 'Extended Warranty',
+    description: '10-year core component warranty for total peace of mind.',
+    image: '/assets/images/图标-一次选择.png',
+  },
+]
+
+function getSanityImageUrl(image?: SanityImage, options?: { width?: number; height?: number }) {
+  if (!image) return null
+
+  if (image.asset?._ref || image.asset?._id) {
+    let builder = urlFor(image)
+    if (options?.width) builder = builder.width(options.width)
+    if (options?.height) builder = builder.height(options.height)
+    return builder.fit(options?.height ? 'crop' : 'max').auto('format').quality(75).url()
+  }
+
+  if (image.imageUrl?.trim()) return image.imageUrl
+  if (image.asset?.url?.trim()) return image.asset.url
+
+  return null
+}
+
+function toEmbedVideoUrl(rawUrl?: string) {
+  if (!rawUrl?.trim()) return null
+
+  try {
+    const url = new URL(rawUrl)
+    const host = url.hostname.replace('www.', '')
+
+    if (host === 'youtu.be') {
+      const id = url.pathname.split('/').filter(Boolean)[0]
+      return id ? `https://www.youtube.com/embed/${id}` : null
+    }
+
+    if (host === 'youtube.com' || host === 'm.youtube.com') {
+      if (url.pathname === '/watch') {
+        const id = url.searchParams.get('v')
+        return id ? `https://www.youtube.com/embed/${id}` : null
+      }
+
+      if (url.pathname.startsWith('/embed/')) return rawUrl
+
+      if (url.pathname.startsWith('/shorts/')) {
+        const id = url.pathname.split('/').filter(Boolean)[1]
+        return id ? `https://www.youtube.com/embed/${id}` : null
+      }
+    }
+
+    if (host === 'vimeo.com') {
+      const id = url.pathname.split('/').filter(Boolean)[0]
+      return id ? `https://player.vimeo.com/video/${id}` : null
+    }
+  } catch {
+    return null
+  }
+
+  return null
+}
+
+function extractYouTubeId(embedUrl: string | null): string | null {
+  if (!embedUrl) return null
+  const match = embedUrl.match(/embed\/([^?]+)/)
+  return match?.[1] ?? null
+}
+
+function ArrowRightIcon({ className }: { className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+    </svg>
+  )
+}
+
+function PhoneIcon({ className }: { className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M6.624 4.932c.36-.809 1.27-1.233 2.115-.985l1.84.54c.72.212 1.203.88 1.203 1.63 0 .635.071 1.17-.266 1.764l-.829 1.464a.75.75 0 0 0 .073.875 15.108 15.108 0 0 0 3.02 3.02.75.75 0 0 0 .875.073l1.464-.829c.595-.337 1.129-.266 1.764-.266.75 0 1.418.483 1.63 1.203l.54 1.84c.248.845-.176 1.755-.985 2.115l-1.644.73a3.75 3.75 0 0 1-3.178-.01 18.734 18.734 0 0 1-5.866-4.242 18.734 18.734 0 0 1-4.242-5.866 3.75 3.75 0 0 1-.01-3.178l.73-1.644Z" />
+    </svg>
+  )
+}
+
+function PlayIcon({ className }: { className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M8.25 6.402c0-.81.878-1.312 1.572-.9l8.625 5.098a1.04 1.04 0 0 1 0 1.8l-8.625 5.098c-.694.41-1.572-.09-1.572-.9V6.402Z" />
+    </svg>
+  )
+}
+
+function ProductCard({
+  title,
+  description,
+  series,
+  image,
+  badge,
+}: {
+  title: string
+  description: string
+  series: string
+  image: string
+  badge?: { label: string; className: string }
+}) {
+  return (
+    <article className="home-product-card overflow-hidden rounded-[1rem] bg-white">
+      <div className="relative h-64 overflow-hidden bg-slate-100">
+        <Image src={image} alt={title} fill sizes="(max-width: 1023px) 100vw, 33vw" className="object-cover" />
+        {badge ? <div className={`absolute right-4 top-4 rounded-full px-3 py-1 text-xs font-bold text-white ${badge.className}`}>{badge.label}</div> : null}
+      </div>
+      <div className="p-6">
+        <h4 className="text-lg font-bold text-slate-900">{title}</h4>
+        <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-500">{description}</p>
+        <div className="mt-5 flex items-center justify-between gap-4">
+          <span className="font-bold text-orange-500">{series}</span>
+          <Link href="/products" className="inline-flex items-center gap-1 text-sm text-slate-400 transition hover:text-orange-500">
+            View Details
+            <ArrowRightIcon className="h-4 w-4" />
+          </Link>
+        </div>
+      </div>
+    </article>
+  )
+}
+
+function SolutionCard({ title, description, image }: { title: string; description: string; image: string }) {
+  return (
+    <article className="overflow-hidden rounded-lg border border-slate-100 bg-white transition hover:shadow-lg">
+      <div className="relative h-48 overflow-hidden bg-slate-100">
+        <Image src={image} alt={title} fill sizes="(max-width: 1023px) 100vw, 33vw" className="object-cover transition-transform duration-500 hover:scale-105" />
+      </div>
+      <div className="p-6">
+        <h4 className="relative inline-block text-lg font-bold text-slate-900">
+          {title}
+          <span className="absolute bottom-0 left-0 h-0.5 w-full bg-blue-600" />
+        </h4>
+        <p className="mt-4 text-sm leading-6 text-slate-500">{description}</p>
+        <Link
+          href="/solutions"
+          className="mt-5 inline-flex min-h-10 items-center rounded border border-slate-300 px-4 py-2 text-sm text-slate-600 transition hover:border-blue-600 hover:text-blue-600"
+        >
+          View More &gt;
+        </Link>
+      </div>
+    </article>
+  )
+}
+
+async function getHomePageData() {
+  try {
+    return await client.fetch<HomePageData | null>(homeQuery)
+  } catch {
+    return null
+  }
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await getHomePageData()
+  const seo = data?.seo
+
+  return {
+    title: seo?.title || 'DoDoShark - Professional Crushing & Grinding Equipment Manufacturer',
+    description:
+      seo?.description || 'DoDoShark Machinery, 20 years of focus on industrial crushing, grinding, and mixing equipment, serving 100+ countries.',
+    keywords: seo?.keywords,
+    alternates: seo?.canonicalUrl ? { canonical: seo.canonicalUrl } : undefined,
+    robots: seo?.noIndex ? { index: false, follow: false } : undefined,
+  }
+}
+
+export default async function HomePage() {
+  const data = await getHomePageData()
+
+  const heroSlides: HeroCarouselImage[] = (data?.heroBackgrounds ?? [])
+    .map((image, index) => {
+      const src = getSanityImageUrl(image, { width: 1920 })
+      if (!src) return null
+      return {
+        src,
+        alt: image.alt || `DoDoShark hero ${index + 1}`,
+      }
+    })
+    .filter((item): item is HeroCarouselImage => Boolean(item))
+
+  const fallbackHeroSlides =
+    heroSlides.length > 0
+      ? heroSlides
+      : [{ src: '/assets/images/banner.png', alt: 'DoDoShark factory banner' }]
+
+  const videoEmbedUrl = toEmbedVideoUrl(data?.whyChooseUsVideoUrl)
+  const youtubeVideoId = extractYouTubeId(videoEmbedUrl)
+
+  return (
+    <main className="bg-white text-slate-700">
+      <section className="relative flex min-h-[620px] items-center overflow-hidden md:min-h-[700px]">
+        <HeroCarousel images={fallbackHeroSlides} autoplayMs={5500} pauseOnHover showDots showArrows />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-slate-950/70 via-slate-950/35 to-transparent" />
+
+        <div className="relative z-10 mx-auto flex w-full max-w-7xl items-center px-4 py-20 sm:px-6 lg:px-8">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-orange-400/30 bg-orange-500/20 px-4 py-2 text-sm font-medium text-orange-300">
+              <span className="h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
+              <span>20 Years of Focus in Crushing &amp; Grinding</span>
+            </div>
+            <h1 className="mt-6 font-display text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">
+              Dual-Engine Business Model
+            </h1>
+            <p className="mt-4 text-lg font-medium text-white/85 sm:text-xl">Agri-Processing + Food Processing</p>
+            <p className="mt-4 max-w-lg text-sm leading-7 text-white/65 sm:text-base">
+              DoDoShark is dedicated to providing professional crushing, grinding, and mixing solutions, boosting efficiency and product quality for enterprises.
+            </p>
+            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+              <Link
+                href="#products"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-[#fbbf24] px-8 py-3 font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-[#f59e0b]"
+              >
+                <span>Explore Products</span>
+                <ArrowRightIcon className="h-4 w-4" />
+              </Link>
+              <Link
+                href="#contact"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border-2 border-white/30 px-8 py-3 font-medium text-white transition hover:bg-white hover:text-slate-950"
+              >
+                <span>Contact Us</span>
+                <PhoneIcon className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <div className="absolute right-0 top-1/2 hidden h-2/3 w-1/3 -translate-y-1/2 opacity-20 lg:block">
+          <div className="h-full w-full rounded-l-full bg-gradient-to-l from-orange-500/40 to-transparent" />
+        </div>
+      </section>
+
+      <section className="border-b border-slate-100 bg-white py-14 sm:py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 gap-x-8 gap-y-10 md:grid-cols-4 md:gap-y-12">
+            {stats.map((item) => (
+              <div key={item.label} className="text-center">
+                <div className="inline-flex items-baseline justify-center gap-1">
+                  <span className="text-4xl font-extrabold leading-none text-orange-500 sm:text-5xl md:text-6xl">{item.value}</span>
+                  <span className="text-base font-bold uppercase tracking-tight text-slate-400 md:text-xl">{item.suffix}</span>
+                </div>
+                <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500 sm:text-xs">{item.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="home-about-bg relative overflow-hidden py-20 text-white sm:py-24">
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute left-0 top-0 h-72 w-72 rounded-full bg-orange-500 blur-3xl sm:h-96 sm:w-96" />
+          <div className="absolute bottom-0 right-0 h-72 w-72 rounded-full bg-blue-500 blur-3xl sm:h-96 sm:w-96" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="mx-auto mb-8 inline-flex h-28 w-28 items-center justify-center rounded-full border border-white/20 bg-white/80 backdrop-blur-md shadow-2xl">
+              <Image src="/assets/images/dodoshark-logo-01.png" alt="DoDoShark" width={80} height={80} className="h-16 w-auto object-contain brightness-125" />
+            </div>
+            <h2 className="font-display text-3xl font-bold uppercase tracking-[0.08em] text-white sm:text-5xl">About DoDoShark</h2>
+            <div className="mx-auto mt-6 h-1.5 w-20 rounded-full bg-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.6)]" />
+          </div>
+
+          <div className="mt-16 grid gap-10 md:grid-cols-3 lg:gap-12">
+            {aboutFeatures.map((item) => (
+              <article key={item.title} className="text-center">
+                <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-white/5">
+                  <Image src={item.image} alt={item.title} width={48} height={48} className="h-12 w-12 object-contain" />
+                </div>
+                <h3 className="text-xl font-bold text-white">{item.title}</h3>
+                <p className="mt-3 text-sm leading-7 text-white/60">{item.description}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#f5f5f5] py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-16 grid items-start gap-10 lg:grid-cols-2 lg:gap-12">
+            <div className="pt-2 sm:pt-8">
+              <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl lg:text-5xl">Choose DoDoShark = Choose Confidence</h2>
+              <div className="mt-7 h-1 w-16 bg-[#f5a623]" />
+              <p className="mt-8 text-base leading-8 text-slate-600 sm:text-lg">
+                DoDoShark practices &quot;Carefree Production, Joyful Harvest&quot; through innovation and high quality.
+              </p>
+            </div>
+
+            <div className="group relative overflow-hidden rounded-[1rem] shadow-2xl">
+              {youtubeVideoId ? (
+                <DeferredLiteYouTube videoId={youtubeVideoId} title="DoDoShark Factory Video" className="rounded-[1rem]" />
+              ) : videoEmbedUrl ? (
+                <div className="relative aspect-video">
+                  <iframe
+                    src={videoEmbedUrl}
+                    title="DoDoShark Factory Video"
+                    className="absolute inset-0 h-full w-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                </div>
+              ) : (
+                <div className="relative aspect-video">
+                  <Image src="/assets/images/工厂展示.png" alt="DoDoShark Factory Video" fill sizes="(max-width: 1023px) 100vw, 50vw" className="object-cover" />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition group-hover:bg-black/30">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-black/60 transition group-hover:scale-110">
+                      <PlayIcon className="ml-1 h-8 w-8 text-white" />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {confidenceCards.map((card) => (
+              <article key={card.title} className="overflow-hidden rounded-[1rem] bg-white shadow-sm transition duration-300 hover:shadow-xl">
+                <div className="p-8 pb-6">
+                  <h3 className="text-xl font-bold text-slate-900">{card.title}</h3>
+                  <h4 className="mt-1 text-lg font-bold text-slate-900">{card.subtitle}</h4>
+                  <div className="mt-6 h-0.5 w-12 bg-[#f5a623]" />
+                  <div className="mt-6 space-y-3 text-sm leading-7 text-slate-600">
+                    {card.points.map((point) => (
+                      <p key={point}>{point}</p>
+                    ))}
+                  </div>
+                </div>
+                <div className="relative h-56 overflow-hidden">
+                  <Image src={card.image} alt={card.title} fill sizes="(max-width: 1279px) 100vw, 33vw" className="object-cover transition-transform duration-500 hover:scale-105" />
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="products" className="bg-slate-100">
+        <div className="relative h-[300px] overflow-hidden sm:h-[360px] lg:h-[420px]">
+          <Image src="/assets/images/banner.png" alt="Industrial Background" fill sizes="100vw" className="object-cover" />
+          <div className="relative z-10 mx-auto px-4 pt-16 text-center sm:px-6 sm:pt-20 lg:max-w-7xl lg:px-8">
+            <h2 className="font-display text-3xl font-bold tracking-wide text-white sm:text-4xl md:text-5xl">Wonderful Products</h2>
+            <div className="mx-auto mt-6 h-1 w-12 rounded-full bg-yellow-400" />
+          </div>
+        </div>
+
+        <div className="relative z-20 mx-auto -mt-24 max-w-6xl px-4 sm:px-6 lg:px-8 lg:-mt-28">
+          <div className="rounded-lg bg-white shadow-xl">
+            <div className="border-b border-slate-200 py-8 text-center">
+              <h3 className="text-2xl font-bold text-slate-900">Agri-Processing Machinery</h3>
+            </div>
+            <div className="p-6 sm:p-8">
+              <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                {agriProducts.map((product) => (
+                  <ProductCard key={product.title} {...product} />
+                ))}
+              </div>
+              <div className="mt-10 text-center">
+                <Link href="/products" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#fbbf24] px-8 py-3 font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-[#f59e0b] sm:w-auto">
+                  View More
+                  <ArrowRightIcon className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-12 rounded-lg bg-white shadow-xl">
+            <div className="border-b border-slate-200 py-8 text-center">
+              <h3 className="text-2xl font-bold text-slate-900">Food Processing Machinery</h3>
+            </div>
+            <div className="p-6 sm:p-8">
+              <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                {foodProducts.map((product) => (
+                  <ProductCard key={product.title} {...product} />
+                ))}
+              </div>
+              <div className="mt-10 text-center">
+                <Link href="/products" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#fbbf24] px-8 py-3 font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-[#f59e0b] sm:w-auto">
+                  View More
+                  <ArrowRightIcon className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-slate-100">
+        <div className="relative h-[300px] overflow-hidden sm:h-[360px] lg:h-[420px]">
+          <Image src="/assets/images/factory.jpg" alt="Factory Solution Background" fill sizes="100vw" className="object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-950/70 via-blue-900/60 to-blue-950/70" />
+          <div className="relative z-10 mx-auto px-4 pt-16 text-center sm:px-6 sm:pt-20 lg:max-w-7xl lg:px-8">
+            <h2 className="font-display text-3xl font-bold tracking-wide text-white sm:text-4xl md:text-5xl">Efficient Solutions</h2>
+            <div className="mx-auto mt-6 h-1 w-12 rounded-full bg-yellow-400" />
+          </div>
+        </div>
+
+        <div className="relative z-20 mx-auto -mt-24 max-w-6xl px-4 sm:px-6 lg:px-8 lg:-mt-28">
+          <div className="rounded-lg bg-white shadow-xl">
+            <div className="border-b border-slate-200 py-8 text-center">
+              <h3 className="text-2xl font-bold text-slate-900 md:text-3xl">Grinding Solutions (Dust-Free)</h3>
+            </div>
+            <div className="p-6 sm:p-8 md:p-12">
+              <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+                {grindingSolutions.map((item) => (
+                  <SolutionCard key={item.title} {...item} />
+                ))}
+              </div>
+              <div className="mt-10 text-center">
+                <Link href="/solutions" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#fbbf24] px-8 py-3 font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-[#f59e0b] sm:w-auto">
+                  View More
+                  <ArrowRightIcon className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mx-auto max-w-6xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
+          <div className="rounded-lg bg-white p-6 shadow-lg sm:p-8 md:p-12">
+            <h3 className="text-center text-2xl font-bold text-slate-900 md:text-3xl">Efficient Mixing Solutions</h3>
+            <p className="mt-4 text-center text-slate-600">Handling powders, granules, and compound fertilizers.</p>
+            <div className="mt-10 grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+              {mixingSolutions.map((item) => (
+                <SolutionCard key={item.title} {...item} />
+              ))}
+            </div>
+            <div className="mt-10 text-center">
+              <Link href="/solutions" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#fbbf24] px-8 py-3 font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-[#f59e0b] sm:w-auto">
+                View More
+                <ArrowRightIcon className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold uppercase tracking-tight text-slate-900 sm:text-4xl md:text-5xl">Project Cases</h2>
+            <div className="mx-auto mt-6 h-1.5 w-20 rounded-full bg-orange-500" />
+            <p className="mt-8 text-base text-slate-500 sm:text-lg">Every Case is a Benchmark for Industrial Excellence.</p>
+          </div>
+
+          <ProjectCasesCarousel items={projectCaseItems} />
+        </div>
+      </section>
+
+      <section className="bg-slate-50 py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-16 text-center">
+            <h2 className="font-display text-3xl font-bold text-slate-900 sm:text-4xl">BLOG - Explore the Real DoDoShark</h2>
+          </div>
+
+          <HomeBlogCarousel items={blogItems} />
+
+          <div className="mt-10 text-center">
+            <Link href="/blogs" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#fbbf24] px-8 py-3 font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-[#f59e0b] sm:w-auto">
+              More Videos
+              <ArrowRightIcon className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" className="home-cta-bg relative overflow-hidden py-20 text-white sm:py-24">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute left-1/4 top-0 h-72 w-72 rounded-full bg-orange-500 blur-3xl sm:h-96 sm:w-96" />
+          <div className="absolute bottom-0 right-1/4 h-72 w-72 rounded-full bg-blue-500 blur-3xl sm:h-96 sm:w-96" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="mx-auto mb-6 inline-flex h-24 w-40 items-center justify-center bg-white/10 backdrop-blur-sm">
+              <Image src="/assets/images/dodoshark-logo-04.png" alt="DoDoShark" width={160} height={110} className="h-20 w-auto object-contain brightness-110" />
+            </div>
+            <h2 className="font-display text-3xl font-bold text-white sm:text-4xl">Right Choice, Lifelong Performance</h2>
+            <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
+              {advantages.map((item) => (
+                <article key={item.title} className="home-advantage-item rounded-[1rem] border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+                  <div className="home-advantage-icon">
+                    <Image src={item.image} alt={item.title} width={56} height={56} className="h-14 w-14 object-contain" />
+                  </div>
+                  <h4 className="text-lg font-bold text-white">{item.title}</h4>
+                  <p className="mt-2 text-sm leading-7 text-white/60">{item.description}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  )
+}
