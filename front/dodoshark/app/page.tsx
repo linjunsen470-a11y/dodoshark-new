@@ -310,6 +310,18 @@ function ArrowRightIcon({ className }: { className?: string }) {
   )
 }
 
+const cardInlineCtaClass =
+  'group inline-flex items-center gap-1 text-sm font-semibold text-[#5eead4] underline decoration-transparent underline-offset-4 transition-colors duration-200 hover:text-[#2dd4bf] hover:decoration-current focus-visible:outline-none focus-visible:text-[#2dd4bf] focus-visible:decoration-current'
+
+function CardInlineCta({ href }: { href: string }) {
+  return (
+    <Link href={href} className={cardInlineCtaClass}>
+      View Details
+      <ArrowRightIcon className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5 group-focus-visible:translate-x-0.5" />
+    </Link>
+  )
+}
+
 function PlayIcon({ className }: { className?: string }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
@@ -339,10 +351,7 @@ function ProductCard({
         <h4 className="text-lg font-bold text-slate-900">{title}</h4>
         <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-500">{description}</p>
         <div className="mt-5 flex items-center justify-end">
-          <Link href="/products" className="inline-flex items-center gap-1 text-sm text-slate-400 transition hover:text-orange-500">
-            View Details
-            <ArrowRightIcon className="h-4 w-4" />
-          </Link>
+          <CardInlineCta href="/products" />
         </div>
       </div>
     </article>
@@ -361,12 +370,9 @@ function SolutionCard({ title, description, image }: { title: string; descriptio
           <span className="absolute bottom-0 left-0 h-0.5 w-full bg-blue-600" />
         </h4>
         <p className="mt-4 text-sm leading-6 text-slate-500">{description}</p>
-        <Link
-          href="/solutions"
-          className="mt-5 inline-flex min-h-10 items-center rounded border border-slate-300 px-4 py-2 text-sm text-slate-600 transition hover:border-blue-600 hover:text-blue-600"
-        >
-          View More &gt;
-        </Link>
+        <div className="mt-5 flex items-center justify-end">
+          <CardInlineCta href="/solutions" />
+        </div>
       </div>
     </article>
   )
@@ -556,7 +562,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section id="products" className="bg-slate-100">
+      <section id="products" className="bg-slate-100 pb-16 sm:pb-20">
         <div className="relative h-[300px] overflow-hidden sm:h-[360px] lg:h-[420px]">
           <Image src="/assets/images/banner.png" alt="Industrial Background" fill sizes="100vw" className="object-cover" />
           <div className="relative z-10 mx-auto px-4 pt-16 text-center sm:px-6 sm:pt-20 lg:max-w-7xl lg:px-8">
@@ -659,12 +665,16 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="overflow-hidden bg-[#1e3a5f] py-20 sm:py-24">
+      <section className="overflow-hidden bg-[#e6eaee] py-10 sm:py-14">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h2 className="font-display text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">Project Cases</h2>
-            <div className="mx-auto mt-6 h-px w-24 bg-white/15" />
-            <p className="mt-8 text-base text-slate-300 sm:text-lg">Every case is a benchmark for industrial excellence.</p>
+            <h2 className="font-display text-3xl font-extrabold tracking-[-0.02em] text-slate-800 sm:text-4xl md:text-5xl">
+              Project Cases
+            </h2>
+            <div className="mx-auto mt-5 h-1 w-24 rounded-full bg-gradient-to-r from-slate-700 via-slate-500 to-amber-400" />
+            <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg">
+              Every case is a benchmark for industrial excellence.
+            </p>
           </div>
 
           <ProjectCasesCarousel items={projectCaseItems} />
@@ -673,15 +683,15 @@ export default async function HomePage() {
 
       
 
-      <section id="contact" className="home-cta-bg relative overflow-hidden py-20 text-white sm:py-24">
+      <section className="home-cta-bg relative overflow-hidden py-12 text-white sm:py-16">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute left-1/4 top-0 h-72 w-72 rounded-full bg-orange-500 blur-3xl sm:h-96 sm:w-96" />
           <div className="absolute bottom-0 right-1/4 h-72 w-72 rounded-full bg-blue-500 blur-3xl sm:h-96 sm:w-96" />
         </div>
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <div className="mx-auto mb-6 inline-flex h-24 w-40 items-center justify-center bg-white/10 backdrop-blur-sm">
-              <Image src="/assets/images/dodoshark-logo-04.png" alt="DoDoShark" width={160} height={110} className="h-20 w-auto object-contain brightness-110" />
+            <div className="mx-auto mb-6 inline-flex h-24 w-40 items-center justify-center backdrop-blur-sm">
+              <Image src="/assets/images/dodoshark-logo-04.png" alt="DoDoShark" width={160} height={110} className="h-40 w-auto object-contain brightness-110" />
             </div>
             <h2 className="font-display text-3xl font-bold text-white sm:text-4xl">Right Choice, Lifelong Performance</h2>
             <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">

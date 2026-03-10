@@ -144,7 +144,10 @@ export default function ProjectCasesCarousel({ items }: ProjectCasesCarouselProp
           </p>
         </div>
 
-        <Link href="/cases" className={styles.footerCta}>
+        <Link
+          href="/cases"
+          className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#fbbf24] px-8 py-3 font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-[#f59e0b] sm:w-auto"
+        >
           View All Cases
           <ArrowRightIcon className={styles.footerCtaIcon} />
         </Link>

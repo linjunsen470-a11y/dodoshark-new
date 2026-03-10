@@ -36,12 +36,12 @@ function FeatureMedia({ item }: { item: FeatureListItem }) {
   if (!media?.asset) return null
 
   return (
-    <div className="relative mx-auto mb-5 h-24 w-24">
+    <div className="relative mx-auto mb-4 h-16 w-16 md:h-20 md:w-20">
       <Image
         src={urlFor(media).width(160).height(160).fit('max').url()}
         alt={media.alt || item.title || 'Feature media'}
         fill
-        sizes="96px"
+        sizes="(min-width: 768px) 80px, 64px"
         className="object-contain"
       />
     </div>
@@ -67,10 +67,10 @@ export default function FeatureListBlock({
   if (!hasHeader && items.length === 0) return null
 
   const titleClass = theme.heading
-  const itemTitleClass = theme.heading
+  const itemTitleClass = isDark ? 'text-blue-300' : 'text-blue-600'
   const itemDescriptionClass = theme.body
   const sectionSpacingClass =
-    seamlessFromPrev && !hasHeader ? '-mt-4 pt-0 pb-14 md:-mt-6 md:pb-16' : 'py-16 md:py-20'
+    seamlessFromPrev && !hasHeader ? '-mt-1 pt-2 pb-14 md:-mt-2 md:pt-3 md:pb-16' : 'py-16 md:py-20'
 
   return (
     <section className={`${sectionSpacingClass} ${theme.section}`}>
@@ -84,21 +84,21 @@ export default function FeatureListBlock({
           />
         )}
 
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-x-8 gap-y-12">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-[repeat(auto-fit,minmax(160px,1fr))] sm:gap-x-6 sm:gap-y-10">
           {items.map((item, index) => (
             <article
               key={item._key ?? `${item.title}-${index}`}
-              className="mx-auto flex max-w-[16rem] flex-col items-center text-center"
+              className="mx-auto flex max-w-[10rem] flex-col items-center text-center sm:max-w-[13rem]"
             >
               <FeatureMedia item={item} />
               <h3
-                className={`mb-4 max-w-[13ch] whitespace-pre-line text-[1.65rem] font-display font-extrabold leading-[1.08] tracking-[-0.02em] md:text-[1.75rem] ${itemTitleClass}`}
+                className={`mb-3 max-w-[12ch] whitespace-pre-line text-lg font-display font-extrabold leading-[1.15] tracking-[-0.02em] md:text-xl ${itemTitleClass}`}
               >
                 {item.title}
               </h3>
               {item.description && (
                 <p
-                  className={`mx-auto max-w-[19ch] whitespace-pre-line text-base font-normal leading-8 ${itemDescriptionClass}`}
+                  className={`mx-auto max-w-[17ch] whitespace-pre-line text-sm font-normal leading-6 md:text-[0.95rem] md:leading-7 ${itemDescriptionClass}`}
                 >
                   {item.description}
                 </p>

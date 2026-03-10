@@ -198,7 +198,7 @@ export default function RichSectionBlock({
     ? 'max-w-[36rem] [&_blockquote:last-child]:mb-0 [&_ol:last-child]:mb-0 [&_p:last-child]:mb-0 [&_ul:last-child]:mb-0'
     : 'max-w-[36rem]'
 
-  const sectionSpacingClass = seamlessToNext ? 'pt-24 pb-2 md:pb-4' : 'py-24'
+  const sectionSpacingClass = seamlessToNext ? 'pt-24 pb-4 md:pb-6' : 'py-24'
 
   return (
     <section id={anchorId} className={`${sectionSpacingClass} ${theme.section}`}>

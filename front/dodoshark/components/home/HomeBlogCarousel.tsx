@@ -102,7 +102,7 @@ export default function HomeBlogCarousel({ items }: HomeBlogCarouselProps) {
           {items.map((item) => (
             <article
               key={item.title}
-              className="group home-blog-card flex-shrink-0 rounded-[1rem] bg-white shadow-sm"
+              className="group home-blog-card box-border flex-shrink-0 rounded-[1rem] border border-slate-200 bg-white shadow-sm"
               style={{ width: `calc(${100 / itemsVisible}% - ${(itemsVisible - 1) * 24 / itemsVisible}px)` }}
             >
               <div className="relative h-56 overflow-hidden md:h-48">
@@ -111,7 +111,7 @@ export default function HomeBlogCarousel({ items }: HomeBlogCarouselProps) {
                   <PlayIcon className="ml-1 h-5 w-5" />
                 </div>
               </div>
-              <div className="p-4">
+              <div className="border-t border-slate-200 bg-white p-4">
                 <h4 className="line-clamp-2 text-sm font-bold text-slate-900">{item.title}</h4>
                 <p className="mt-2 text-xs text-slate-400">{item.views}</p>
               </div>
