@@ -57,9 +57,14 @@ export default function Header() {
   const pathname = usePathname()
   const isHome = pathname === '/'
   const [isScrolled, setIsScrolled] = useState(() => pathname !== '/')
+  const [isDesktopViewport, setIsDesktopViewport] = useState(false)
 
   const syncScrolled = useEffectEvent(() => {
     setIsScrolled(window.scrollY > 18)
+  })
+
+  const syncDesktopViewport = useEffectEvent(() => {
+    setIsDesktopViewport(window.matchMedia('(min-width: 1280px)').matches)
   })
 
   useEffect(() => {
@@ -73,10 +78,29 @@ export default function Header() {
     return () => window.removeEventListener('scroll', syncScrolled)
   }, [isHome, syncScrolled])
 
+  useEffect(() => {
+    syncDesktopViewport()
+
+    const mediaQuery = window.matchMedia('(min-width: 1280px)')
+    mediaQuery.addEventListener('change', syncDesktopViewport)
+    return () => mediaQuery.removeEventListener('change', syncDesktopViewport)
+  }, [syncDesktopViewport])
+
   const desktopFloating = isHome && !isScrolled
+  const desktopHeaderBackgroundStyle =
+    !desktopFloating && isDesktopViewport
+      ? {
+          backgroundColor: '#17346e',
+          backgroundImage:
+            "radial-gradient(circle at 74% 42%, rgba(251, 191, 36, 0.42) 0%, rgba(251, 191, 36, 0.18) 12%, rgba(251, 191, 36, 0) 26%), linear-gradient(90deg, rgba(7, 26, 58, 0.72) 0%, rgba(7, 26, 58, 0.18) 42%, rgba(7, 26, 58, 0.28) 64%, rgba(7, 26, 58, 0.76) 100%), linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(5, 18, 44, 0.08) 38%, rgba(5, 18, 44, 0.3) 100%), url('/assets/images/background/footer-background.png')",
+          backgroundPosition: 'center, center, center, 66% 24%',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover, cover, cover, 138% auto',
+        }
+      : undefined
   const desktopHeaderClass = desktopFloating
-    ? 'xl:bg-transparent xl:border-white/10 xl:shadow-none xl:backdrop-blur-0'
-    : 'bg-[#1e3a5f]/94 border-white/16 shadow-[0_10px_30px_-24px_rgba(15,23,42,0.92)] backdrop-blur-xl'
+    ? 'xl:border-white/10 xl:shadow-none'
+    : 'shadow-[0_10px_30px_-24px_rgba(15,23,42,0.92)] backdrop-blur-xl xl:border-white/16 xl:shadow-[0_10px_30px_-24px_rgba(15,23,42,0.92)] xl:backdrop-blur-0'
 
   return (
     <>
@@ -118,12 +142,11 @@ export default function Header() {
       </div>
 
       <header
-        className={`sticky top-0 z-50 border-b transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 ${desktopHeaderClass} ${
-          isHome ? '' : ''
-        } border-[#e8e7de] bg-[#f5f5f0] xl:border-white/16 xl:bg-[#1e3a5f]`}
+        className={`sticky top-0 z-50 border-b border-[#e8e7de] bg-[#f5f5f0] transition-[border-color,box-shadow,backdrop-filter] duration-300 xl:bg-transparent ${desktopHeaderClass}`}
+        style={desktopHeaderBackgroundStyle}
       >
         <div className="mx-auto max-w-[1280px] px-4">
-          <div className="relative flex h-14 items-center justify-between gap-3 xl:h-[72px]">
+          <div className="flex h-14 items-center justify-between gap-3 xl:h-[72px]">
             <div className="xl:hidden">
               <Link href="/" className="inline-flex items-center py-1">
                 <Image
