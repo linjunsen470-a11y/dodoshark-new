@@ -16,13 +16,12 @@ export default defineType({
       type: 'string',
       options: {
         list: [
-          { title: 'Grid', value: 'grid' },
           { title: 'Carousel', value: 'carousel' },
-          { title: 'Masonry', value: 'masonry' },
+          { title: 'Thumbnail Gallery', value: 'thumbnailGallery' },
         ],
         layout: 'radio',
       },
-      initialValue: 'grid',
+      initialValue: 'thumbnailGallery',
     }),
     defineField({
       name: 'backgroundVariant',
@@ -110,7 +109,7 @@ export default defineType({
     prepare({ title, layout }) {
       return {
         title: title || 'Media Gallery',
-        subtitle: `Layout: ${layout || 'grid'}`,
+        subtitle: `Layout: ${layout || 'thumbnailGallery'}`,
       }
     },
   },

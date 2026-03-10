@@ -1,12 +1,16 @@
 'use client'
 
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { forwardRef, useEffect, useRef, useState } from 'react'
+import { A11y, Keyboard } from 'swiper/modules'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import type { Swiper as SwiperInstance } from 'swiper'
 
 import { urlFor } from '@/app/lib/sanity'
 import Icon from '@/components/ui/Icon'
 import { getSharedBackgroundTheme } from './backgroundTheme'
 import SectionHeader from './SectionHeader'
+import 'swiper/css'
 
 type GalleryImage = {
   alt?: string
@@ -21,33 +25,6 @@ type GalleryImage = {
         height?: number
       }
     }
-  }
-}
-
-function hasImageIdentity(image?: GalleryImage) {
-  const ref = image?.asset?._ref?.trim()
-  const id = image?.asset?._id?.trim()
-  return Boolean(ref || id)
-}
-
-function resolveImageSrc({
-  image,
-  width,
-}: {
-  image?: GalleryImage
-  width: number
-}) {
-  if (!image) return undefined
-
-  const directUrl = image?.asset?.url?.trim()
-  if (directUrl) return directUrl
-
-  if (!hasImageIdentity(image)) return undefined
-
-  try {
-    return urlFor(image).width(width).fit('max').url()
-  } catch {
-    return undefined
   }
 }
 
@@ -70,8 +47,69 @@ export type MediaGalleryBlockData = {
   _key?: string
   title?: string
   backgroundVariant?: 'default' | 'muted' | 'dark'
-  layout?: 'grid' | 'carousel' | 'masonry'
+  layout?: 'carousel' | 'thumbnailGallery'
   items?: GalleryItem[]
+}
+
+function hasImageIdentity(image?: GalleryImage) {
+  const ref = image?.asset?._ref?.trim()
+  const id = image?.asset?._id?.trim()
+  return Boolean(ref || id)
+}
+
+function resolveImageSrc({
+  image,
+  width,
+}: {
+  image?: GalleryImage
+  width: number
+}) {
+  if (!image) return undefined
+
+  const directUrl = image.asset?.url?.trim()
+  if (directUrl) return directUrl
+
+  if (!hasImageIdentity(image)) return undefined
+
+  try {
+    return urlFor(image).width(width).fit('max').url()
+  } catch {
+    return undefined
+  }
+}
+
+function resolveGalleryItemPreviewImage(item?: GalleryItem) {
+  if (!item) return undefined
+  return item.type === 'videoUrl' ? item.videoThumbnail : item.image
+}
+
+function resolveGalleryItemPreviewSrc(item: GalleryItem, width: number) {
+  return resolveImageSrc({
+    image: resolveGalleryItemPreviewImage(item),
+    width,
+  })
+}
+
+function resolveGalleryItemAlt(item: GalleryItem) {
+  const image = resolveGalleryItemPreviewImage(item)
+  return image?.alt || item.caption || (item.type === 'videoUrl' ? 'Video thumbnail' : 'Gallery image')
+}
+
+function getGalleryItemDimensions(item: GalleryItem, fallbackWidth: number, fallbackHeight: number) {
+  const image = resolveGalleryItemPreviewImage(item)
+  return {
+    width: image?.asset?.metadata?.dimensions?.width ?? fallbackWidth,
+    height: image?.asset?.metadata?.dimensions?.height ?? fallbackHeight,
+  }
+}
+
+function getGalleryItemBlurDataUrl(item: GalleryItem) {
+  return resolveGalleryItemPreviewImage(item)?.asset?.metadata?.lqip
+}
+
+function getGalleryItemLabel(item: GalleryItem, index: number) {
+  const baseLabel = item.caption?.trim() || (item.type === 'videoUrl' ? 'Video item' : 'Image item')
+  return `${baseLabel} ${index + 1}`
 }
 
 function resolveVideoEmbedSrc(url?: string) {
@@ -151,7 +189,7 @@ function ImageTile({
 
   if (!src || !image) {
     return (
-      <div className="rounded-lg bg-slate-100 border border-slate-200 p-10 text-slate-400 text-sm text-center">
+      <div className="border border-slate-200 bg-slate-100 p-10 text-center text-sm text-slate-400">
         Image unavailable
       </div>
     )
@@ -163,13 +201,13 @@ function ImageTile({
 
   return (
     <figure className="group">
-      <div className="aspect-video bg-slate-800 rounded-lg relative overflow-hidden shadow-xl">
+      <div className="relative aspect-video overflow-hidden bg-slate-800 shadow-xl">
         <Image
           src={src}
           alt={image.alt || caption || 'Gallery image'}
           width={width}
           height={height}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
           placeholder={hasLqip ? 'blur' : 'empty'}
           blurDataURL={image.asset?.metadata?.lqip}
         />
@@ -206,14 +244,14 @@ function VideoTile({
 
   return (
     <button type="button" onClick={() => onOpenVideo(url, caption)} className="group block w-full text-left">
-      <div className="aspect-video bg-slate-800 rounded-lg relative overflow-hidden shadow-xl">
+      <div className="relative aspect-video overflow-hidden bg-slate-800 shadow-xl">
         {thumbnailSrc ? (
           <Image
             src={thumbnailSrc}
             alt={thumbnail?.alt || caption || 'Video thumbnail'}
             width={width}
             height={height}
-            className="w-full h-full object-cover opacity-70 group-hover:scale-105 transition-transform duration-700"
+            className="h-full w-full object-cover opacity-70 transition-transform duration-700 group-hover:scale-105"
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-800 text-slate-200">
@@ -222,14 +260,14 @@ function VideoTile({
         )}
 
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-md flex items-center justify-center group-hover:bg-orange-500 group-hover:scale-110 transition-all text-white">
+          <div className="flex h-16 w-16 items-center justify-center rounded-md bg-white/20 text-white backdrop-blur-md transition-all group-hover:scale-110 group-hover:bg-orange-500">
             <Icon icon="play" className="ml-1 h-6 w-6" />
           </div>
         </div>
       </div>
       {caption && (
         <h5
-          className={`mt-4 text-center font-bold font-display uppercase tracking-widest text-sm ${isDarkBackground ? 'text-slate-100' : 'text-slate-900'}`}
+          className={`mt-4 text-center text-sm font-bold font-display uppercase tracking-widest ${isDarkBackground ? 'text-slate-100' : 'text-slate-900'}`}
         >
           {caption}
         </h5>
@@ -262,17 +300,260 @@ function GalleryTile({
   return <ImageTile image={item.image} caption={item.caption} isDarkBackground={isDarkBackground} />
 }
 
+function ThumbnailGalleryStage({
+  item,
+  onOpenVideo,
+}: {
+  item: GalleryItem
+  onOpenVideo: (url?: string, caption?: string) => void
+}) {
+  const previewSrc = resolveGalleryItemPreviewSrc(item, 1800)
+  const { width, height } = getGalleryItemDimensions(item, 1800, 1200)
+  const blurDataURL = getGalleryItemBlurDataUrl(item)
+  const hasLqip = Boolean(blurDataURL)
+  const isVideo = item.type === 'videoUrl'
+
+  if (!previewSrc) {
+    if (isVideo) {
+      return (
+        <button
+          type="button"
+          onClick={() => onOpenVideo(item.videoUrl, item.caption)}
+          className="group relative block aspect-[4/3] w-full overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-left shadow-[0_24px_80px_-28px_rgba(15,23,42,0.55)] sm:aspect-[16/10]"
+        >
+          <div className="absolute inset-0 flex items-center justify-center text-slate-300">
+            <Icon icon="film" className="h-14 w-14 sm:h-16 sm:w-16" />
+          </div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-md transition-all group-hover:scale-110 group-hover:bg-orange-500 sm:h-20 sm:w-20">
+              <Icon icon="play" className="ml-1 h-6 w-6 sm:h-8 sm:w-8" />
+            </div>
+          </div>
+        </button>
+      )
+    }
+
+    return (
+      <div className="flex aspect-[4/3] w-full items-center justify-center bg-slate-100 text-sm text-slate-400 sm:aspect-[16/10]">
+        Media unavailable
+      </div>
+    )
+  }
+
+  const media = (
+    <>
+      <Image
+        src={previewSrc}
+        alt={resolveGalleryItemAlt(item)}
+        width={width}
+        height={height}
+        className={`h-full w-full object-cover transition-transform duration-700 ${isVideo ? 'opacity-75 group-hover:scale-[1.03]' : 'group-hover:scale-[1.02]'}`}
+        placeholder={hasLqip ? 'blur' : 'empty'}
+        blurDataURL={blurDataURL}
+        sizes="(max-width: 640px) 100vw, (max-width: 1280px) 92vw, 1120px"
+      />
+      {isVideo && (
+        <>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-md transition-all group-hover:scale-110 group-hover:bg-orange-500 sm:h-20 sm:w-20">
+              <Icon icon="play" className="ml-1 h-6 w-6 sm:h-8 sm:w-8" />
+            </div>
+          </div>
+        </>
+      )}
+    </>
+  )
+
+  if (isVideo) {
+    return (
+      <button
+        type="button"
+        onClick={() => onOpenVideo(item.videoUrl, item.caption)}
+        className="group relative block aspect-[4/3] w-full overflow-hidden bg-slate-900 text-left shadow-[0_24px_80px_-28px_rgba(15,23,42,0.55)] sm:aspect-[16/10]"
+      >
+        {media}
+      </button>
+    )
+  }
+
+  return (
+    <div className="group relative aspect-[4/3] w-full overflow-hidden bg-slate-900 shadow-[0_24px_80px_-28px_rgba(15,23,42,0.55)] sm:aspect-[16/10]">
+      {media}
+    </div>
+  )
+}
+
+const ThumbnailGalleryThumb = forwardRef<HTMLButtonElement, {
+  item: GalleryItem
+  index: number
+  isActive: boolean
+  onSelect: () => void
+  isDarkBackground?: boolean
+}>(
+  function ThumbnailGalleryThumb(
+    {
+      item,
+      index,
+      isActive,
+      onSelect,
+      isDarkBackground = false,
+    },
+    ref
+  ) {
+    const previewSrc = resolveGalleryItemPreviewSrc(item, 320)
+    const { width, height } = getGalleryItemDimensions(item, 320, 240)
+    const isVideo = item.type === 'videoUrl'
+    const idleBorder = isDarkBackground ? 'border-white/10 bg-slate-900/70' : 'border-slate-200 bg-white'
+    const activeBorder = isDarkBackground
+      ? 'border-orange-400 ring-2 ring-orange-400/30'
+      : 'border-orange-500 ring-2 ring-orange-500/25'
+
+    return (
+      <button
+        ref={ref}
+        type="button"
+        onClick={onSelect}
+        className={`group relative block w-full overflow-hidden border transition-all duration-300 ${isActive ? activeBorder : idleBorder}`}
+        aria-label={getGalleryItemLabel(item, index)}
+        aria-pressed={isActive}
+      >
+        <div className="relative aspect-[5/4] bg-slate-900">
+          {previewSrc ? (
+            <Image
+              src={previewSrc}
+              alt={resolveGalleryItemAlt(item)}
+              width={width}
+              height={height}
+              className={`h-full w-full object-cover transition duration-300 ${isActive ? 'scale-[1.02]' : 'opacity-80 group-hover:opacity-100 group-hover:scale-105'}`}
+              sizes="(max-width: 640px) 96px, (max-width: 1024px) 120px, 144px"
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center text-slate-300">
+              <Icon icon={isVideo ? 'film' : 'image'} className="h-6 w-6" />
+            </div>
+          )}
+
+          <div className={`absolute inset-0 transition-colors ${isActive ? 'bg-black/10' : 'bg-black/25 group-hover:bg-black/15'}`} />
+
+          {isVideo && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm">
+                <Icon icon="play" className="ml-0.5 h-3.5 w-3.5" />
+              </div>
+            </div>
+          )}
+        </div>
+      </button>
+    )
+  }
+)
+
+ThumbnailGalleryThumb.displayName = 'ThumbnailGalleryThumb'
+
+function ThumbnailGallery({
+  items,
+  isDarkBackground = false,
+  captionClassName,
+  onOpenVideo,
+}: {
+  items: GalleryItem[]
+  isDarkBackground?: boolean
+  captionClassName: string
+  onOpenVideo: (url?: string, caption?: string) => void
+}) {
+  const [mainSwiper, setMainSwiper] = useState<SwiperInstance | null>(null)
+  const [activeIndex, setActiveIndex] = useState(0)
+  const thumbnailRefs = useRef<(HTMLButtonElement | null)[]>([])
+
+  useEffect(() => {
+    if (activeIndex < items.length) return
+    setActiveIndex(0)
+  }, [activeIndex, items.length])
+
+  useEffect(() => {
+    const activeThumbnail = thumbnailRefs.current[activeIndex]
+    if (!activeThumbnail) return
+
+    activeThumbnail.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'nearest',
+    })
+  }, [activeIndex])
+
+  if (items.length === 0) return null
+
+  const activeItem = items[Math.min(activeIndex, items.length - 1)]
+  const desktopTrackClassName =
+    items.length < 5 ? 'lg:justify-center' : 'lg:justify-start'
+
+  return (
+    <div>
+      <Swiper
+        modules={[A11y, Keyboard]}
+        onSwiper={setMainSwiper}
+        slidesPerView={1}
+        speed={500}
+        keyboard={{ enabled: true }}
+        allowTouchMove={items.length > 1}
+        onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
+        a11y={{
+          slideLabelMessage: 'Gallery item {{index}}',
+          prevSlideMessage: 'Previous media item',
+          nextSlideMessage: 'Next media item',
+        }}
+      >
+        {items.map((item, index) => (
+          <SwiperSlide key={item._key ?? `${item.caption}-${index}`}>
+            <ThumbnailGalleryStage item={item} onOpenVideo={onOpenVideo} />
+          </SwiperSlide>
+        ))}
+      </Swiper>
+
+      {activeItem?.caption && (
+        <p className={`mt-5 text-center text-sm font-bold uppercase tracking-[0.24em] sm:text-base ${captionClassName}`}>
+          {activeItem.caption}
+        </p>
+      )}
+
+      {items.length > 1 && (
+        <div className="mt-6 overflow-x-auto pb-2">
+          <div className={`flex min-w-full gap-3 ${desktopTrackClassName}`}>
+            {items.map((item, index) => (
+              <div
+                key={`${item._key ?? item.caption ?? 'thumb'}-${index}`}
+                className="w-[96px] shrink-0 sm:w-[112px] md:w-[136px] lg:w-[calc((100%-48px)/5)]"
+              >
+                <ThumbnailGalleryThumb
+                  ref={(node) => {
+                    thumbnailRefs.current[index] = node
+                  }}
+                  item={item}
+                  index={index}
+                  isActive={index === activeIndex}
+                  onSelect={() => mainSwiper?.slideTo(index)}
+                  isDarkBackground={isDarkBackground}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function MediaGalleryBlock({ block }: { block: MediaGalleryBlockData }) {
   const variant = block.backgroundVariant ?? 'default'
   const theme = getSharedBackgroundTheme(variant)
   const isDark = variant === 'dark'
-  const layout = block.layout ?? 'grid'
+  const layout = block.layout === 'carousel' ? 'carousel' : 'thumbnailGallery'
   const [activeVideo, setActiveVideo] = useState<ActiveVideo | null>(null)
   const items = (block.items ?? []).filter(
     (item) =>
       (item.type === 'videoUrl' && item.videoUrl) ||
-      (item.type !== 'videoUrl' &&
-        Boolean(resolveImageSrc({ image: item.image, width: 1200 })))
+      (item.type !== 'videoUrl' && Boolean(resolveImageSrc({ image: item.image, width: 1200 })))
   )
 
   function openVideo(url?: string, caption?: string) {
@@ -311,7 +592,7 @@ export default function MediaGalleryBlock({ block }: { block: MediaGalleryBlockD
   return (
     <>
       <section className={`py-24 ${theme.section}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {block.title && (
             <SectionHeader
               title={block.title}
@@ -321,22 +602,12 @@ export default function MediaGalleryBlock({ block }: { block: MediaGalleryBlockD
             />
           )}
 
-          {layout === 'grid' && (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {items.map((item, index) => (
-                <div key={item._key ?? `${item.caption}-${index}`}>
-                  <GalleryTile item={item} isDarkBackground={isDark} onOpenVideo={openVideo} />
-                </div>
-              ))}
-            </div>
-          )}
-
           {layout === 'carousel' && (
-            <div className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-2">
+            <div className="flex snap-x snap-mandatory gap-6 overflow-x-auto pb-2">
               {items.map((item, index) => (
                 <div
                   key={item._key ?? `${item.caption}-${index}`}
-                  className="min-w-[280px] md:min-w-[420px] max-w-[500px] snap-start"
+                  className="max-w-[500px] min-w-[280px] snap-start md:min-w-[420px]"
                 >
                   <GalleryTile item={item} isDarkBackground={isDark} onOpenVideo={openVideo} />
                 </div>
@@ -344,17 +615,13 @@ export default function MediaGalleryBlock({ block }: { block: MediaGalleryBlockD
             </div>
           )}
 
-          {layout === 'masonry' && (
-            <div className="columns-1 md:columns-2 lg:columns-3 gap-6 [column-fill:_balance]">
-              {items.map((item, index) => (
-                <div
-                  key={item._key ?? `${item.caption}-${index}`}
-                  className="mb-6 break-inside-avoid"
-                >
-                  <GalleryTile item={item} isDarkBackground={isDark} onOpenVideo={openVideo} />
-                </div>
-              ))}
-            </div>
+          {layout === 'thumbnailGallery' && (
+            <ThumbnailGallery
+              items={items}
+              isDarkBackground={isDark}
+              captionClassName={isDark ? 'text-slate-100' : 'text-slate-700'}
+              onOpenVideo={openVideo}
+            />
           )}
         </div>
       </section>
@@ -370,11 +637,11 @@ export default function MediaGalleryBlock({ block }: { block: MediaGalleryBlockD
           <div className="mx-auto flex h-full w-full max-w-6xl items-center justify-center">
             <div className="w-full" onClick={(event) => event.stopPropagation()}>
               <div className="mb-3 flex items-center justify-between text-white">
-                <h3 className="text-sm md:text-base font-semibold tracking-wide">{activeVideo.title}</h3>
+                <h3 className="text-sm font-semibold tracking-wide md:text-base">{activeVideo.title}</h3>
                 <button
                   type="button"
                   onClick={closeVideo}
-                  className="rounded-md border border-white/30 px-4 py-1.5 text-xs md:text-sm hover:bg-white/15 transition-colors"
+                  className="rounded-md border border-white/30 px-4 py-1.5 text-xs transition-colors hover:bg-white/15 md:text-sm"
                 >
                   Close
                 </button>

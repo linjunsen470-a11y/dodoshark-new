@@ -2,14 +2,13 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useId } from 'react'
-import { A11y, Autoplay, Keyboard, Navigation, Pagination } from 'swiper/modules'
+import { useState } from 'react'
+import { A11y, Keyboard } from 'swiper/modules'
+import type { Swiper as SwiperInstance } from 'swiper'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
 import styles from './ProjectCasesCarousel.module.css'
 import 'swiper/css'
-import 'swiper/css/navigation'
-import 'swiper/css/pagination'
 
 type ProjectCaseItem = {
   title: string
@@ -40,64 +39,76 @@ function ArrowLeftIcon({ className }: { className?: string }) {
 }
 
 export default function ProjectCasesCarousel({ items }: ProjectCasesCarouselProps) {
-  const navigationId = useId().replace(/:/g, '')
-  const prevClass = `project-cases-prev-${navigationId}`
-  const nextClass = `project-cases-next-${navigationId}`
-  const paginationClass = `project-cases-pagination-${navigationId}`
+  const [swiper, setSwiper] = useState<SwiperInstance | null>(null)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [canPrev, setCanPrev] = useState(false)
+  const [canNext, setCanNext] = useState(items.length > 1)
+
+  if (items.length === 0) return null
+
+  function syncControls(instance: SwiperInstance) {
+    setCurrentIndex(instance.realIndex)
+    setCanPrev(!instance.isBeginning)
+    setCanNext(!instance.isEnd)
+  }
 
   return (
-    <div className="relative mt-16">
+    <div className={styles.shell}>
       <Swiper
-        modules={[Autoplay, Navigation, Pagination, Keyboard, A11y]}
+        modules={[Keyboard, A11y]}
         className={styles.carousel}
         slidesPerView={1}
-        loop={items.length > 1}
-        speed={650}
+        spaceBetween={18}
+        speed={550}
         grabCursor
+        watchOverflow
         keyboard={{ enabled: true }}
-        autoplay={{
-          delay: 4500,
-          disableOnInteraction: false,
-          pauseOnMouseEnter: true,
-        }}
-        navigation={{
-          prevEl: `.${prevClass}`,
-          nextEl: `.${nextClass}`,
-          disabledClass: styles.navButtonDisabled,
-        }}
-        pagination={{
-          el: `.${paginationClass}`,
-          clickable: true,
+        breakpoints={{
+          768: {
+            slidesPerView: 2,
+            spaceBetween: 24,
+          },
+          1200: {
+            slidesPerView: 3,
+            spaceBetween: 28,
+          },
         }}
         a11y={{
           prevSlideMessage: 'Previous case',
           nextSlideMessage: 'Next case',
-          paginationBulletMessage: 'Go to case {{index}}',
         }}
+        onSwiper={(instance) => {
+          setSwiper(instance)
+          syncControls(instance)
+        }}
+        onSlideChange={syncControls}
+        onResize={syncControls}
       >
         {items.map((item) => (
           <SwiperSlide key={`${item.title}-${item.logo}`} className={styles.slide}>
             <Link href={item.href} className={styles.cardLink}>
-              <div className={styles.logoBadge}>
-                <Image src={item.logo} alt={`${item.title} logo`} width={144} height={42} className={styles.logoImage} />
+              <div className={styles.imageWrap}>
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  fill
+                  sizes="(max-width: 767px) 100vw, (max-width: 1199px) 50vw, 33vw"
+                  className={styles.image}
+                  priority={false}
+                />
+                {item.logo ? (
+                  <div className={styles.logoBadge}>
+                    <Image src={item.logo} alt={`${item.title} logo`} width={132} height={40} className={styles.logoImage} />
+                  </div>
+                ) : null}
               </div>
-
-              <Image
-                src={item.image}
-                alt={item.title}
-                fill
-                sizes="(max-width: 767px) 100vw, (max-width: 1279px) 100vw, 1120px"
-                className={styles.image}
-                priority={false}
-              />
-              <div className={styles.overlay} />
 
               <div className={styles.content}>
                 <h3 className={styles.title}>{item.title}</h3>
                 <p className={styles.description}>{item.description}</p>
-                <span className={styles.cta}>
-                  View Case Study
-                  <ArrowRightIcon className={styles.arrow} />
+                <span className={styles.inlineCta}>
+                  Read Case Study
+                  <ArrowRightIcon className={styles.inlineArrow} />
                 </span>
               </div>
             </Link>
@@ -106,18 +117,37 @@ export default function ProjectCasesCarousel({ items }: ProjectCasesCarouselProp
       </Swiper>
 
       <div className={styles.footerBar}>
-        <div className={styles.paginationWrap}>
-          <div className={paginationClass} />
+        <div className={styles.footerLead}>
+          <div className={styles.controls}>
+            <button
+              type="button"
+              aria-label="Previous case"
+              className={styles.navButton}
+              disabled={!canPrev}
+              onClick={() => swiper?.slidePrev()}
+            >
+              <ArrowLeftIcon className={styles.navIcon} />
+            </button>
+            <button
+              type="button"
+              aria-label="Next case"
+              className={styles.navButton}
+              disabled={!canNext}
+              onClick={() => swiper?.slideNext()}
+            >
+              <ArrowRightIcon className={styles.navIcon} />
+            </button>
+          </div>
+
+          <p className={styles.mobileCounter} aria-live="polite">
+            {Math.min(currentIndex + 1, items.length)} of {items.length}
+          </p>
         </div>
 
-        <div className={styles.controls}>
-          <button type="button" aria-label="Previous case" className={`${styles.navButton} ${prevClass}`}>
-            <ArrowLeftIcon className={styles.navIcon} />
-          </button>
-          <button type="button" aria-label="Next case" className={`${styles.navButton} ${nextClass}`}>
-            <ArrowRightIcon className={styles.navIcon} />
-          </button>
-        </div>
+        <Link href="/cases" className={styles.footerCta}>
+          View All Cases
+          <ArrowRightIcon className={styles.footerCtaIcon} />
+        </Link>
       </div>
     </div>
   )

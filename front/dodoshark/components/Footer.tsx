@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 
 const contactItems = [
@@ -92,21 +93,6 @@ const socialLinks = [
   },
 ]
 
-function WorldMapArtwork() {
-  return (
-    <svg viewBox="0 0 420 220" className="footer-map-svg" role="img" aria-label="World map showing DoDoShark global presence">
-      <g fill="currentColor">
-        <path d="M42 84c8-12 22-18 39-19 16-1 34 3 49 8 8 3 18 3 25 9 5 5 9 13 7 20-2 6-8 9-11 14-4 8 0 18-4 26-6 12-24 9-36 4-14-7-28-17-40-27-11-8-20-16-29-25-4-4-6-10 0-10Z" />
-        <path d="M128 55c9-8 22-9 34-8 10 1 22 3 29 11 6 7 8 19 0 25-9 6-23 3-34 2-10 0-21 2-29-5-7-6-7-18 0-25Z" />
-        <path d="M184 78c7-6 16-10 25-10 19-2 39 2 57 6 13 3 29 7 38 18 7 8 7 20 0 28-11 14-33 15-49 12-18-3-35-8-52-15-8-3-17-7-22-15-6-8-4-18 3-24Z" />
-        <path d="M228 122c11-6 25-5 37-4 15 2 30 5 43 12 12 7 24 18 23 33-1 14-15 22-27 24-18 3-37-2-52-10-15-7-28-18-34-33-4-9 1-18 10-22Z" />
-        <path d="M292 62c12-7 27-10 41-10 18 0 37 3 52 13 10 6 17 17 15 29-3 15-18 24-31 26-17 3-35-1-50-9-13-6-27-16-31-31-2-8-1-14 4-18Z" />
-        <path d="M316 138c12-2 24 2 35 6 15 7 31 16 40 30 6 9 6 22-2 30-9 10-25 11-38 9-15-3-30-10-42-20-10-8-20-21-17-35 2-10 14-18 24-20Z" />
-      </g>
-    </svg>
-  )
-}
-
 export default function Footer() {
   return (
     <footer className="industrial-footer">
@@ -149,11 +135,14 @@ export default function Footer() {
             <div className="footer-rule" />
 
             <div className="footer-map-wrap" aria-label="Worldwide customer distribution map">
-              <WorldMapArtwork />
-              <span className="footer-map-dot footer-map-dot--1" aria-hidden="true" />
-              <span className="footer-map-dot footer-map-dot--2" aria-hidden="true" />
-              <span className="footer-map-dot footer-map-dot--3" aria-hidden="true" />
-              <span className="footer-map-dot footer-map-dot--4" aria-hidden="true" />
+              <Image
+                src="/assets/images/background/footer-map-image.png"
+                alt="World map showing DoDoShark global presence"
+                width={320}
+                height={156}
+                className="footer-map-image"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
+              />
             </div>
           </section>
 

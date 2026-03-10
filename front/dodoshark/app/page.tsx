@@ -659,12 +659,12 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="bg-white py-20 sm:py-24">
+      <section className="overflow-hidden bg-slate-950 py-20 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h2 className="text-3xl font-bold uppercase tracking-tight text-slate-900 sm:text-4xl md:text-5xl">Project Cases</h2>
-            <div className="mx-auto mt-6 h-1.5 w-20 rounded-full bg-orange-500" />
-            <p className="mt-8 text-base text-slate-500 sm:text-lg">Every Case is a Benchmark for Industrial Excellence.</p>
+            <h2 className="font-display text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">Project Cases</h2>
+            <div className="mx-auto mt-6 h-px w-24 bg-white/15" />
+            <p className="mt-8 text-base text-slate-300 sm:text-lg">Every case is a benchmark for industrial excellence.</p>
           </div>
 
           <ProjectCasesCarousel items={projectCaseItems} />
