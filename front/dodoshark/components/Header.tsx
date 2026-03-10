@@ -81,14 +81,14 @@ export default function Header() {
   return (
     <>
       <div className="hidden border-b border-[#e8e7de] bg-[#f5f5f0]/96 xl:block">
-        <div className="mx-auto flex min-h-[68px] max-w-[1280px] items-center justify-between px-4">
+        <div className="mx-auto flex min-h-[76px] max-w-[1280px] items-center justify-between px-4">
           <Link href="/" className="flex shrink-0 items-center">
             <Image
               src="/assets/images/brand/dodoshark-logo.png"
               alt="DoDoShark"
-              width={180}
-              height={44}
-              className="h-11 w-auto object-contain"
+              width={198}
+              height={48}
+              className="h-16 w-auto object-contain"
               priority
             />
           </Link>
@@ -131,7 +131,7 @@ export default function Header() {
                   alt="DoDoShark"
                   width={156}
                   height={38}
-                  className="h-8 w-auto object-contain"
+                  className="h-12 w-auto object-contain"
                   priority
                 />
               </Link>
@@ -152,7 +152,7 @@ export default function Header() {
                   <Link
                     key={`${item.label}-${item.href}`}
                     href={item.href}
-                    className={`shrink-0 px-1 py-2 text-[13px] font-semibold uppercase tracking-[0.08em] transition-colors ${itemClass}`}
+                    className={`shrink-0 px-1 py-2 text-[13px] font-semibold tracking-[0.08em] transition-colors ${itemClass}`}
                   >
                     {item.label}
                   </Link>

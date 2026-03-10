@@ -104,21 +104,18 @@ const agriProducts = [
   {
     title: 'Iron Hammer Mill',
     description: 'Suitable for grain, corn, and tuber crops, with fineness reaching 10-150 mesh.',
-    series: 'SFSP Series',
     image: '/assets/images/粉碎大分类.png',
     badge: { label: 'Hot', className: 'bg-orange-500' },
   },
   {
     title: 'Wheat Grinder',
     description: 'Handles wheat, corn, and sorghum with efficiency, fineness up to 40-100 mesh.',
-    series: '9FZ Series',
     image: '/assets/images/玉米物料.png',
     badge: { label: 'New', className: 'bg-green-500' },
   },
   {
     title: 'Mixer Machine',
     description: 'For feed, chemical, and building materials. High uniformity with variation coefficient under 5.',
-    series: 'SJHS Series',
     image: '/assets/images/机械大板块.png',
   },
 ]
@@ -127,19 +124,16 @@ const foodProducts = [
   {
     title: 'SUS304 Grinder',
     description: 'For food, herbs, and corrosive materials. Dust-free, fineness up to 10-150 mesh.',
-    series: 'SUS Series',
     image: '/assets/images/玉米物料.png',
   },
   {
     title: 'SUS304 Mixer',
     description: 'Highly uniform mixing for powders and fine particles in food and chemical sectors.',
-    series: 'SLJH Series',
     image: '/assets/images/手动50型.png',
   },
   {
     title: 'Dough Mixer',
     description: 'Fast and durable for large batches, ideal for eateries and food factories.',
-    series: 'PSJ Series',
     image: '/assets/images/出厂严格.png',
   },
 ]
@@ -316,14 +310,6 @@ function ArrowRightIcon({ className }: { className?: string }) {
   )
 }
 
-function PhoneIcon({ className }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M6.624 4.932c.36-.809 1.27-1.233 2.115-.985l1.84.54c.72.212 1.203.88 1.203 1.63 0 .635.071 1.17-.266 1.764l-.829 1.464a.75.75 0 0 0 .073.875 15.108 15.108 0 0 0 3.02 3.02.75.75 0 0 0 .875.073l1.464-.829c.595-.337 1.129-.266 1.764-.266.75 0 1.418.483 1.63 1.203l.54 1.84c.248.845-.176 1.755-.985 2.115l-1.644.73a3.75 3.75 0 0 1-3.178-.01 18.734 18.734 0 0 1-5.866-4.242 18.734 18.734 0 0 1-4.242-5.866 3.75 3.75 0 0 1-.01-3.178l.73-1.644Z" />
-    </svg>
-  )
-}
-
 function PlayIcon({ className }: { className?: string }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
@@ -335,13 +321,11 @@ function PlayIcon({ className }: { className?: string }) {
 function ProductCard({
   title,
   description,
-  series,
   image,
   badge,
 }: {
   title: string
   description: string
-  series: string
   image: string
   badge?: { label: string; className: string }
 }) {
@@ -354,8 +338,7 @@ function ProductCard({
       <div className="p-6">
         <h4 className="text-lg font-bold text-slate-900">{title}</h4>
         <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-500">{description}</p>
-        <div className="mt-5 flex items-center justify-between gap-4">
-          <span className="font-bold text-orange-500">{series}</span>
+        <div className="mt-5 flex items-center justify-end">
           <Link href="/products" className="inline-flex items-center gap-1 text-sm text-slate-400 transition hover:text-orange-500">
             View Details
             <ArrowRightIcon className="h-4 w-4" />
@@ -453,20 +436,13 @@ export default async function HomePage() {
             <p className="mt-4 max-w-lg text-sm leading-7 text-white/65 sm:text-base">
               DoDoShark is dedicated to providing professional crushing, grinding, and mixing solutions, boosting efficiency and product quality for enterprises.
             </p>
-            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+            <div className="mt-8">
               <Link
                 href="#products"
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-[#fbbf24] px-8 py-3 font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-[#f59e0b]"
               >
                 <span>Explore Products</span>
                 <ArrowRightIcon className="h-4 w-4" />
-              </Link>
-              <Link
-                href="#contact"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border-2 border-white/30 px-8 py-3 font-medium text-white transition hover:bg-white hover:text-slate-950"
-              >
-                <span>Contact Us</span>
-                <PhoneIcon className="h-4 w-4" />
               </Link>
             </div>
           </div>
@@ -503,7 +479,7 @@ export default async function HomePage() {
             <div className="mx-auto mb-8 inline-flex h-28 w-28 items-center justify-center rounded-full border border-white/20 bg-white/80 backdrop-blur-md shadow-2xl">
               <Image src="/assets/images/dodoshark-logo-01.png" alt="DoDoShark" width={80} height={80} className="h-16 w-auto object-contain brightness-125" />
             </div>
-            <h2 className="font-display text-3xl font-bold uppercase tracking-[0.08em] text-white sm:text-5xl">About DoDoShark</h2>
+            <h2 className="font-display text-3xl font-bold tracking-[0.08em] text-white sm:text-5xl">About &nbsp;DoDoShark</h2>
             <div className="mx-auto mt-6 h-1.5 w-20 rounded-full bg-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.6)]" />
           </div>
 
@@ -525,7 +501,7 @@ export default async function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-16 grid items-start gap-10 lg:grid-cols-2 lg:gap-12">
             <div className="pt-2 sm:pt-8">
-              <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl lg:text-5xl">Choose DoDoShark = Choose Confidence</h2>
+              <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl lg:text-5xl"><span>Choose DodoShark</span><br/><span>Choose Confidence</span></h2>
               <div className="mt-7 h-1 w-16 bg-[#f5a623]" />
               <p className="mt-8 text-base leading-8 text-slate-600 sm:text-lg">
                 DoDoShark practices &quot;Carefree Production, Joyful Harvest&quot; through innovation and high quality.
@@ -662,19 +638,22 @@ export default async function HomePage() {
         </div>
 
         <div className="mx-auto max-w-6xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
-          <div className="rounded-lg bg-white p-6 shadow-lg sm:p-8 md:p-12">
-            <h3 className="text-center text-2xl font-bold text-slate-900 md:text-3xl">Efficient Mixing Solutions</h3>
-            <p className="mt-4 text-center text-slate-600">Handling powders, granules, and compound fertilizers.</p>
-            <div className="mt-10 grid gap-8 md:grid-cols-2 xl:grid-cols-3">
-              {mixingSolutions.map((item) => (
-                <SolutionCard key={item.title} {...item} />
-              ))}
+          <div className="rounded-lg bg-white shadow-lg">
+            <div className="border-b border-slate-200 py-8 text-center">
+              <h3 className="text-2xl font-bold text-slate-900 md:text-3xl">Efficient Mixing Solutions</h3>
             </div>
-            <div className="mt-10 text-center">
-              <Link href="/solutions" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#fbbf24] px-8 py-3 font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-[#f59e0b] sm:w-auto">
-                View More
-                <ArrowRightIcon className="h-4 w-4" />
-              </Link>
+            <div className="p-6 sm:p-8 md:p-12">
+              <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+                {mixingSolutions.map((item) => (
+                  <SolutionCard key={item.title} {...item} />
+                ))}
+              </div>
+              <div className="mt-10 text-center">
+                <Link href="/solutions" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#fbbf24] px-8 py-3 font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-[#f59e0b] sm:w-auto">
+                  View More
+                  <ArrowRightIcon className="h-4 w-4" />
+                </Link>
+              </div>
             </div>
           </div>
         </div>

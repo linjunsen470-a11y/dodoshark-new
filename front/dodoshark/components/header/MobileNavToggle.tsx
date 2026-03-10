@@ -84,7 +84,7 @@ export default function MobileNavToggle({ navItems, ctaHref, ctaLabel }: MobileN
                 <Link
                   key={`mobile-${item.label}-${item.href}`}
                   href={item.href}
-                  className="rounded-xl px-4 py-3 text-sm font-semibold uppercase tracking-[0.05em] text-[#1e3a5f] transition hover:bg-[#ece7dc] hover:text-[#102643]"
+                  className="rounded-xl px-4 py-3 text-sm font-semibold tracking-[0.05em] text-[#1e3a5f] transition hover:bg-[#ece7dc] hover:text-[#102643]"
                   onClick={() => setMobileOpen(false)}
                 >
                   {item.label}
