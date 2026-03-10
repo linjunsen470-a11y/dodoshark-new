@@ -82,7 +82,7 @@ export default function TableBlock({ block }: { block: TableBlockData }) {
                       {headerCells.map((cell, idx) => (
                         <th
                           key={idx}
-                          className="px-5 py-4 text-center text-xs md:text-sm font-black uppercase tracking-wider whitespace-nowrap"
+                          className="px-5 py-4 text-center text-xs md:text-sm font-black tracking-wider whitespace-nowrap"
                         >
                           {cell || '-'}
                         </th>
