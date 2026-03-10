@@ -12,6 +12,7 @@ import HeroBlock, { type HeroBlockData } from '@/components/page-builder/HeroBlo
 import MediaGalleryBlock, {
   type MediaGalleryBlockData,
 } from '@/components/page-builder/MediaGalleryBlock'
+import MergedRichFeatureSection from '@/components/page-builder/MergedRichFeatureSection'
 import MachineSelectorBlock, {
   type MachineSelectorBlockData,
 } from '@/components/page-builder/MachineSelectorBlock'
@@ -24,7 +25,10 @@ import RichSectionBlock, {
 } from '@/components/page-builder/RichSectionBlock'
 import TableBlock, { type TableBlockData } from '@/components/page-builder/TableBlock'
 import Icon from '@/components/ui/Icon'
-import { mapFeatureBackgroundStyleToVariant } from '@/components/page-builder/backgroundTheme'
+import {
+  groupPageBuilderBlocks,
+  type PageBuilderRenderGroup,
+} from '@/components/page-builder/richFeatureMerge'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -124,30 +128,6 @@ function splitTitle(title?: string) {
     head: parts.slice(0, middle).join(' '),
     tail: parts.slice(middle).join(' '),
   }
-}
-
-function hasFeatureListHeader(block: FeatureListBlockData) {
-  return Boolean(block.title?.trim())
-}
-
-function shouldMergeRichAndFeature(
-  richBlock?: SolutionBlock,
-  featureBlock?: SolutionBlock,
-) {
-  if (richBlock?._type !== 'richSectionBlock' || featureBlock?._type !== 'featureListBlock') {
-    return false
-  }
-
-  const rich = richBlock as RichSectionBlockData
-  const feature = featureBlock as FeatureListBlockData
-
-  if (!feature.mergeWithPreviousRichSection) {
-    return false
-  }
-
-  const richVariant = rich.backgroundVariant ?? 'default'
-  const featureVariant = mapFeatureBackgroundStyleToVariant(feature.backgroundStyle ?? 'white')
-  return richVariant === featureVariant
 }
 
 async function getSolution(slug: string) {
@@ -399,6 +379,172 @@ function toImageSrc(
   }
 }
 
+function renderSolutionGroup(group: PageBuilderRenderGroup<SolutionBlock>) {
+  if (group.kind === 'mergedRichFeature') {
+    return (
+      <MergedRichFeatureSection
+        key={group.key}
+        richBlock={group.richBlock}
+        featureBlock={group.featureBlock}
+      />
+    )
+  }
+
+  const { block, key } = group
+
+  if (block._type === 'heroBlock') {
+    return <HeroBlock key={key} block={block} />
+  }
+
+  if (block._type === 'richSectionBlock') {
+    return <RichSectionBlock key={key} block={block} />
+  }
+
+  if (block._type === 'featureListBlock') {
+    return <FeatureListBlock key={key} block={block} />
+  }
+
+  if (block._type === 'mediaGalleryBlock') {
+    return <MediaGalleryBlock key={key} block={block} />
+  }
+
+  if (block._type === 'machineSelectorBlock') {
+    return <MachineSelectorBlock key={key} block={block} />
+  }
+
+  if (block._type === 'cardGridBlock') {
+    return <CardGridBlock key={key} block={block} />
+  }
+
+  if (block._type === 'tableBlock') {
+    return <TableBlock key={key} block={block} />
+  }
+
+  if (block._type === 'metricsBlock') {
+    return <MetricsBlock key={key} block={block} />
+  }
+
+  if (block._type === 'ctaBlock') {
+    return <CtaBlock key={key} block={block} />
+  }
+
+  if (block._type === 'portableTextBlock') {
+    return <PortableTextBlock key={key} block={block} />
+  }
+
+  if (block._type === 'collectionReferenceBlock') {
+    return <CollectionReferenceBlock key={key} block={block} />
+  }
+
+  if (block._type !== 'featureGridBlock' && block._type !== 'videoGalleryBlock') {
+    return null
+  }
+
+  return (
+    <section key={key} className="py-24 bg-white text-slate-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {block._type === 'featureGridBlock' && (
+          <div>
+            {block.title && (
+              <h2 className="text-3xl font-display font-black mb-12 text-center section-title relative inline-block uppercase tracking-tight left-1/2 -translate-x-1/2">
+                {block.title}
+              </h2>
+            )}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {block.items?.map((item: FeatureGridItem, itemIdx: number) => {
+                const featureImageSrc = toImageSrc(item.image, 800, {
+                  height: 500,
+                  fit: 'crop',
+                })
+
+                return (
+                  <div
+                    key={item._key ?? itemIdx}
+                    className="bg-slate-50 rounded-lg p-8 premium-card"
+                  >
+                    <div className="w-14 h-14 rounded-lg bg-orange-50 text-orange-600 border border-orange-100 flex items-center justify-center mb-6">
+                      <Icon icon={item.icon?.trim() || 'gear'} className="h-5 w-5" />
+                    </div>
+                    {featureImageSrc && (
+                      <div className="h-48 rounded-lg overflow-hidden mb-6 bg-white">
+                        <Image
+                          src={featureImageSrc}
+                          alt={item.image?.alt || item.title || 'Feature image'}
+                          width={800}
+                          height={500}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+                    {item.title && (
+                      <h3 className="text-xl font-display font-black mb-3">{item.title}</h3>
+                    )}
+                    {item.description && (
+                      <p className="text-slate-500 text-sm leading-relaxed">
+                        {item.description}
+                      </p>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {block._type === 'videoGalleryBlock' && (
+          <div>
+            {block.title && (
+              <h2 className="text-3xl font-display font-black mb-12 text-center section-title relative inline-block uppercase tracking-tight left-1/2 -translate-x-1/2">
+                {block.title}
+              </h2>
+            )}
+            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+              {block.videos?.map((video: VideoItem, videoIdx: number) => {
+                const videoThumbnailSrc = toImageSrc(video.thumbnail, 1280, {
+                  height: 720,
+                  fit: 'crop',
+                })
+
+                return (
+                  <a
+                    key={video._key ?? videoIdx}
+                    href={video.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group block"
+                  >
+                    <div className="aspect-video bg-slate-800 rounded-lg relative overflow-hidden mb-4 shadow-xl">
+                      {videoThumbnailSrc && (
+                        <Image
+                          src={videoThumbnailSrc}
+                          alt={video.thumbnail?.alt || video.title || 'Video thumbnail'}
+                          fill
+                          sizes="(min-width: 1024px) 50vw, 100vw"
+                          className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700"
+                        />
+                      )}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-md flex items-center justify-center group-hover:bg-orange-500 group-hover:scale-110 transition-all text-white">
+                          <Icon icon="play" className="ml-1 h-5 w-5" />
+                        </div>
+                      </div>
+                    </div>
+                    {video.title && (
+                      <h5 className="text-center font-bold font-display uppercase tracking-widest text-sm">
+                        {video.title}
+                      </h5>
+                    )}
+                  </a>
+                )
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
 export default async function SolutionPage({ params }: SolutionPageProps) {
   const { slug } = await params
   const solution = await getSolution(slug)
@@ -407,6 +553,8 @@ export default async function SolutionPage({ params }: SolutionPageProps) {
     notFound()
   }
 
+  const contentBlocks = (solution.contentBlocks ?? []).filter(Boolean)
+  const renderGroups = groupPageBuilderBlocks(contentBlocks)
   const hasBuilderHero = solution.contentBlocks?.some((block) => block?._type === 'heroBlock')
   const titleParts = splitTitle(solution.title)
   const heroImageSrc = toImageSrc(solution.heroImage, 1800, { height: 1200, fit: 'crop' })
@@ -477,178 +625,7 @@ export default async function SolutionPage({ params }: SolutionPageProps) {
         </section>
       )}
 
-      <div id="solution-content">
-        {solution.contentBlocks?.map((block: SolutionBlock, idx: number) => {
-          const prevBlock = idx > 0 ? solution.contentBlocks?.[idx - 1] : undefined
-          const nextBlock = solution.contentBlocks?.[idx + 1]
-          const seamlessToNext = shouldMergeRichAndFeature(block, nextBlock)
-          const seamlessFromPrev = shouldMergeRichAndFeature(prevBlock, block)
-
-          if (block._type === 'heroBlock') {
-            return <HeroBlock key={block._key ?? idx} block={block} />
-          }
-
-          if (block._type === 'richSectionBlock') {
-            return (
-              <RichSectionBlock
-                key={block._key ?? idx}
-                block={block}
-                seamlessToNext={seamlessToNext}
-              />
-            )
-          }
-
-          if (block._type === 'featureListBlock') {
-            return (
-              <FeatureListBlock
-                key={block._key ?? idx}
-                block={block}
-                seamlessFromPrev={seamlessFromPrev}
-              />
-            )
-          }
-
-          if (block._type === 'mediaGalleryBlock') {
-            return <MediaGalleryBlock key={block._key ?? idx} block={block} />
-          }
-
-          if (block._type === 'machineSelectorBlock') {
-            return <MachineSelectorBlock key={block._key ?? idx} block={block} />
-          }
-
-          if (block._type === 'cardGridBlock') {
-            return <CardGridBlock key={block._key ?? idx} block={block} />
-          }
-
-          if (block._type === 'tableBlock') {
-            return <TableBlock key={block._key ?? idx} block={block} />
-          }
-
-          if (block._type === 'metricsBlock') {
-            return <MetricsBlock key={block._key ?? idx} block={block} />
-          }
-
-          if (block._type === 'ctaBlock') {
-            return <CtaBlock key={block._key ?? idx} block={block} />
-          }
-
-          if (block._type === 'portableTextBlock') {
-            return <PortableTextBlock key={block._key ?? idx} block={block} />
-          }
-
-          if (block._type === 'collectionReferenceBlock') {
-            return <CollectionReferenceBlock key={block._key ?? idx} block={block} />
-          }
-
-          if (block._type !== 'featureGridBlock' && block._type !== 'videoGalleryBlock') {
-            return null
-          }
-
-          return (
-            <section key={block._key ?? idx} className="py-24 bg-white text-slate-900">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {block._type === 'featureGridBlock' && (
-                  <div>
-                    {block.title && (
-                      <h2 className="text-3xl font-display font-black mb-12 text-center section-title relative inline-block uppercase tracking-tight left-1/2 -translate-x-1/2">
-                        {block.title}
-                      </h2>
-                    )}
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                      {block.items?.map((item: FeatureGridItem, itemIdx: number) => {
-                        const featureImageSrc = toImageSrc(item.image, 800, {
-                          height: 500,
-                          fit: 'crop',
-                        })
-
-                        return (
-                          <div
-                            key={item._key ?? itemIdx}
-                            className="bg-slate-50 rounded-lg p-8 premium-card"
-                          >
-                            <div className="w-14 h-14 rounded-lg bg-orange-50 text-orange-600 border border-orange-100 flex items-center justify-center mb-6">
-                              <Icon icon={item.icon?.trim() || 'gear'} className="h-5 w-5" />
-                            </div>
-                            {featureImageSrc && (
-                              <div className="h-48 rounded-lg overflow-hidden mb-6 bg-white">
-                                <Image
-                                  src={featureImageSrc}
-                                  alt={item.image?.alt || item.title || 'Feature image'}
-                                  width={800}
-                                  height={500}
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                            )}
-                            {item.title && (
-                              <h3 className="text-xl font-display font-black mb-3">{item.title}</h3>
-                            )}
-                            {item.description && (
-                              <p className="text-slate-500 text-sm leading-relaxed">
-                                {item.description}
-                              </p>
-                            )}
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {block._type === 'videoGalleryBlock' && (
-                  <div>
-                    {block.title && (
-                      <h2 className="text-3xl font-display font-black mb-12 text-center section-title relative inline-block uppercase tracking-tight left-1/2 -translate-x-1/2">
-                        {block.title}
-                      </h2>
-                    )}
-                    <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-                      {block.videos?.map((video: VideoItem, videoIdx: number) => {
-                        const videoThumbnailSrc = toImageSrc(video.thumbnail, 1280, {
-                          height: 720,
-                          fit: 'crop',
-                        })
-
-                        return (
-                          <a
-                            key={video._key ?? videoIdx}
-                            href={video.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="group block"
-                          >
-                            <div className="aspect-video bg-slate-800 rounded-lg relative overflow-hidden mb-4 shadow-xl">
-                              {videoThumbnailSrc && (
-                                <Image
-                                  src={videoThumbnailSrc}
-                                  alt={video.thumbnail?.alt || video.title || 'Video thumbnail'}
-                                  fill
-                                  sizes="(min-width: 1024px) 50vw, 100vw"
-                                  className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700"
-                                />
-                              )}
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-md flex items-center justify-center group-hover:bg-orange-500 group-hover:scale-110 transition-all text-white">
-                                  <Icon icon="play" className="ml-1 h-5 w-5" />
-                                </div>
-                              </div>
-                            </div>
-                            {video.title && (
-                              <h5 className="text-center font-bold font-display uppercase tracking-widest text-sm">
-                                {video.title}
-                              </h5>
-                            )}
-                          </a>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </section>
-          )
-        })}
-      </div>
+      <div id="solution-content">{renderGroups.map((group) => renderSolutionGroup(group))}</div>
     </div>
   )
 }

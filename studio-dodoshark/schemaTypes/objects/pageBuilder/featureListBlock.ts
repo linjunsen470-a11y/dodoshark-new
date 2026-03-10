@@ -12,7 +12,7 @@ export default defineType({
       type: 'boolean',
       initialValue: false,
       description:
-        'Enable when this feature list should visually continue the previous rich section.',
+        'Enable only when the immediately previous block is a Rich Section and both blocks use the same background style.',
     }),
     defineField({
       name: 'title',

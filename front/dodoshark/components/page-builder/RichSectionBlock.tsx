@@ -59,6 +59,14 @@ export type RichSectionBlockData = {
   anchorId?: string
 }
 
+export function hasRichSectionContent(block: RichSectionBlockData) {
+  const hasMedia = Boolean(block.media?.asset)
+  const hasBody = Boolean(block.body?.length)
+  const hasSubtitle = Boolean(block.subtitle?.trim())
+
+  return Boolean(block.heading || hasSubtitle || hasBody || hasMedia)
+}
+
 function getPortableTextComponents(isDark: boolean): PortableTextComponents {
   const textColor = isDark ? 'text-slate-300' : 'text-slate-600'
   const headingColor = isDark ? 'text-white' : 'text-slate-900'
@@ -168,13 +176,17 @@ function MediaFigure({
 
 type RichSectionBlockProps = {
   block: RichSectionBlockData
-  seamlessToNext?: boolean
 }
 
-export default function RichSectionBlock({
+type RichSectionBlockContentProps = {
+  block: RichSectionBlockData
+  trimTrailingContentSpacing?: boolean
+}
+
+export function RichSectionBlockContent({
   block,
-  seamlessToNext = false,
-}: RichSectionBlockProps) {
+  trimTrailingContentSpacing = false,
+}: RichSectionBlockContentProps) {
   const layout = block.layout === 'mediaLeftTextRight' ? 'mediaLeftTextRight' : 'textLeftMediaRight'
   const variant = block.backgroundVariant ?? 'default'
   const theme = getSharedBackgroundTheme(variant)
@@ -182,9 +194,8 @@ export default function RichSectionBlock({
   const hasMedia = Boolean(block.media?.asset)
   const hasBody = Boolean(block.body?.length)
   const hasSubtitle = Boolean(block.subtitle?.trim())
-  const anchorId = block.anchorId?.trim() || undefined
 
-  if (!block.heading && !hasSubtitle && !hasBody && !hasMedia) return null
+  if (!hasRichSectionContent(block)) return null
 
   const headingClass = theme.heading
   const subtitleClass = theme.subtitle
@@ -194,50 +205,60 @@ export default function RichSectionBlock({
     layout === 'mediaLeftTextRight' ? 'lg:order-2' : 'lg:order-1'
   const mediaOrderClass =
     layout === 'mediaLeftTextRight' ? 'lg:order-1' : 'lg:order-2'
-  const bodyClass = seamlessToNext
-    ? 'max-w-[36rem] [&_blockquote:last-child]:mb-0 [&_ol:last-child]:mb-0 [&_p:last-child]:mb-0 [&_ul:last-child]:mb-0'
+  const bodyClass = trimTrailingContentSpacing
+    ? 'max-w-[36rem] [&_blockquote:last-child]:mb-0 [&_h2:last-child]:mb-0 [&_h3:last-child]:mb-0 [&_ol:last-child]:mb-0 [&_p:last-child]:mb-0 [&_ul:last-child]:mb-0'
     : 'max-w-[36rem]'
 
-  const sectionSpacingClass = seamlessToNext ? 'pt-24 pb-4 md:pb-6' : 'py-24'
-
   return (
-    <section id={anchorId} className={`${sectionSpacingClass} ${theme.section}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={layoutClass}>
-          <div className={`${textOrderClass} max-w-[36rem]`}>
-            {(block.heading || hasSubtitle) && (
-              <SectionHeader
-                title={block.heading}
-                subtitle={hasSubtitle ? block.subtitle : undefined}
-                isDark={isDark}
-                align="left"
-                className="mb-8 max-w-[36rem]"
-                titleClassName={`text-3xl font-display font-extrabold leading-[1.05] tracking-[-0.02em] md:text-[2.5rem] ${headingClass}`}
-                subtitleClassName={`max-w-[34rem] text-[0.98rem] font-normal leading-7 md:text-base ${subtitleClass}`}
-              />
-            )}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className={layoutClass}>
+        <div className={`${textOrderClass} max-w-[36rem]`}>
+          {(block.heading || hasSubtitle) && (
+            <SectionHeader
+              title={block.heading}
+              subtitle={hasSubtitle ? block.subtitle : undefined}
+              isDark={isDark}
+              align="left"
+              className="mb-8 max-w-[36rem]"
+              titleClassName={`text-3xl font-display font-extrabold leading-[1.05] tracking-[-0.02em] md:text-[2.5rem] ${headingClass}`}
+              subtitleClassName={`max-w-[34rem] text-[0.98rem] font-normal leading-7 md:text-base ${subtitleClass}`}
+            />
+          )}
 
-            {hasBody && (
-              <div className={bodyClass}>
-                <PortableText
-                  value={block.body as PortableTextBlock[]}
-                  components={getPortableTextComponents(isDark)}
-                />
-              </div>
-            )}
-          </div>
-
-          {hasMedia && (
-            <div className={mediaOrderClass}>
-              <MediaFigure
-                media={block.media}
-                title={block.heading}
-                disableMediaFrameEffect={block.disableMediaFrameEffect}
+          {hasBody && (
+            <div className={bodyClass}>
+              <PortableText
+                value={block.body as PortableTextBlock[]}
+                components={getPortableTextComponents(isDark)}
               />
             </div>
           )}
         </div>
+
+        {hasMedia && (
+          <div className={mediaOrderClass}>
+            <MediaFigure
+              media={block.media}
+              title={block.heading}
+              disableMediaFrameEffect={block.disableMediaFrameEffect}
+            />
+          </div>
+        )}
       </div>
+    </div>
+  )
+}
+
+export default function RichSectionBlock({ block }: RichSectionBlockProps) {
+  if (!hasRichSectionContent(block)) return null
+
+  const variant = block.backgroundVariant ?? 'default'
+  const theme = getSharedBackgroundTheme(variant)
+  const anchorId = block.anchorId?.trim() || undefined
+
+  return (
+    <section id={anchorId} className={`py-24 ${theme.section}`}>
+      <RichSectionBlockContent block={block} />
     </section>
   )
 }

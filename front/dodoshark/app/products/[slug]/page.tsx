@@ -14,6 +14,7 @@ import HeroBlock, { type HeroBlockData } from '@/components/page-builder/HeroBlo
 import MediaGalleryBlock, {
   type MediaGalleryBlockData,
 } from '@/components/page-builder/MediaGalleryBlock'
+import MergedRichFeatureSection from '@/components/page-builder/MergedRichFeatureSection'
 import MachineSelectorBlock, {
   type MachineSelectorBlockData,
 } from '@/components/page-builder/MachineSelectorBlock'
@@ -25,7 +26,10 @@ import RichSectionBlock, {
   type RichSectionBlockData,
 } from '@/components/page-builder/RichSectionBlock'
 import TableBlock, { type TableBlockData } from '@/components/page-builder/TableBlock'
-import { mapFeatureBackgroundStyleToVariant } from '@/components/page-builder/backgroundTheme'
+import {
+  groupPageBuilderBlocks,
+  type PageBuilderRenderGroup,
+} from '@/components/page-builder/richFeatureMerge'
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>
@@ -344,30 +348,6 @@ function toImageSrc(image?: SanityImage, width = 1200) {
   }
 }
 
-function hasFeatureListHeader(block: FeatureListBlockData) {
-  return Boolean(block.title?.trim())
-}
-
-function shouldMergeRichAndFeature(
-  richBlock?: ProductBlock,
-  featureBlock?: ProductBlock,
-) {
-  if (richBlock?._type !== 'richSectionBlock' || featureBlock?._type !== 'featureListBlock') {
-    return false
-  }
-
-  const rich = richBlock as RichSectionBlockData
-  const feature = featureBlock as FeatureListBlockData
-
-  if (!feature.mergeWithPreviousRichSection) {
-    return false
-  }
-
-  const richVariant = rich.backgroundVariant ?? 'default'
-  const featureVariant = mapFeatureBackgroundStyleToVariant(feature.backgroundStyle ?? 'white')
-  return richVariant === featureVariant
-}
-
 function renderLegacyFeatureGrid(block: FeatureGridBlockData, key: string | number) {
   return (
     <section key={key} className="py-24 bg-white text-slate-900">
@@ -450,32 +430,26 @@ function renderLegacyVideoGallery(block: VideoGalleryBlockData, key: string | nu
   )
 }
 
-function renderPageBuilderBlock(block: ProductBlock, idx: number, blocks: ProductBlock[]) {
-  const key = (block as { _key?: string })._key ?? idx
-  const prevBlock = idx > 0 ? blocks[idx - 1] : undefined
-  const nextBlock = idx < blocks.length - 1 ? blocks[idx + 1] : undefined
-  const seamlessToNext = shouldMergeRichAndFeature(block, nextBlock)
-  const seamlessFromPrev = shouldMergeRichAndFeature(prevBlock, block)
+function renderPageBuilderGroup(group: PageBuilderRenderGroup<ProductBlock>) {
+  if (group.kind === 'mergedRichFeature') {
+    return (
+      <MergedRichFeatureSection
+        key={group.key}
+        richBlock={group.richBlock}
+        featureBlock={group.featureBlock}
+      />
+    )
+  }
+
+  const { block, key } = group
 
   switch (block._type) {
     case 'heroBlock':
       return <HeroBlock key={key} block={block as HeroBlockData} />
     case 'richSectionBlock':
-      return (
-        <RichSectionBlock
-          key={key}
-          block={block as RichSectionBlockData}
-          seamlessToNext={seamlessToNext}
-        />
-      )
+      return <RichSectionBlock key={key} block={block as RichSectionBlockData} />
     case 'featureListBlock':
-      return (
-        <FeatureListBlock
-          key={key}
-          block={block as FeatureListBlockData}
-          seamlessFromPrev={seamlessFromPrev}
-        />
-      )
+      return <FeatureListBlock key={key} block={block as FeatureListBlockData} />
     case 'mediaGalleryBlock':
       return <MediaGalleryBlock key={key} block={block as MediaGalleryBlockData} />
     case 'machineSelectorBlock':
@@ -517,6 +491,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   }
 
   const blocks = (product.contentBlocks ?? []).filter(Boolean)
+  const renderGroups = groupPageBuilderBlocks(blocks)
   const hasBuilderHero = blocks.some((block) => block._type === 'heroBlock')
   const mainImageSrc = toImageSrc(product.mainImage, 1200)
 
@@ -558,7 +533,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </section>
       )}
 
-      {blocks.map((block, idx) => renderPageBuilderBlock(block, idx, blocks))}
+      {renderGroups.map((group) => renderPageBuilderGroup(group))}
     </div>
   )
 }
