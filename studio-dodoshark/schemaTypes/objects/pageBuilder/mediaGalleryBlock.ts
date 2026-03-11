@@ -18,6 +18,7 @@ export default defineType({
         list: [
           { title: 'Carousel', value: 'carousel' },
           { title: 'Thumbnail Gallery', value: 'thumbnailGallery' },
+          { title: 'Video Card Carousel', value: 'videoCardCarousel' },
         ],
         layout: 'radio',
       },
@@ -37,6 +38,25 @@ export default defineType({
       },
       initialValue: 'default',
       validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'cta',
+      title: 'Section CTA',
+      type: 'object',
+      fields: [
+        defineField({
+          name: 'label',
+          title: 'Button Label',
+          type: 'string',
+        }),
+        defineField({
+          name: 'href',
+          title: 'Button Link',
+          type: 'url',
+          validation: (rule) =>
+            rule.uri({ allowRelative: true, scheme: ['http', 'https', 'mailto', 'tel'] }),
+        }),
+      ],
     }),
     defineField({
       name: 'items',
@@ -81,8 +101,15 @@ export default defineType({
               type: 'image',
               hidden: ({ parent }) => parent?.type !== 'videoUrl',
               options: { hotspot: true },
+              description: 'Optional. In Video Card Carousel, a blank value falls back to the default YouTube preview when the video URL is a YouTube link.',
             }),
             defineField({ name: 'caption', title: 'Caption', type: 'string' }),
+            defineField({
+              name: 'metaText',
+              title: 'Meta Text',
+              type: 'string',
+              description: 'Secondary text shown under the card title in video card carousel layout.',
+            }),
           ],
           preview: {
             select: {

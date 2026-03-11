@@ -22,6 +22,10 @@ export type TableBlockData = {
   note?: string
 }
 
+type ParsedCellBlock =
+  | { type: 'paragraph'; lines: string[] }
+  | { type: 'list'; items: string[] }
+
 function normalizeRows(rows: TableRow[]) {
   const maxCols = rows.reduce((max, row) => {
     return Math.max(max, row.cells?.length ?? 0)
@@ -40,6 +44,153 @@ function normalizeRows(rows: TableRow[]) {
 function extractRows(table?: TableValue | TableRow[]) {
   if (Array.isArray(table)) return table
   return table?.rows ?? []
+}
+
+function decodeEscapedText(value: string) {
+  const escapedBackslashToken = '__TABLE_ESCAPED_BACKSLASH__'
+
+  return value
+    .replace(/\\\\/g, escapedBackslashToken)
+    .replace(/\\n/g, '\n')
+    .replaceAll(escapedBackslashToken, '\\')
+}
+
+function normalizeCellLines(value: string) {
+  return decodeEscapedText(value).split('\n')
+}
+
+function getListItemValue(line: string) {
+  const trimmed = line.trim()
+
+  if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+    return trimmed.slice(2).trim()
+  }
+
+  if (trimmed.startsWith('• ')) {
+    return trimmed.slice(2).trim()
+  }
+
+  return null
+}
+
+function parseCellContent(value: string) {
+  const lines = normalizeCellLines(value)
+  const blocks: ParsedCellBlock[] = []
+  let paragraphLines: string[] = []
+  let listItems: string[] = []
+
+  function flushParagraph() {
+    const cleaned = paragraphLines.map((line) => line.trim()).filter(Boolean)
+    if (cleaned.length > 0) {
+      blocks.push({ type: 'paragraph', lines: cleaned })
+    }
+    paragraphLines = []
+  }
+
+  function flushList() {
+    const cleaned = listItems.map((item) => item.trim()).filter(Boolean)
+    if (cleaned.length > 0) {
+      blocks.push({ type: 'list', items: cleaned })
+    }
+    listItems = []
+  }
+
+  for (const line of lines) {
+    const listValue = getListItemValue(line)
+
+    if (!line.trim()) {
+      flushParagraph()
+      flushList()
+      continue
+    }
+
+    if (listValue !== null) {
+      flushParagraph()
+      listItems.push(listValue)
+      continue
+    }
+
+    flushList()
+    paragraphLines.push(line)
+  }
+
+  flushParagraph()
+  flushList()
+
+  return {
+    decoded: decodeEscapedText(value),
+    blocks,
+    hasList: blocks.some((block) => block.type === 'list'),
+  }
+}
+
+function renderCellContent(value: string | undefined, context: 'header' | 'body') {
+  const rawValue = value ?? ''
+
+  if (!rawValue.trim()) {
+    return '-'
+  }
+
+  if (context === 'header') {
+    const lines = normalizeCellLines(rawValue)
+      .map((line) => line.trim())
+      .filter(Boolean)
+
+    if (lines.length <= 1) {
+      return lines[0] ?? '-'
+    }
+
+    return (
+      <div className="flex flex-col items-center justify-center gap-1 whitespace-normal">
+        {lines.map((line, index) => (
+          <span key={`${line}-${index}`} className="block">
+            {line}
+          </span>
+        ))}
+      </div>
+    )
+  }
+
+  const parsed = parseCellContent(rawValue)
+
+  if (parsed.blocks.length === 0) {
+    return parsed.decoded || '-'
+  }
+
+  if (parsed.blocks.length === 1 && parsed.blocks[0]?.type === 'paragraph' && parsed.blocks[0].lines.length === 1) {
+    return parsed.blocks[0].lines[0]
+  }
+
+  const bodyAlignClass = parsed.hasList ? 'items-start text-left' : 'items-center text-center'
+
+  return (
+    <div className={`flex flex-col gap-2 ${bodyAlignClass}`}>
+      {parsed.blocks.map((block, blockIndex) => {
+        if (block.type === 'list') {
+          return (
+            <ul
+              key={`list-${blockIndex}`}
+              className="ml-4 list-disc space-y-1 text-left"
+            >
+              {block.items.map((item, itemIndex) => (
+                <li key={`${item}-${itemIndex}`}>{item}</li>
+              ))}
+            </ul>
+          )
+        }
+
+        return (
+          <div key={`paragraph-${blockIndex}`} className="flex flex-col gap-1">
+            {block.lines.map((line, lineIndex) => (
+              <span key={`${line}-${lineIndex}`} className="block">
+                {line}
+              </span>
+            ))}
+          </div>
+        )
+      })}
+    </div>
+  )
 }
 
 export default function TableBlock({ block }: { block: TableBlockData }) {
@@ -82,9 +233,9 @@ export default function TableBlock({ block }: { block: TableBlockData }) {
                       {headerCells.map((cell, idx) => (
                         <th
                           key={idx}
-                          className="px-5 py-4 text-center text-xs md:text-sm font-black tracking-wider whitespace-nowrap"
+                          className="px-5 py-4 text-center text-xs font-black tracking-wider align-middle md:text-sm"
                         >
-                          {cell || '-'}
+                          {renderCellContent(cell, 'header')}
                         </th>
                       ))}
                     </tr>
@@ -102,7 +253,7 @@ export default function TableBlock({ block }: { block: TableBlockData }) {
                           key={`${rowIdx}-${cellIdx}`}
                           className="px-5 py-4 text-sm text-slate-600 text-center align-middle leading-relaxed"
                         >
-                          {cell || '-'}
+                          {renderCellContent(cell, 'body')}
                         </td>
                       ))}
                     </tr>

@@ -36,6 +36,8 @@ export default defineType({
       name: 'table',
       title: '表格数据',
       type: 'table',
+      description:
+        '单元格支持简单转义：\\n 表示换行，\\\\ 表示反斜杠；换行后以 - 、* 或 • 开头的行会渲染为列表。示例：电机功率\\n(千瓦)',
       validation: (Rule) => Rule.required().error('请填写表格数据'),
     }),
     defineField({

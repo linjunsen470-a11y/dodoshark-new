@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { forwardRef, useEffect, useRef, useState } from 'react'
 import { A11y, Keyboard } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
@@ -35,6 +36,12 @@ type GalleryItem = {
   videoUrl?: string
   videoThumbnail?: GalleryImage
   caption?: string
+  metaText?: string
+}
+
+type MediaGalleryCta = {
+  label?: string
+  href?: string
 }
 
 type ActiveVideo = {
@@ -47,7 +54,8 @@ export type MediaGalleryBlockData = {
   _key?: string
   title?: string
   backgroundVariant?: 'default' | 'muted' | 'dark'
-  layout?: 'carousel' | 'thumbnailGallery'
+  layout?: 'carousel' | 'thumbnailGallery' | 'videoCardCarousel'
+  cta?: MediaGalleryCta
   items?: GalleryItem[]
 }
 
@@ -112,6 +120,57 @@ function getGalleryItemLabel(item: GalleryItem, index: number) {
   return `${baseLabel} ${index + 1}`
 }
 
+function extractYouTubeVideoId(url?: string) {
+  const raw = url?.trim()
+  if (!raw) return undefined
+
+  let parsed: URL
+  try {
+    parsed = new URL(raw)
+  } catch {
+    return undefined
+  }
+
+  if (!['https:', 'http:'].includes(parsed.protocol)) return undefined
+
+  const host = parsed.hostname.toLowerCase()
+  const pathname = parsed.pathname
+  if (host === 'youtu.be') {
+    const id = pathname.split('/').filter(Boolean)[0]
+    return id || undefined
+  }
+
+  if (host.includes('youtube.com') || host.includes('youtube-nocookie.com')) {
+    if (pathname === '/watch') return parsed.searchParams.get('v') || undefined
+
+    const segments = pathname.split('/').filter(Boolean)
+    if (!segments.length) return undefined
+
+    if (segments[0] === 'embed' && segments[1]) return segments[1]
+    if ((segments[0] === 'shorts' || segments[0] === 'live') && segments[1]) return segments[1]
+  }
+
+  return undefined
+}
+
+function resolveYouTubePreviewThumbnail(url?: string, quality: 'default' | 'hqdefault' | 'mqdefault' | 'sddefault' | 'maxresdefault' = 'hqdefault') {
+  const videoId = extractYouTubeVideoId(url)
+  if (!videoId) return undefined
+
+  return `https://i.ytimg.com/vi/${videoId}/${quality}.jpg`
+}
+
+function isYouTubePreviewThumbnail(src?: string) {
+  if (!src) return false
+
+  try {
+    const parsed = new URL(src)
+    return parsed.hostname === 'i.ytimg.com' || parsed.hostname === 'img.youtube.com'
+  } catch {
+    return false
+  }
+}
+
 function resolveVideoEmbedSrc(url?: string) {
   const raw = url?.trim()
   if (!raw) return undefined
@@ -133,26 +192,7 @@ function resolveVideoEmbedSrc(url?: string) {
     return parsed.toString()
   }
 
-  const extractYouTubeId = () => {
-    if (host === 'youtu.be') {
-      const id = pathname.split('/').filter(Boolean)[0]
-      return id || undefined
-    }
-
-    if (host.includes('youtube.com') || host.includes('youtube-nocookie.com')) {
-      if (pathname === '/watch') return parsed.searchParams.get('v') || undefined
-
-      const segments = pathname.split('/').filter(Boolean)
-      if (!segments.length) return undefined
-
-      if (segments[0] === 'embed' && segments[1]) return segments[1]
-      if ((segments[0] === 'shorts' || segments[0] === 'live') && segments[1]) return segments[1]
-    }
-
-    return undefined
-  }
-
-  const youtubeId = extractYouTubeId()
+  const youtubeId = extractYouTubeVideoId(url)
   if (youtubeId) {
     return `https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1`
   }
@@ -174,6 +214,40 @@ function resolveVideoEmbedSrc(url?: string) {
   if (pathname.includes('/embed/')) return withParam('autoplay', '1')
 
   return withParam('autoplay', '1')
+}
+
+function ArrowLeftIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      className={className}
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+    </svg>
+  )
+}
+
+function ArrowRightIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      className={className}
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5 15.75 12l-7.5 7.5" />
+    </svg>
+  )
+}
+
+function isExternalHref(href: string) {
+  return /^(https?:|mailto:|tel:)/i.test(href)
 }
 
 function ImageTile({
@@ -465,14 +539,10 @@ function ThumbnailGallery({
   const [mainSwiper, setMainSwiper] = useState<SwiperInstance | null>(null)
   const [activeIndex, setActiveIndex] = useState(0)
   const thumbnailRefs = useRef<(HTMLButtonElement | null)[]>([])
+  const clampedActiveIndex = Math.min(activeIndex, Math.max(items.length - 1, 0))
 
   useEffect(() => {
-    if (activeIndex < items.length) return
-    setActiveIndex(0)
-  }, [activeIndex, items.length])
-
-  useEffect(() => {
-    const activeThumbnail = thumbnailRefs.current[activeIndex]
+    const activeThumbnail = thumbnailRefs.current[clampedActiveIndex]
     if (!activeThumbnail) return
 
     activeThumbnail.scrollIntoView({
@@ -480,11 +550,11 @@ function ThumbnailGallery({
       block: 'nearest',
       inline: 'nearest',
     })
-  }, [activeIndex])
+  }, [clampedActiveIndex])
 
   if (items.length === 0) return null
 
-  const activeItem = items[Math.min(activeIndex, items.length - 1)]
+  const activeItem = items[clampedActiveIndex]
   const desktopTrackClassName =
     items.length < 5 ? 'lg:justify-center' : 'lg:justify-start'
 
@@ -531,7 +601,7 @@ function ThumbnailGallery({
                   }}
                   item={item}
                   index={index}
-                  isActive={index === activeIndex}
+                  isActive={index === clampedActiveIndex}
                   onSelect={() => mainSwiper?.slideTo(index)}
                   isDarkBackground={isDarkBackground}
                 />
@@ -544,12 +614,220 @@ function ThumbnailGallery({
   )
 }
 
+function HomeStyleVideoCard({
+  item,
+  onOpenVideo,
+}: {
+  item: GalleryItem
+  onOpenVideo: (url?: string, caption?: string) => void
+}) {
+  const previewSrc = resolveGalleryItemPreviewSrc(item, 960)
+  const youtubeFallbackSrc = item.type === 'videoUrl' ? resolveYouTubePreviewThumbnail(item.videoUrl) : undefined
+  const resolvedPreviewSrc = previewSrc || youtubeFallbackSrc
+  const shouldUseNativeImage = !previewSrc && isYouTubePreviewThumbnail(youtubeFallbackSrc)
+  const { width, height } = getGalleryItemDimensions(item, 960, 720)
+  const blurDataURL = getGalleryItemBlurDataUrl(item)
+  const hasLqip = Boolean(blurDataURL)
+  const isVideo = item.type === 'videoUrl'
+  const title = item.caption?.trim() || (isVideo ? 'Video item' : 'Gallery image')
+  const metaText = item.metaText?.trim()
+
+  const cardBody = (
+    <>
+      <div className="relative h-56 overflow-hidden md:h-48">
+        {resolvedPreviewSrc ? (
+          shouldUseNativeImage ? (
+            <img
+              src={resolvedPreviewSrc}
+              alt={resolveGalleryItemAlt(item)}
+              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              loading="lazy"
+            />
+          ) : (
+            <Image
+              src={resolvedPreviewSrc}
+              alt={resolveGalleryItemAlt(item)}
+              width={width}
+              height={height}
+              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              placeholder={hasLqip ? 'blur' : 'empty'}
+              blurDataURL={blurDataURL}
+              sizes="(max-width: 767px) 100vw, (max-width: 1199px) 50vw, 25vw"
+            />
+          )
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-slate-200 text-slate-500">
+            <Icon icon={isVideo ? 'film' : 'image'} className="h-10 w-10" />
+          </div>
+        )}
+
+        {isVideo && <div className="absolute inset-0 bg-black/10" />}
+
+        {isVideo && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="flex h-[60px] w-[60px] items-center justify-center rounded-full bg-orange-500/95 text-white shadow-lg transition-transform duration-300 group-hover:scale-110">
+              <Icon icon="play" className="ml-1 h-5 w-5" />
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="border-t border-slate-200 bg-white p-4">
+        <h3 className="line-clamp-2 text-sm font-bold text-slate-900">{title}</h3>
+        {metaText && <p className="mt-2 text-xs text-slate-400">{metaText}</p>}
+      </div>
+    </>
+  )
+
+  if (isVideo) {
+    return (
+      <button
+        type="button"
+        onClick={() => onOpenVideo(item.videoUrl, item.caption)}
+        className="group flex h-full w-full flex-col overflow-hidden rounded-[1rem] border border-slate-200 bg-white text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+      >
+        {cardBody}
+      </button>
+    )
+  }
+
+  return (
+    <article className="group flex h-full flex-col overflow-hidden rounded-[1rem] border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+      {cardBody}
+    </article>
+  )
+}
+
+function VideoCardCarousel({
+  title,
+  cta,
+  items,
+  isDarkBackground = false,
+  onOpenVideo,
+}: {
+  title?: string
+  cta?: MediaGalleryCta
+  items: GalleryItem[]
+  isDarkBackground?: boolean
+  onOpenVideo: (url?: string, caption?: string) => void
+}) {
+  const [swiper, setSwiper] = useState<SwiperInstance | null>(null)
+  const [isBeginning, setIsBeginning] = useState(true)
+  const [isEnd, setIsEnd] = useState(items.length <= 1)
+  const ctaLabel = cta?.label?.trim()
+  const ctaHref = cta?.href?.trim()
+  const isExternalCta = Boolean(ctaHref && isExternalHref(ctaHref))
+
+  function syncSwiperState(instance: SwiperInstance) {
+    setIsBeginning(instance.isBeginning || instance.isLocked)
+    setIsEnd(instance.isEnd || instance.isLocked)
+  }
+
+  return (
+    <>
+      {title && (
+        <SectionHeader
+          title={title}
+          isDark={isDarkBackground}
+          align="center"
+          className="mb-16"
+          titleClassName={`text-3xl md:text-4xl font-display font-black tracking-tight ${isDarkBackground ? 'text-white' : 'text-slate-900'}`}
+        />
+      )}
+
+      {items.length > 0 && (
+        <div className="group relative mx-auto max-w-7xl">
+          <button
+            type="button"
+            aria-label="Previous videos"
+            className="absolute left-2 top-[35%] z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-slate-900 shadow-xl transition hover:bg-orange-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-35 md:-left-3 md:h-11 md:w-11 xl:opacity-0 xl:group-hover:opacity-100"
+            disabled={isBeginning}
+            onClick={() => swiper?.slidePrev()}
+          >
+            <ArrowLeftIcon className="h-5 w-5" />
+          </button>
+
+          <button
+            type="button"
+            aria-label="Next videos"
+            className="absolute right-2 top-[35%] z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-slate-900 shadow-xl transition hover:bg-orange-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-35 md:-right-3 md:h-11 md:w-11 xl:opacity-0 xl:group-hover:opacity-100"
+            disabled={isEnd}
+            onClick={() => swiper?.slideNext()}
+          >
+            <ArrowRightIcon className="h-5 w-5" />
+          </button>
+
+          <Swiper
+            key={items.length}
+            modules={[A11y, Keyboard]}
+            slidesPerView={1}
+            spaceBetween={24}
+            speed={500}
+            keyboard={{ enabled: true }}
+            watchOverflow
+            breakpoints={{
+              768: { slidesPerView: 2 },
+              1200: { slidesPerView: 4 },
+            }}
+            onSwiper={(instance) => {
+              setSwiper(instance)
+              syncSwiperState(instance)
+            }}
+            onSlideChange={syncSwiperState}
+            onBreakpoint={syncSwiperState}
+            onResize={syncSwiperState}
+            a11y={{
+              slideLabelMessage: 'Video card {{index}}',
+              prevSlideMessage: 'Previous videos',
+              nextSlideMessage: 'Next videos',
+            }}
+          >
+            {items.map((item, index) => (
+              <SwiperSlide key={item._key ?? `${item.caption ?? 'media-card'}-${index}`} className="h-auto">
+                <HomeStyleVideoCard item={item} onOpenVideo={onOpenVideo} />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
+      )}
+
+      {ctaLabel && ctaHref && (
+        <div className="mt-10 text-center">
+          {isExternalCta ? (
+            <a
+              href={ctaHref}
+              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#fbbf24] px-8 py-3 font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-[#f59e0b] sm:w-auto"
+              target={ctaHref.startsWith('http') ? '_blank' : undefined}
+              rel={ctaHref.startsWith('http') ? 'noreferrer' : undefined}
+            >
+              {ctaLabel}
+              <ArrowRightIcon className="h-4 w-4" />
+            </a>
+          ) : (
+            <Link
+              href={ctaHref}
+              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#fbbf24] px-8 py-3 font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-[#f59e0b] sm:w-auto"
+            >
+              {ctaLabel}
+              <ArrowRightIcon className="h-4 w-4" />
+            </Link>
+          )}
+        </div>
+      )}
+    </>
+  )
+}
+
 export default function MediaGalleryBlock({ block }: { block: MediaGalleryBlockData }) {
   const variant = block.backgroundVariant ?? 'default'
   const theme = getSharedBackgroundTheme(variant)
   const isDark = variant === 'dark'
-  const layout = block.layout === 'carousel' ? 'carousel' : 'thumbnailGallery'
+  const layout =
+    block.layout === 'carousel' || block.layout === 'videoCardCarousel'
+      ? block.layout
+      : 'thumbnailGallery'
   const [activeVideo, setActiveVideo] = useState<ActiveVideo | null>(null)
+  const hasCta = Boolean(block.cta?.label?.trim() && block.cta?.href?.trim())
   const items = (block.items ?? []).filter(
     (item) =>
       (item.type === 'videoUrl' && item.videoUrl) ||
@@ -587,13 +865,13 @@ export default function MediaGalleryBlock({ block }: { block: MediaGalleryBlockD
     }
   }, [activeVideo])
 
-  if (!block.title && items.length === 0) return null
+  if (!block.title && items.length === 0 && !hasCta) return null
 
   return (
     <>
-      <section className={`py-24 ${theme.section}`}>
+      <section className={`${layout === 'videoCardCarousel' ? 'py-20 sm:py-24' : 'py-24'} ${theme.section}`}>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          {block.title && (
+          {block.title && layout !== 'videoCardCarousel' && (
             <SectionHeader
               title={block.title}
               isDark={isDark}
@@ -620,6 +898,16 @@ export default function MediaGalleryBlock({ block }: { block: MediaGalleryBlockD
               items={items}
               isDarkBackground={isDark}
               captionClassName={isDark ? 'text-slate-100' : 'text-slate-700'}
+              onOpenVideo={openVideo}
+            />
+          )}
+
+          {layout === 'videoCardCarousel' && (
+            <VideoCardCarousel
+              title={block.title}
+              cta={block.cta}
+              items={items}
+              isDarkBackground={isDark}
               onOpenVideo={openVideo}
             />
           )}
