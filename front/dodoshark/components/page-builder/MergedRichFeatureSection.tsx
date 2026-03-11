@@ -22,7 +22,11 @@ export default function MergedRichFeatureSection({
     <section id={anchorId} className={`py-24 ${theme.section}`}>
       <RichSectionBlockContent block={richBlock} trimTrailingContentSpacing />
       <div className="mt-12 md:mt-16">
-        <FeatureListBlockContent block={featureBlock} showHeader={false} />
+        <FeatureListBlockContent
+          block={featureBlock}
+          showHeader={false}
+          renderMode="mergedCards"
+        />
       </div>
     </section>
   )
