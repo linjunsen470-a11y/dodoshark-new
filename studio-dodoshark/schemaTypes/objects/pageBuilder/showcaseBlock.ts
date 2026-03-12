@@ -25,6 +25,19 @@ export default defineType({
       type: 'string',
     }),
     defineField({
+      name: 'layout',
+      title: 'Layout',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Card Carousel', value: 'cardCarousel' },
+          { title: 'Split Carousel', value: 'splitCarousel' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'cardCarousel',
+    }),
+    defineField({
       name: 'backgroundVariant',
       title: 'Background Style',
       type: 'string',
@@ -76,29 +89,10 @@ export default defineType({
               ],
             }),
             defineField({
-              name: 'logo',
-              title: 'Logo',
-              type: 'image',
-              options: { hotspot: true },
-              validation: (rule) => rule.custom(requireAltText),
-              fields: [
-                defineField({
-                  name: 'alt',
-                  title: 'Alt Text',
-                  type: 'string',
-                }),
-              ],
-            }),
-            defineField({
               name: 'href',
               title: 'Link URL',
               type: 'url',
               validation: (rule) => rule.uri({ scheme: ['http', 'https'] }),
-            }),
-            defineField({
-              name: 'ctaLabel',
-              title: 'CTA Label',
-              type: 'string',
             }),
           ],
           preview: {
@@ -142,12 +136,13 @@ export default defineType({
     select: {
       title: 'title',
       itemCount: 'items',
+      layout: 'layout',
     },
-    prepare({ title, itemCount }) {
+    prepare({ title, itemCount, layout }) {
       const count = Array.isArray(itemCount) ? itemCount.length : 0
       return {
         title: title || 'Showcase Block',
-        subtitle: `${count} showcase item${count === 1 ? '' : 's'}`,
+        subtitle: `${layout || 'cardCarousel'} · ${count} showcase item${count === 1 ? '' : 's'}`,
       }
     },
   },

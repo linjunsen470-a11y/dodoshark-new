@@ -18,6 +18,7 @@ type CardImage = {
   alt?: string
   asset?: {
     _id?: string
+    _ref?: string
     url?: string
   }
 }
@@ -75,15 +76,20 @@ const defaultSliderControls: SliderControls = {
   totalPages: 1,
 }
 
+const defaultBannerOverlayColor = 'rgba(15,23,42,0.45)'
+
 export type CardGridBlockData = {
   _type: 'cardGridBlock'
   _key?: string
   title?: string
   subtitle?: string
+  firstLineCardTitle?: string
   backgroundVariant?: 'default' | 'muted' | 'dark'
+  enableBannerOverlap?: boolean
+  bannerImage?: CardImage
+  bannerOverlayColor?: string
   nestedCards?: CardItem[]
   nestedCardTitle?: string
-  columns?: 2 | 3 | 4
   cards?: CardItem[]
   groups?: CardGroup[]
   disableCardFrameEffect?: boolean
@@ -97,6 +103,37 @@ const columnClassMap = {
 
 function isExternalHref(href: string) {
   return /^(https?:|mailto:|tel:)/i.test(href)
+}
+
+function resolveImageSrc(
+  image?: CardImage,
+  options: { width?: number; height?: number; fit?: 'crop' | 'max' } = {},
+) {
+  if (!image) return undefined
+
+  const directUrl = image.asset?.url?.trim()
+  if (directUrl) return directUrl
+
+  const hasIdentity = Boolean(image.asset?._ref || image.asset?._id)
+  if (!hasIdentity) return undefined
+
+  try {
+    let builder = urlFor(image).width(options.width ?? 900)
+
+    if (options.height) {
+      builder = builder.height(options.height)
+    }
+
+    return builder.fit(options.fit ?? 'crop').url()
+  } catch {
+    return undefined
+  }
+}
+
+function getColumnsForCardCount(count: number): 2 | 3 | 4 {
+  if (count <= 2) return 2
+  if (count >= 4) return 4
+  return 3
 }
 
 function getSliderControls(instance: SwiperInstance): SliderControls {
@@ -221,14 +258,15 @@ function GridCard({
   const contentClass = size === 'large' ? 'p-6' : 'p-5'
   const imageBgClass = disableCardFrameEffect && isDarkBackground ? 'bg-slate-800' : 'bg-slate-100'
   const emptyImageClass = disableCardFrameEffect && isDarkBackground ? 'text-slate-500' : 'text-slate-300'
+  const imageSrc = resolveImageSrc(data.image, { width: 900, height: 700, fit: 'crop' })
 
   return (
     <article className={articleClass}>
       <div className={`relative ${imageHeightClass} ${imageBgClass}`}>
-        {data.image?.asset ? (
+        {imageSrc ? (
           <Image
-            src={urlFor(data.image).width(900).height(700).fit('crop').url()}
-            alt={data.image.alt || data.title || 'Card image'}
+            src={imageSrc}
+            alt={data.image?.alt || data.title || 'Card image'}
             fill
             sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             className="object-cover"
@@ -294,14 +332,15 @@ function MobileCarouselCard({
   const emptyImageClass = disableCardFrameEffect && isDarkBackground ? 'text-slate-500' : 'text-slate-300'
   const dotsBaseClass = isDarkBackground ? 'bg-slate-500/50' : 'bg-slate-300'
   const dotsActiveClass = isDarkBackground ? 'bg-orange-300' : 'bg-orange-500'
+  const imageSrc = resolveImageSrc(data.image, { width: 900, height: 700, fit: 'crop' })
 
   return (
     <article className={articleClass}>
       <div className={`relative aspect-[16/10] ${imageBgClass}`}>
-        {data.image?.asset ? (
+        {imageSrc ? (
           <Image
-            src={urlFor(data.image).width(900).height(700).fit('crop').url()}
-            alt={data.image.alt || data.title || 'Card image'}
+            src={imageSrc}
+            alt={data.image?.alt || data.title || 'Card image'}
             fill
             sizes="100vw"
             className="object-cover"
@@ -390,21 +429,18 @@ function SectionTitle({
 function GroupGrid({
   sectionTitle,
   cards,
-  columns,
   disableCardFrameEffect,
   isDarkBackground,
 }: {
   sectionTitle?: string
   cards: CardItem[]
-  columns: 2 | 3 | 4
   disableCardFrameEffect?: boolean
   isDarkBackground?: boolean
 }) {
   const [mobileSwiper, setMobileSwiper] = useState<SwiperInstance | null>(null)
   const [mobileControls, setMobileControls] = useState<SliderControls>(defaultSliderControls)
 
-  const derivedColumns = cards.length <= 2 ? 2 : cards.length >= 4 ? 4 : 3
-  const columnsToUse = derivedColumns || columns
+  const columnsToUse = getColumnsForCardCount(cards.length)
   const desktopCardSize: 'large' | 'small' = columnsToUse <= 2 ? 'large' : 'small'
 
   if (cards.length === 0) return null
@@ -469,6 +505,7 @@ export default function CardGridBlock({ block }: { block: CardGridBlockData }) {
   const variant = block.backgroundVariant ?? 'muted'
   const theme = getSharedBackgroundTheme(variant)
   const isDarkBackground = variant === 'dark'
+  const enableBannerOverlap = Boolean(block.enableBannerOverlap)
   const nestedCards = (block.nestedCards ?? []).filter(
     (item) => item?.cardType || item?.reference || item?.inlineCard,
   )
@@ -488,17 +525,91 @@ export default function CardGridBlock({ block }: { block: CardGridBlockData }) {
     (item) => item?.cardType || item?.reference || item?.inlineCard,
   )
   const mergedNestedCards = nestedCards.length > 0 ? nestedCards : legacyGroupCards
-  const legacyColumns = block.columns ?? 3
-  const disableCardFrameEffect = Boolean(block.disableCardFrameEffect)
-  const cardsSectionTitle = block.subtitle?.trim() || undefined
-  const nestedSectionTitle = block.nestedCardTitle?.trim() || undefined
-
   const hasNestedCards = mergedNestedCards.length > 0
   const hasLegacy = legacyCards.length > 0
-  const headerSubtitle = hasLegacy ? undefined : block.subtitle
+  const hasCardContent = hasLegacy || hasNestedCards
+  const disableCardFrameEffect = Boolean(block.disableCardFrameEffect)
+  const firstLineCardTitle = block.firstLineCardTitle?.trim() || undefined
+  const cardsSectionTitle =
+    firstLineCardTitle || (!enableBannerOverlap && hasLegacy ? block.subtitle?.trim() || undefined : undefined)
+  const nestedSectionTitle = block.nestedCardTitle?.trim() || undefined
+  const bannerImageSrc = resolveImageSrc(block.bannerImage, { width: 2000, height: 900, fit: 'crop' })
+  const bannerOverlayColor = block.bannerOverlayColor?.trim() || defaultBannerOverlayColor
+  const contentIsDarkBackground = enableBannerOverlap ? false : isDarkBackground
+
+  const headerSubtitle = firstLineCardTitle ? block.subtitle : hasLegacy ? undefined : block.subtitle
   const subtitleClass = isDarkBackground ? theme.subtitle : theme.body
 
   if (!block.title && !block.subtitle && !hasNestedCards && !hasLegacy) return null
+
+  const content = (
+    <>
+      {hasLegacy && (
+        <GroupGrid
+          sectionTitle={cardsSectionTitle}
+          cards={legacyCards}
+          disableCardFrameEffect={disableCardFrameEffect}
+          isDarkBackground={contentIsDarkBackground}
+        />
+      )}
+
+      {hasNestedCards && (
+        <GroupGrid
+          sectionTitle={nestedSectionTitle}
+          cards={mergedNestedCards}
+          disableCardFrameEffect={disableCardFrameEffect}
+          isDarkBackground={contentIsDarkBackground}
+        />
+      )}
+    </>
+  )
+
+  if (enableBannerOverlap) {
+    return (
+      <section className={`${theme.section} pb-24`}>
+        <div className="relative h-[300px] overflow-hidden sm:h-[360px] lg:h-[420px]">
+          {bannerImageSrc ? (
+            <Image
+              src={bannerImageSrc}
+              alt={block.bannerImage?.alt || block.title || 'Card grid banner'}
+              fill
+              sizes="100vw"
+              className="object-cover"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-slate-800" />
+          )}
+          <div className="absolute inset-0" style={{ backgroundColor: bannerOverlayColor }} />
+
+          <div className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-4 text-center sm:px-6 lg:px-8">
+            <div className="w-full">
+              {block.title && (
+                <h2 className="font-display text-3xl font-black tracking-tight text-white sm:text-4xl md:text-5xl">
+                  {block.title}
+                </h2>
+              )}
+              {block.subtitle && (
+                <p className="mx-auto mt-5 max-w-3xl text-base leading-relaxed text-slate-100 md:text-lg">
+                  {block.subtitle}
+                </p>
+              )}
+              {(block.title || block.subtitle) && (
+                <div className="mx-auto mt-6 h-1.5 w-20 rounded-full bg-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.6)]" />
+              )}
+            </div>
+          </div>
+        </div>
+
+        {hasCardContent && (
+          <div className="relative z-10 mx-auto -mt-20 max-w-7xl px-4 sm:px-6 lg:-mt-24 lg:px-8">
+            <div className="rounded-[1.5rem] bg-white px-6 py-8 shadow-[0_24px_60px_-24px_rgba(15,23,42,0.35)] sm:px-8 md:py-10 lg:px-10 lg:py-12">
+              {content}
+            </div>
+          </div>
+        )}
+      </section>
+    )
+  }
 
   return (
     <section className={`py-24 ${theme.section}`}>
@@ -514,25 +625,7 @@ export default function CardGridBlock({ block }: { block: CardGridBlockData }) {
           />
         )}
 
-        {hasLegacy && (
-          <GroupGrid
-            sectionTitle={cardsSectionTitle}
-            cards={legacyCards}
-            columns={legacyColumns}
-            disableCardFrameEffect={disableCardFrameEffect}
-            isDarkBackground={isDarkBackground}
-          />
-        )}
-
-        {hasNestedCards && (
-          <GroupGrid
-            sectionTitle={nestedSectionTitle}
-            cards={mergedNestedCards}
-            columns={3}
-            disableCardFrameEffect={disableCardFrameEffect}
-            isDarkBackground={isDarkBackground}
-          />
-        )}
+        {content}
       </div>
     </section>
   )

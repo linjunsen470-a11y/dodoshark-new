@@ -1,8 +1,9 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { useState } from 'react'
-import { A11y, Keyboard } from 'swiper/modules'
+import { A11y, Autoplay, Keyboard } from 'swiper/modules'
 import type { Swiper as SwiperInstance } from 'swiper'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
@@ -33,9 +34,7 @@ export type ShowcaseItem = {
   title?: string
   description?: string
   image?: ShowcaseImage
-  logo?: ShowcaseImage
   href?: string
-  ctaLabel?: string
 }
 
 export type ShowcaseBlockData = {
@@ -43,6 +42,7 @@ export type ShowcaseBlockData = {
   _key?: string
   title?: string
   subtitle?: string
+  layout?: 'cardCarousel' | 'splitCarousel'
   backgroundVariant?: 'default' | 'muted' | 'dark'
   items?: ShowcaseItem[]
   footerCta?: {
@@ -103,9 +103,7 @@ function ShowcaseCard({ item }: { item: ShowcaseItem }) {
   const title = item.title?.trim() || 'Untitled Showcase'
   const description = item.description?.trim()
   const href = item.href?.trim() || ''
-  const ctaLabel = item.ctaLabel?.trim() || 'View Details'
   const imageSrc = resolveImageSrc(item.image, { width: 1200, height: 800, fit: 'crop' })
-  const logoSrc = resolveImageSrc(item.logo, { width: 264, height: 80, fit: 'max' })
   const className = `${styles.cardLink} ${href ? '' : styles.cardStatic}`.trim()
 
   const content = (
@@ -120,26 +118,11 @@ function ShowcaseCard({ item }: { item: ShowcaseItem }) {
             className={styles.image}
           />
         )}
-        {logoSrc ? (
-          <div className={styles.logoBadge}>
-            <Image
-              src={logoSrc}
-              alt={item.logo?.alt || `${title} logo`}
-              width={132}
-              height={40}
-              className={styles.logoImage}
-            />
-          </div>
-        ) : null}
       </div>
 
       <div className={styles.content}>
         <h3 className={styles.title}>{title}</h3>
         {description ? <p className={styles.description}>{description}</p> : null}
-        <span className={styles.inlineCta}>
-          {ctaLabel}
-          <ArrowRightIcon className={styles.inlineArrow} />
-        </span>
       </div>
     </>
   )
@@ -155,8 +138,162 @@ function ShowcaseCard({ item }: { item: ShowcaseItem }) {
   )
 }
 
+function isExternalHref(href: string) {
+  return /^(https?:|mailto:|tel:)/i.test(href)
+}
+
+function SplitCarousel({
+  items,
+  isDark,
+  footerCta,
+}: {
+  items: ShowcaseItem[]
+  isDark: boolean
+  footerCta?: ShowcaseBlockData['footerCta']
+}) {
+  const [swiper, setSwiper] = useState<SwiperInstance | null>(null)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const dotsBaseClass = isDark ? 'bg-slate-500/50' : 'bg-slate-300'
+  const dotsActiveClass = isDark ? 'bg-orange-300' : 'bg-orange-500'
+  const titleClass = isDark ? 'text-white' : 'text-slate-900'
+  const bodyClass = isDark ? 'text-slate-300' : 'text-slate-600'
+  const footerHref = footerCta?.href?.trim() || ''
+  const footerLabel = footerCta?.label?.trim() || ''
+
+  if (items.length === 0) return null
+
+  return (
+    <div className="mx-auto max-w-7xl">
+      <Swiper
+        modules={[Keyboard, A11y, Autoplay]}
+        slidesPerView={1}
+        loop={items.length > 1}
+        spaceBetween={24}
+        speed={650}
+        grabCursor
+        watchOverflow
+        allowTouchMove={items.length > 1}
+        keyboard={{ enabled: true }}
+        autoplay={
+          items.length > 1
+            ? {
+                delay: 5000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+              }
+            : false
+        }
+        a11y={{
+          prevSlideMessage: 'Previous showcase',
+          nextSlideMessage: 'Next showcase',
+          slideLabelMessage: 'Showcase slide {{index}}',
+        }}
+        onSwiper={(instance) => {
+          setSwiper(instance)
+          setCurrentIndex(instance.realIndex)
+        }}
+        onSlideChange={(instance) => setCurrentIndex(instance.realIndex)}
+      >
+        {items.map((item, index) => {
+          const title = item.title?.trim() || 'Untitled Showcase'
+          const description = item.description?.trim()
+          const imageSrc = resolveImageSrc(item.image, { width: 1600, height: 1100, fit: 'crop' })
+
+          return (
+            <SwiperSlide key={item._key ?? `${title}-${index}`} className="!h-auto">
+              <article className="grid h-full gap-8 md:items-center lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-16">
+                <div className="order-2 flex flex-col justify-center md:order-2 lg:order-1">
+                  <h3 className={`text-2xl font-display font-black tracking-tight md:text-4xl ${titleClass}`}>
+                    {title}
+                  </h3>
+                  {description ? (
+                    <p className={`mt-5 text-base leading-8 md:text-lg ${bodyClass}`}>
+                      {description}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div className="order-1 overflow-hidden rounded-[1.5rem] bg-slate-200 shadow-[0_24px_56px_-28px_rgba(15,23,42,0.35)] md:order-1 lg:order-2">
+                  {imageSrc ? (
+                    <div className="relative aspect-[4/3] w-full md:aspect-[16/10]">
+                      <Image
+                        src={imageSrc}
+                        alt={item.image?.alt || title}
+                        fill
+                        sizes="(max-width: 1023px) 100vw, 52vw"
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex aspect-[4/3] items-center justify-center text-slate-400 md:aspect-[16/10]">
+                      <ArrowRightIcon className="h-10 w-10 rotate-45" />
+                    </div>
+                  )}
+                </div>
+              </article>
+            </SwiperSlide>
+          )
+        })}
+      </Swiper>
+
+      {items.length > 1 && (
+        <div className="mt-8 flex items-center justify-center gap-2">
+          {items.map((item, index) => {
+            const active = index === currentIndex
+
+            return (
+              <button
+                key={item._key ?? `split-showcase-dot-${index}`}
+                type="button"
+                aria-label={`Go to showcase slide ${index + 1}`}
+                aria-pressed={active}
+                onClick={() => {
+                  if (!swiper || swiper.destroyed) return
+                  if (items.length > 1) {
+                    swiper.slideToLoop(index)
+                    return
+                  }
+                  swiper.slideTo(index)
+                }}
+                className={`h-2.5 rounded-full transition-all ${
+                  active ? `w-8 ${dotsActiveClass}` : `w-2.5 ${dotsBaseClass}`
+                }`}
+              />
+            )
+          })}
+        </div>
+      )}
+
+      {footerLabel && footerHref && (
+        <div className="mt-10 text-center">
+          {isExternalHref(footerHref) ? (
+            <a
+              href={footerHref}
+              target={footerHref.startsWith('http') ? '_blank' : undefined}
+              rel={footerHref.startsWith('http') ? 'noreferrer' : undefined}
+              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#fbbf24] px-8 py-3 font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-[#f59e0b] sm:w-auto"
+            >
+              {footerLabel}
+              <ArrowRightIcon className={styles.footerCtaIcon} />
+            </a>
+          ) : (
+            <Link
+              href={footerHref}
+              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#fbbf24] px-8 py-3 font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-[#f59e0b] sm:w-auto"
+            >
+              {footerLabel}
+              <ArrowRightIcon className={styles.footerCtaIcon} />
+            </Link>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function ShowcaseBlock({ block }: { block: ShowcaseBlockData }) {
   const items = (block.items ?? []).filter((item) => item?.title?.trim() && item?.image?.asset)
+  const layout = block.layout === 'splitCarousel' ? 'splitCarousel' : 'cardCarousel'
   const [swiper, setSwiper] = useState<SwiperInstance | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [canPrev, setCanPrev] = useState(false)
@@ -181,92 +318,96 @@ export default function ShowcaseBlock({ block }: { block: ShowcaseBlockData }) {
             title={block.title}
             subtitle={block.subtitle}
             isDark={isDark}
-            className="mb-10"
+            className={layout === 'splitCarousel' ? 'mb-14' : 'mb-10'}
             titleClassName={`text-3xl md:text-4xl font-display font-black tracking-tight ${theme.heading}`}
             subtitleClassName={`mx-auto max-w-3xl text-base md:text-lg ${theme.subtitle}`}
           />
         )}
 
         {items.length > 0 && (
-          <div className={`${styles.shell} ${isDark ? styles.darkShell : ''}`.trim()}>
-            <Swiper
-              modules={[Keyboard, A11y]}
-              className={styles.carousel}
-              slidesPerView={1}
-              spaceBetween={18}
-              speed={550}
-              grabCursor
-              watchOverflow
-              keyboard={{ enabled: true }}
-              breakpoints={{
-                768: {
-                  slidesPerView: 2,
-                  spaceBetween: 24,
-                },
-                1200: {
-                  slidesPerView: 3,
-                  spaceBetween: 28,
-                },
-              }}
-              a11y={{
-                prevSlideMessage: 'Previous showcase',
-                nextSlideMessage: 'Next showcase',
-              }}
-              onSwiper={(instance) => {
-                setSwiper(instance)
-                syncControls(instance)
-              }}
-              onSlideChange={syncControls}
-              onResize={syncControls}
-            >
-              {items.map((item, index) => (
-                <SwiperSlide key={item._key ?? `${item.title}-${index}`} className={styles.slide}>
-                  <ShowcaseCard item={item} />
-                </SwiperSlide>
-              ))}
-            </Swiper>
+          layout === 'splitCarousel' ? (
+            <SplitCarousel items={items} isDark={isDark} footerCta={block.footerCta} />
+          ) : (
+            <div className={`${styles.shell} ${isDark ? styles.darkShell : ''}`.trim()}>
+              <Swiper
+                modules={[Keyboard, A11y]}
+                className={styles.carousel}
+                slidesPerView={1}
+                spaceBetween={18}
+                speed={550}
+                grabCursor
+                watchOverflow
+                keyboard={{ enabled: true }}
+                breakpoints={{
+                  768: {
+                    slidesPerView: 2,
+                    spaceBetween: 24,
+                  },
+                  1200: {
+                    slidesPerView: 3,
+                    spaceBetween: 28,
+                  },
+                }}
+                a11y={{
+                  prevSlideMessage: 'Previous showcase',
+                  nextSlideMessage: 'Next showcase',
+                }}
+                onSwiper={(instance) => {
+                  setSwiper(instance)
+                  syncControls(instance)
+                }}
+                onSlideChange={syncControls}
+                onResize={syncControls}
+              >
+                {items.map((item, index) => (
+                  <SwiperSlide key={item._key ?? `${item.title}-${index}`} className={styles.slide}>
+                    <ShowcaseCard item={item} />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
 
-            <div className={styles.footerBar}>
-              <div className={styles.footerLead}>
-                <div className={styles.controls}>
-                  <button
-                    type="button"
-                    aria-label="Previous showcase"
-                    className={styles.navButton}
-                    disabled={!canPrev}
-                    onClick={() => swiper?.slidePrev()}
-                  >
-                    <ArrowLeftIcon className={styles.navIcon} />
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="Next showcase"
-                    className={styles.navButton}
-                    disabled={!canNext}
-                    onClick={() => swiper?.slideNext()}
-                  >
-                    <ArrowRightIcon className={styles.navIcon} />
-                  </button>
+              <div className={styles.footerBar}>
+                <div className={styles.footerLead}>
+                  <div className={styles.controls}>
+                    <button
+                      type="button"
+                      aria-label="Previous showcase"
+                      className={styles.navButton}
+                      disabled={!canPrev}
+                      onClick={() => swiper?.slidePrev()}
+                    >
+                      <ArrowLeftIcon className={styles.navIcon} />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="Next showcase"
+                      className={styles.navButton}
+                      disabled={!canNext}
+                      onClick={() => swiper?.slideNext()}
+                    >
+                      <ArrowRightIcon className={styles.navIcon} />
+                    </button>
+                  </div>
+
+                  <p className={styles.mobileCounter} aria-live="polite">
+                    {Math.min(currentIndex + 1, items.length)} of {items.length}
+                  </p>
                 </div>
 
-                <p className={styles.mobileCounter} aria-live="polite">
-                  {Math.min(currentIndex + 1, items.length)} of {items.length}
-                </p>
+                {block.footerCta?.label?.trim() && block.footerCta?.href?.trim() ? (
+                  <a
+                    href={block.footerCta.href.trim()}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#fbbf24] px-8 py-3 font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-[#f59e0b] sm:w-auto"
+                  >
+                    {block.footerCta.label.trim()}
+                    <ArrowRightIcon className={styles.footerCtaIcon} />
+                  </a>
+                ) : null}
               </div>
-
-              {block.footerCta?.label?.trim() && block.footerCta?.href?.trim() ? (
-                <a
-                  href={block.footerCta.href.trim()}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#fbbf24] px-8 py-3 font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-[#f59e0b] sm:w-auto"
-                >
-                  {block.footerCta.label.trim()}
-                  <ArrowRightIcon className={styles.footerCtaIcon} />
-                </a>
-              ) : null}
             </div>
-          </div>
+          )
         )}
       </div>
     </section>

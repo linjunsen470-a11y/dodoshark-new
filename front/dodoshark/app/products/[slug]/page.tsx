@@ -231,6 +231,12 @@ const productQuery = `*[_type == "product" && slug.current == $slug][0] {
         image { ..., asset }
       }
     },
+    enableBannerOverlap,
+    bannerImage {
+      ...,
+      asset
+    },
+    bannerOverlayColor,
     nestedCardTitle,
     defaultGroupIndex,
     maxItemsPerRow,

@@ -92,7 +92,7 @@ function ReferenceCard({ item }: { item: ReferenceItem }) {
   const content = (
     <article className="premium-card h-full p-4 md:p-5">
       <div className="flex h-full flex-col items-center text-center">
-        <div className="mb-4 aspect-square w-16 overflow-hidden rounded-lg bg-slate-100 sm:w-20 md:mb-5 md:w-full md:max-w-none md:aspect-[1/1]">
+        <div className="mb-4 aspect-square w-16 overflow-hidden rounded-lg sm:w-20 md:mb-5 md:w-full md:max-w-none md:aspect-[1/1]">
           {image?.asset ? (
             <Image
               src={urlFor(image).width(800).fit('max').url()}

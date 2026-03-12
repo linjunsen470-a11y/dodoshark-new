@@ -259,6 +259,12 @@ async function getSolution(slug: string) {
           image { ..., asset }
         }
       },
+      enableBannerOverlap,
+      bannerImage {
+        ...,
+        asset
+      },
+      bannerOverlayColor,
       nestedCardTitle,
       nestedCards[] {
         ...,
