@@ -11,7 +11,9 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import { urlFor } from '@/app/lib/sanity'
 import Icon from '@/components/ui/Icon'
 import { getSharedBackgroundTheme } from './backgroundTheme'
+import SectionShell from './SectionShell'
 import SectionHeader from './SectionHeader'
+import { bodyTextClass, cardTitleClass, sectionSubtitleClass } from './sectionStyles'
 import 'swiper/css'
 
 type CardImage = {
@@ -245,8 +247,11 @@ function GridCard({
   if (!hasContent) return null
 
   const imageHeightClass = size === 'large' ? 'aspect-[16/10]' : 'aspect-[4/3]'
-  const titleClass = size === 'large' ? 'text-xl' : 'text-base'
-  const textClass = size === 'large' ? 'text-sm' : 'text-xs'
+  const titleClass =
+    size === 'large'
+      ? cardTitleClass
+      : 'text-lg font-display font-bold leading-[1.2] tracking-[-0.02em]'
+  const textClass = size === 'large' ? bodyTextClass : 'text-sm leading-6'
   const ctaClass = size === 'large' ? 'text-sm' : 'text-xs'
   const titleTone = disableCardFrameEffect && isDarkBackground ? 'text-slate-100' : 'text-slate-900'
   const descriptionTone =
@@ -279,12 +284,12 @@ function GridCard({
       </div>
       <div className={contentClass}>
         {data.title && (
-          <h3 className={`${titleClass} mb-2 font-display font-black ${titleTone}`}>
+          <h3 className={`${titleClass} mb-2 ${titleTone}`}>
             {data.title}
           </h3>
         )}
         {data.description && (
-          <p className={`${textClass} mb-4 leading-relaxed ${descriptionTone}`}>
+          <p className={`${textClass} mb-4 ${descriptionTone}`}>
             {data.description}
           </p>
         )}
@@ -378,12 +383,12 @@ function MobileCarouselCard({
 
       <div className="p-6">
         {data.title && (
-          <h3 className={`mb-2 text-xl font-display font-black ${titleTone}`}>
+          <h3 className={`mb-2 ${cardTitleClass} ${titleTone}`}>
             {data.title}
           </h3>
         )}
         {data.description && (
-          <p className={`mb-4 text-sm leading-relaxed ${descriptionTone}`}>
+          <p className={`mb-4 ${bodyTextClass} ${descriptionTone}`}>
             {data.description}
           </p>
         )}
@@ -410,14 +415,14 @@ function SectionTitle({
 }) {
   if (!title) return null
 
-  const separatorClass = isDarkBackground ? 'bg-slate-600' : 'bg-slate-400/70'
+  const separatorClass = isDarkBackground ? 'bg-slate-600' : 'bg-slate-300'
   const titleClass = isDarkBackground ? 'text-slate-100' : 'text-slate-800'
 
   return (
-    <header className="mb-10 text-center">
+    <header className="mb-8 text-center md:mb-10">
       <div className="flex items-center gap-6">
         <span className={`h-px flex-1 ${separatorClass}`} />
-        <h3 className={`text-3xl font-display font-black md:text-4xl ${titleClass}`}>
+        <h3 className={`text-2xl font-display font-bold tracking-[-0.02em] md:text-[1.75rem] ${titleClass}`}>
           {title}
         </h3>
         <span className={`h-px flex-1 ${separatorClass}`} />
@@ -566,7 +571,7 @@ export default function CardGridBlock({ block }: { block: CardGridBlockData }) {
 
   if (enableBannerOverlap) {
     return (
-      <section className={`${theme.section} pb-24`}>
+      <section className={`${theme.section} pb-20 md:pb-24`}>
         <div className="relative h-[300px] overflow-hidden sm:h-[360px] lg:h-[420px]">
           {bannerImageSrc ? (
             <Image
@@ -583,19 +588,13 @@ export default function CardGridBlock({ block }: { block: CardGridBlockData }) {
 
           <div className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-4 text-center sm:px-6 lg:px-8">
             <div className="w-full">
-              {block.title && (
-                <h2 className="font-display text-3xl font-black tracking-tight text-white sm:text-4xl md:text-5xl">
-                  {block.title}
-                </h2>
-              )}
-              {block.subtitle && (
-                <p className="mx-auto mt-5 max-w-3xl text-base leading-relaxed text-slate-100 md:text-lg">
-                  {block.subtitle}
-                </p>
-              )}
-              {(block.title || block.subtitle) && (
-                <div className="mx-auto mt-6 h-1.5 w-20 rounded-full bg-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.6)]" />
-              )}
+              <SectionHeader
+                title={block.title}
+                subtitle={headerSubtitle}
+                tone="dark"
+                className="mx-auto max-w-3xl"
+                subtitleClassName="mx-auto max-w-3xl text-sm leading-7 text-slate-300 md:text-base"
+              />
             </div>
           </div>
         </div>
@@ -612,21 +611,19 @@ export default function CardGridBlock({ block }: { block: CardGridBlockData }) {
   }
 
   return (
-    <section className={`py-24 ${theme.section}`}>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {(block.title || block.subtitle) && (
-          <SectionHeader
-            title={block.title}
-            subtitle={headerSubtitle}
-            isDark={isDarkBackground}
-            className="mb-14"
-            titleClassName={`text-3xl md:text-4xl font-display font-black tracking-tight ${theme.heading}`}
-            subtitleClassName={`mx-auto mt-5 max-w-3xl text-base md:text-lg ${subtitleClass}`}
-          />
-        )}
+    <SectionShell sectionClassName={theme.section}>
+      {(block.title || block.subtitle) && (
+        <SectionHeader
+          title={block.title}
+          subtitle={headerSubtitle}
+          tone={isDarkBackground ? 'dark' : 'light'}
+          className="mb-10 md:mb-12"
+          titleClassName={theme.heading}
+          subtitleClassName={`mx-auto max-w-3xl ${sectionSubtitleClass} ${subtitleClass}`}
+        />
+      )}
 
-        {content}
-      </div>
-    </section>
+      {content}
+    </SectionShell>
   )
 }

@@ -3,6 +3,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { client, urlFor } from '@/app/lib/sanity'
+import SectionHeader from '@/components/page-builder/SectionHeader'
+import SectionShell from '@/components/page-builder/SectionShell'
 import Icon from '@/components/ui/Icon'
 
 type QueryParamValue = string | string[] | undefined
@@ -204,7 +206,7 @@ export default async function SolutionsPage({ searchParams }: SolutionsPageProps
 
   return (
     <main className="bg-[#fcfdfd] text-slate-900">
-      <section className="relative overflow-hidden bg-slate-800 pb-24 pt-32">
+      <section className="relative overflow-hidden bg-slate-800 pb-20 pt-28 md:pb-24 md:pt-32">
         {heroImageSrc && (
           <Image
             src={heroImageSrc}
@@ -217,135 +219,150 @@ export default async function SolutionsPage({ searchParams }: SolutionsPageProps
         <div className="absolute inset-0 bg-[radial-gradient(#fb923c_1px,transparent_1px)] [background-size:32px_32px] opacity-15" />
         <div className="relative z-10 mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
           {heroBadge && (
-            <div className="mb-8 inline-flex items-center gap-3 rounded-md border border-orange-500/20 bg-orange-500/10 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-orange-400">
+            <div className="mb-6 inline-flex items-center gap-3 rounded-full border border-orange-400/30 bg-orange-500/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-orange-300">
               <Icon icon="lightbulb" className="h-4 w-4" />
               <span>{heroBadge}</span>
             </div>
           )}
-          <h1 className="mb-8 text-5xl font-display font-black leading-tight tracking-tight text-white md:text-7xl">
-            {heroTitle ? (
-              heroTitle
-            ) : (
-              <>
-                Material Processing <span className="accent-gradient-text">Solutions</span>
-              </>
-            )}
-          </h1>
-          <p className="mx-auto max-w-3xl text-xl font-light leading-relaxed text-slate-400">{heroSubtitle}</p>
+          <div className="mx-auto max-w-4xl">
+            <SectionHeader
+              title={
+                heroTitle ? (
+                  heroTitle
+                ) : (
+                  <>
+                    Material Processing <span className="accent-gradient-text">Solutions</span>
+                  </>
+                )
+              }
+              subtitle={heroSubtitle}
+              tone="dark"
+              className="mx-auto"
+              titleClassName="text-white"
+              subtitleClassName="mx-auto max-w-3xl text-sm leading-7 text-slate-300 md:text-base lg:text-lg"
+            />
+          </div>
         </div>
       </section>
 
-      <section id="solutions" className="py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-10 flex flex-wrap justify-center gap-3">
-            <Link
-              href={buildHref({ q })}
-              className={`rounded-md border-2 px-6 py-2.5 text-[11px] font-black uppercase tracking-widest transition-all ${
-                category
-                  ? 'border-slate-200 text-slate-700 hover:border-slate-300'
-                  : 'border-orange-500 bg-orange-500 text-white shadow-lg shadow-orange-500/25'
-              }`}
-            >
-              All Solutions
-            </Link>
-            {categories.map((item) => {
-              const slug = item.slug?.current
-              if (!slug) return null
-              const active = slug === category
+      <SectionShell id="solutions">
+        <div className="mb-10 md:mb-12">
+          <SectionHeader
+            eyebrow="Browse Solutions"
+            title="Find the right process route by material and application"
+            subtitle="Use category filters and keyword search to narrow down solution pages built around actual process scenarios."
+            className="mx-auto max-w-3xl"
+          />
+        </div>
+
+        <div className="mb-8 flex flex-wrap justify-center gap-3 md:mb-10">
+          <Link
+            href={buildHref({ q })}
+            className={`rounded-full border px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.16em] transition-colors ${
+              category
+                ? 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
+                : 'border-orange-500 bg-orange-500 text-white shadow-lg shadow-orange-500/20'
+            }`}
+          >
+            All Solutions
+          </Link>
+          {categories.map((item) => {
+            const slug = item.slug?.current
+            if (!slug) return null
+            const active = slug === category
+            return (
+              <Link
+                key={item._id ?? slug}
+                href={buildHref({ category: slug, q })}
+                className={`rounded-full border px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.16em] transition-colors ${
+                  active
+                    ? 'border-orange-500 bg-orange-500 text-white shadow-lg shadow-orange-500/20'
+                    : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
+                }`}
+              >
+                {item.title || slug}
+              </Link>
+            )
+          })}
+        </div>
+
+        <form action="/solutions" method="get" className="mx-auto mb-14 max-w-2xl md:mb-16">
+          {category && <input type="hidden" name="category" value={category} />}
+          <div className="relative">
+            <Icon icon="search" className="pointer-events-none absolute right-5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input
+              name="q"
+              defaultValue={q}
+              placeholder="Search your material (e.g. Corn, Spices, Plastic)..."
+              className="w-full rounded-2xl border border-slate-200 bg-white px-6 py-4 pr-12 text-sm font-medium text-slate-900 shadow-sm transition-all focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-500/10"
+            />
+          </div>
+        </form>
+
+        {solutions.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-slate-300 bg-white p-16 text-center text-slate-500">
+            No solutions found matching your search.
+          </div>
+        ) : (
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {solutions.map((item) => {
+              const imageSrc = toImageSrc(item.heroImage, 900)
+              const href = item.slug?.current ? `/solutions/${item.slug.current}` : '#'
               return (
-                <Link
-                  key={item._id ?? slug}
-                  href={buildHref({ category: slug, q })}
-                  className={`rounded-md border-2 px-6 py-2.5 text-[11px] font-black uppercase tracking-widest transition-all ${
-                    active
-                      ? 'border-orange-500 bg-orange-500 text-white shadow-lg shadow-orange-500/25'
-                      : 'border-slate-200 text-slate-700 hover:border-slate-300'
-                  }`}
-                >
-                  {item.title || slug}
-                </Link>
+                <article key={item._id} className="premium-card group overflow-hidden p-2">
+                  <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-slate-100 shadow-inner">
+                    {imageSrc ? (
+                      <Image
+                        src={imageSrc}
+                        alt={item.heroImage?.alt || item.title || 'Solution image'}
+                        fill
+                        sizes="(min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw"
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-slate-300">
+                        <Icon icon="image" className="h-10 w-10" />
+                      </div>
+                    )}
+                    <div className="absolute left-4 top-4 rounded-full bg-white/92 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-700 shadow-sm backdrop-blur-md">
+                      {item.category?.title || 'Solution'}
+                    </div>
+                  </div>
+                  <div className="p-7">
+                    <h3 className="mb-3 text-xl font-display font-extrabold leading-[1.15] tracking-[-0.02em] text-slate-900 transition-colors group-hover:text-orange-600 md:text-[1.375rem]">
+                      {item.title}
+                    </h3>
+                    <p className="mb-6 line-clamp-2 min-h-14 text-sm leading-7 text-slate-600 md:text-base">
+                      {item.summary || 'High-efficiency and stable industrial process design.'}
+                    </p>
+                    <Link
+                      href={href}
+                      className="flex w-full items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-800 transition-colors hover:border-slate-800 hover:bg-slate-800 hover:text-white"
+                    >
+                      Explore Solution Details
+                    </Link>
+                  </div>
+                </article>
               )
             })}
           </div>
+        )}
 
-          <form action="/solutions" method="get" className="mx-auto mb-16 max-w-2xl">
-            {category && <input type="hidden" name="category" value={category} />}
-            <div className="relative">
-              <Icon icon="search" className="pointer-events-none absolute right-5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <input
-                name="q"
-                defaultValue={q}
-                placeholder="Search your material (e.g. Corn, Spices, Plastic)..."
-                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-8 py-5 pr-12 text-sm font-medium text-slate-900 transition-all focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-500/10"
+        {totalPages > 1 && (
+          <div className="mt-16 flex items-center justify-center gap-2 md:mt-20">
+            {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
+              <Link
+                key={pageNumber}
+                href={buildHref({ category, q, page: pageNumber })}
+                className={`h-3 rounded-full transition-all ${
+                  pageNumber === currentPage ? 'w-8 bg-orange-500' : 'w-2.5 bg-slate-300 hover:bg-slate-400'
+                }`}
+                aria-label={`Go to page ${pageNumber}`}
               />
-            </div>
-          </form>
-
-          {solutions.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-slate-300 bg-white p-16 text-center text-slate-500">
-              No solutions found matching your search.
-            </div>
-          ) : (
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-              {solutions.map((item) => {
-                const imageSrc = toImageSrc(item.heroImage, 900)
-                const href = item.slug?.current ? `/solutions/${item.slug.current}` : '#'
-                return (
-                  <article key={item._id} className="premium-card group p-2">
-                    <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-slate-100 shadow-inner">
-                      {imageSrc ? (
-                        <Image
-                          src={imageSrc}
-                          alt={item.heroImage?.alt || item.title || 'Solution image'}
-                          fill
-                          sizes="(min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw"
-                          className="object-cover transition-transform duration-700 group-hover:scale-105"
-                        />
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-slate-300">
-                          <Icon icon="image" className="h-10 w-10" />
-                        </div>
-                      )}
-                      <div className="absolute left-4 top-4 rounded-md bg-white/90 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-slate-900 shadow-sm backdrop-blur-md">
-                        {item.category?.title || 'Solution'}
-                      </div>
-                    </div>
-                    <div className="p-7">
-                      <h3 className="mb-3 text-xl font-display font-black leading-tight text-slate-900 transition-colors group-hover:text-orange-600">
-                        {item.title}
-                      </h3>
-                      <p className="mb-6 line-clamp-2 min-h-10 text-sm font-light leading-relaxed text-slate-500">
-                        {item.summary || 'High-efficiency and stable industrial process design.'}
-                      </p>
-                      <Link
-                        href={href}
-                        className="flex w-full items-center justify-center rounded-lg bg-slate-50 py-3 text-[10px] font-black uppercase tracking-widest transition-all hover:bg-slate-800 hover:text-white"
-                      >
-                        Explore Solution Details
-                      </Link>
-                    </div>
-                  </article>
-                )
-              })}
-            </div>
-          )}
-
-          {totalPages > 1 && (
-            <div className="mt-20 flex items-center justify-center gap-3">
-              {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
-                <Link
-                  key={pageNumber}
-                  href={buildHref({ category, q, page: pageNumber })}
-                  className={`h-3 rounded-full transition-all ${
-                    pageNumber === currentPage ? 'w-8 bg-orange-500' : 'w-3 bg-slate-200 hover:bg-slate-300'
-                  }`}
-                  aria-label={`Go to page ${pageNumber}`}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+            ))}
+          </div>
+        )}
+      </SectionShell>
     </main>
   )
 }

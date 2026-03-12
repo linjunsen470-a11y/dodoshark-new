@@ -9,7 +9,9 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 
 import { urlFor } from '@/app/lib/sanity'
 import { getSharedBackgroundTheme } from './backgroundTheme'
+import SectionShell from './SectionShell'
 import SectionHeader from './SectionHeader'
+import { bodyTextClass, cardTitleClass, sectionSubtitleClass } from './sectionStyles'
 import styles from './ShowcaseBlock.module.css'
 import 'swiper/css'
 
@@ -203,11 +205,11 @@ function SplitCarousel({
             <SwiperSlide key={item._key ?? `${title}-${index}`} className="!h-auto">
               <article className="grid h-full gap-8 md:items-center lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-16">
                 <div className="order-2 flex flex-col justify-center md:order-2 lg:order-1">
-                  <h3 className={`text-2xl font-display font-black tracking-tight md:text-4xl ${titleClass}`}>
+                  <h3 className={`${cardTitleClass} ${titleClass}`}>
                     {title}
                   </h3>
                   {description ? (
-                    <p className={`mt-5 text-base leading-8 md:text-lg ${bodyClass}`}>
+                    <p className={`mt-5 ${bodyTextClass} ${bodyClass}`}>
                       {description}
                     </p>
                   ) : null}
@@ -311,24 +313,23 @@ export default function ShowcaseBlock({ block }: { block: ShowcaseBlockData }) {
   }
 
   return (
-    <section className={`py-24 ${theme.section}`}>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {(block.title || block.subtitle) && (
-          <SectionHeader
-            title={block.title}
-            subtitle={block.subtitle}
-            isDark={isDark}
-            className={layout === 'splitCarousel' ? 'mb-14' : 'mb-10'}
-            titleClassName={`text-3xl md:text-4xl font-display font-black tracking-tight ${theme.heading}`}
-            subtitleClassName={`mx-auto max-w-3xl text-base md:text-lg ${theme.subtitle}`}
-          />
-        )}
+    <SectionShell sectionClassName={theme.section}>
+      {(block.title || block.subtitle) && (
+        <SectionHeader
+          title={block.title}
+          subtitle={block.subtitle}
+          tone={isDark ? 'dark' : 'light'}
+          className={layout === 'splitCarousel' ? 'mb-12 md:mb-14' : 'mb-10 md:mb-12'}
+          titleClassName={theme.heading}
+          subtitleClassName={`mx-auto max-w-3xl ${sectionSubtitleClass} ${theme.subtitle}`}
+        />
+      )}
 
-        {items.length > 0 && (
-          layout === 'splitCarousel' ? (
-            <SplitCarousel items={items} isDark={isDark} footerCta={block.footerCta} />
-          ) : (
-            <div className={`${styles.shell} ${isDark ? styles.darkShell : ''}`.trim()}>
+      {items.length > 0 && (
+        layout === 'splitCarousel' ? (
+          <SplitCarousel items={items} isDark={isDark} footerCta={block.footerCta} />
+        ) : (
+          <div className={`${styles.shell} ${isDark ? styles.darkShell : ''}`.trim()}>
               <Swiper
                 modules={[Keyboard, A11y]}
                 className={styles.carousel}
@@ -406,10 +407,9 @@ export default function ShowcaseBlock({ block }: { block: ShowcaseBlockData }) {
                   </a>
                 ) : null}
               </div>
-            </div>
-          )
-        )}
-      </div>
-    </section>
+          </div>
+        )
+      )}
+    </SectionShell>
   )
 }

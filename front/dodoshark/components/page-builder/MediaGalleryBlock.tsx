@@ -10,7 +10,9 @@ import type { Swiper as SwiperInstance } from 'swiper'
 import { urlFor } from '@/app/lib/sanity'
 import Icon from '@/components/ui/Icon'
 import { getSharedBackgroundTheme } from './backgroundTheme'
+import SectionShell from './SectionShell'
 import SectionHeader from './SectionHeader'
+import { sectionSubtitleClass } from './sectionStyles'
 import 'swiper/css'
 
 type GalleryImage = {
@@ -728,10 +730,10 @@ function VideoCardCarousel({
       {title && (
         <SectionHeader
           title={title}
-          isDark={isDarkBackground}
+          tone={isDarkBackground ? 'dark' : 'light'}
           align="center"
-          className="mb-16"
-          titleClassName={`text-3xl md:text-4xl font-display font-black tracking-tight ${isDarkBackground ? 'text-white' : 'text-slate-900'}`}
+          className="mb-10 md:mb-12"
+          titleClassName={isDarkBackground ? 'text-white' : 'text-slate-900'}
         />
       )}
 
@@ -869,50 +871,52 @@ export default function MediaGalleryBlock({ block }: { block: MediaGalleryBlockD
 
   return (
     <>
-      <section className={`${layout === 'videoCardCarousel' ? 'py-20 sm:py-24' : 'py-24'} ${theme.section}`}>
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          {block.title && layout !== 'videoCardCarousel' && (
-            <SectionHeader
-              title={block.title}
-              isDark={isDark}
-              className="mb-12"
-              titleClassName={`text-3xl font-display font-black uppercase tracking-tight ${theme.heading}`}
-            />
-          )}
+      <SectionShell
+        spacing={layout === 'videoCardCarousel' ? 'compact' : 'default'}
+        sectionClassName={theme.section}
+      >
+        {block.title && layout !== 'videoCardCarousel' && (
+          <SectionHeader
+            title={block.title}
+            tone={isDark ? 'dark' : 'light'}
+            className="mb-10 md:mb-12"
+            titleClassName={theme.heading}
+            subtitleClassName={`mx-auto max-w-3xl ${sectionSubtitleClass} ${theme.subtitle}`}
+          />
+        )}
 
-          {layout === 'carousel' && (
-            <div className="flex snap-x snap-mandatory gap-6 overflow-x-auto pb-2">
-              {items.map((item, index) => (
-                <div
-                  key={item._key ?? `${item.caption}-${index}`}
-                  className="max-w-[500px] min-w-[280px] snap-start md:min-w-[420px]"
-                >
-                  <GalleryTile item={item} isDarkBackground={isDark} onOpenVideo={openVideo} />
-                </div>
-              ))}
-            </div>
-          )}
+        {layout === 'carousel' && (
+          <div className="flex snap-x snap-mandatory gap-6 overflow-x-auto pb-2">
+            {items.map((item, index) => (
+              <div
+                key={item._key ?? `${item.caption}-${index}`}
+                className="max-w-[500px] min-w-[280px] snap-start md:min-w-[420px]"
+              >
+                <GalleryTile item={item} isDarkBackground={isDark} onOpenVideo={openVideo} />
+              </div>
+            ))}
+          </div>
+        )}
 
-          {layout === 'thumbnailGallery' && (
-            <ThumbnailGallery
-              items={items}
-              isDarkBackground={isDark}
-              captionClassName={isDark ? 'text-slate-100' : 'text-slate-700'}
-              onOpenVideo={openVideo}
-            />
-          )}
+        {layout === 'thumbnailGallery' && (
+          <ThumbnailGallery
+            items={items}
+            isDarkBackground={isDark}
+            captionClassName={isDark ? 'text-slate-100' : 'text-slate-700'}
+            onOpenVideo={openVideo}
+          />
+        )}
 
-          {layout === 'videoCardCarousel' && (
-            <VideoCardCarousel
-              title={block.title}
-              cta={block.cta}
-              items={items}
-              isDarkBackground={isDark}
-              onOpenVideo={openVideo}
-            />
-          )}
-        </div>
-      </section>
+        {layout === 'videoCardCarousel' && (
+          <VideoCardCarousel
+            title={block.title}
+            cta={block.cta}
+            items={items}
+            isDarkBackground={isDark}
+            onOpenVideo={openVideo}
+          />
+        )}
+      </SectionShell>
 
       {activeVideo && (
         <div

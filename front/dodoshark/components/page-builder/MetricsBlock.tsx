@@ -1,6 +1,8 @@
 import { getSharedBackgroundTheme } from './backgroundTheme'
+import SectionShell from './SectionShell'
 import SectionHeader from './SectionHeader'
 import Icon from '@/components/ui/Icon'
+import { bodyTextClass } from './sectionStyles'
 
 type MetricItem = {
   _key?: string
@@ -28,18 +30,17 @@ export default function MetricsBlock({ block }: { block: MetricsBlockData }) {
   if (!block.title && items.length === 0) return null
 
   return (
-    <section className={`py-20 ${theme.section} ${sectionBorderClass}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {block.title && (
-          <SectionHeader
-            title={block.title}
-            isDark={isDark}
-            className="mb-12"
-            titleClassName={`text-3xl md:text-4xl font-display font-black tracking-tight ${theme.heading}`}
-          />
-        )}
+    <SectionShell spacing="compact" sectionClassName={`${theme.section} ${sectionBorderClass}`}>
+      {block.title && (
+        <SectionHeader
+          title={block.title}
+          tone={isDark ? 'dark' : 'light'}
+          className="mb-10 md:mb-12"
+          titleClassName={theme.heading}
+        />
+      )}
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+      <div className="grid grid-cols-2 gap-6 lg:grid-cols-4 md:gap-8">
           {items.map((item, idx) => {
             const iconClass = item.icon?.trim() || 'chart-line'
 
@@ -52,21 +53,20 @@ export default function MetricsBlock({ block }: { block: MetricsBlockData }) {
                   <Icon icon={iconClass} className="h-5 w-5" />
                 </div>
 
-                <div className="text-3xl md:text-4xl font-display font-black text-slate-900 mb-1">
+                <div className="mb-1 text-3xl font-display font-black text-slate-900 md:text-4xl">
                   <span className="text-orange-500">{item.value}</span>
                   {item.unit && <span className="text-xl align-top ms-1">{item.unit}</span>}
                 </div>
 
                 {item.label && (
-                  <p className="text-xs md:text-sm text-slate-500 uppercase tracking-wide">
+                  <p className={`text-[11px] uppercase tracking-[0.16em] text-slate-500 md:text-xs ${bodyTextClass}`}>
                     {item.label}
                   </p>
                 )}
               </article>
             )
           })}
-        </div>
       </div>
-    </section>
+    </SectionShell>
   )
 }

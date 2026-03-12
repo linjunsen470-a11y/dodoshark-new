@@ -5,6 +5,12 @@ import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
 import { urlFor } from '@/app/lib/sanity'
+import {
+  getSectionToneClasses,
+  heroDescriptionClass,
+  heroSubtitleClass,
+  heroTitleClass,
+} from './sectionStyles'
 
 type HeroImage = {
   _key?: string
@@ -123,11 +129,18 @@ function CtaButton({ button }: { button: HeroCtaButton }) {
   )
 }
 
-function HeroAccent({ className = '' }: { className?: string }) {
+function HeroAccent({
+  className = '',
+  tone = 'light',
+}: {
+  className?: string
+  tone?: 'light' | 'dark'
+}) {
+  const toneClasses = getSectionToneClasses(tone)
+
   return (
     <div className={`mb-7 flex ${className}`}>
-      <span className="h-1.5 w-14 bg-[#243b7c]" />
-      <span className="h-1.5 w-4 bg-[#e7be4a]" />
+      <span className={`h-1 w-16 rounded-full ${toneClasses.divider}`} />
     </div>
   )
 }
@@ -153,7 +166,10 @@ function HeroTextContent({
 
       {block.subtitle && <p className={subtitleClassName}>{block.subtitle}</p>}
 
-      <HeroAccent className={accentAlignClass} />
+      <HeroAccent
+        className={accentAlignClass}
+        tone={titleClassName.includes('text-white') ? 'dark' : 'light'}
+      />
 
       {block.description && <p className={descriptionClassName}>{block.description}</p>}
 
@@ -351,9 +367,9 @@ function LegacyHero({
           <div className={`flex max-w-xl flex-col ${panelAlignClass}`}>
             <HeroTextContent
               block={block}
-              titleClassName="mb-4 text-3xl font-bold leading-tight text-black sm:text-4xl lg:text-5xl"
-              subtitleClassName="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-black"
-              descriptionClassName="whitespace-pre-line text-base leading-relaxed text-black sm:text-lg"
+              titleClassName={`mb-4 ${heroTitleClass} text-white`}
+              subtitleClassName={`mb-4 ${heroSubtitleClass} text-slate-200`}
+              descriptionClassName={`whitespace-pre-line ${heroDescriptionClass} text-slate-100`}
               accentAlignClass={indicatorAlignClass}
               actionsClassName={`mt-8 flex flex-wrap gap-3 ${indicatorAlignClass}`}
             />
@@ -453,9 +469,9 @@ function SplitHero({
             <div className="max-w-xl text-left">
               <HeroTextContent
                 block={block}
-                titleClassName="mb-4 text-2xl font-bold leading-tight text-slate-900 sm:text-3xl lg:text-5xl"
-                subtitleClassName="mb-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-700 sm:text-xs"
-                descriptionClassName="whitespace-pre-line text-sm leading-7 text-slate-700 sm:text-base lg:text-lg"
+                titleClassName={`mb-4 text-slate-900 ${heroTitleClass}`}
+                subtitleClassName={`mb-4 ${heroSubtitleClass} text-slate-500`}
+                descriptionClassName={`whitespace-pre-line ${heroDescriptionClass} text-slate-700`}
                 accentAlignClass="justify-start"
                 actionsClassName="mt-8 flex flex-wrap gap-3 justify-start"
               />

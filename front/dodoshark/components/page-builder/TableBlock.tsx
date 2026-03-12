@@ -1,5 +1,7 @@
 import { getSharedBackgroundTheme } from './backgroundTheme'
+import SectionShell from './SectionShell'
 import SectionHeader from './SectionHeader'
+import { sectionSubtitleClass } from './sectionStyles'
 
 type TableRow = {
   _key?: string
@@ -208,20 +210,19 @@ export default function TableBlock({ block }: { block: TableBlockData }) {
   if (!block.title && !block.description && rows.length === 0 && !block.note) return null
 
   return (
-    <section className={`py-24 ${theme.section} ${sectionBorderClass}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {(block.title || block.description) && (
-          <SectionHeader
-            title={block.title}
-            subtitle={block.description}
-            isDark={isDark}
-            className="mb-12"
-            titleClassName={`text-3xl md:text-4xl font-display font-black tracking-tight ${theme.heading}`}
-            subtitleClassName={`${subtitleClass} max-w-3xl mx-auto`}
-          />
-        )}
+    <SectionShell sectionClassName={`${theme.section} ${sectionBorderClass}`}>
+      {(block.title || block.description) && (
+        <SectionHeader
+          title={block.title}
+          subtitle={block.description}
+          tone={isDark ? 'dark' : 'light'}
+          className="mb-10 md:mb-12"
+          titleClassName={theme.heading}
+          subtitleClassName={`${subtitleClass} ${sectionSubtitleClass} mx-auto max-w-3xl`}
+        />
+      )}
 
-        <div className="rounded-lg border border-slate-200 bg-white shadow-sm overflow-hidden">
+      <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
           {rows.length === 0 ? (
             <div className="p-10 text-center text-slate-400 text-sm">No table data.</div>
           ) : (
@@ -262,12 +263,11 @@ export default function TableBlock({ block }: { block: TableBlockData }) {
               </table>
             </div>
           )}
-        </div>
-
-        {block.note && (
-          <p className={`mt-4 text-xs leading-relaxed whitespace-pre-line ${subtitleClass}`}>{block.note}</p>
-        )}
       </div>
-    </section>
+
+      {block.note && (
+        <p className={`mt-4 whitespace-pre-line text-xs leading-relaxed ${subtitleClass}`}>{block.note}</p>
+      )}
+    </SectionShell>
   )
 }

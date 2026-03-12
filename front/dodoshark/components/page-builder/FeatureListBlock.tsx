@@ -5,7 +5,9 @@ import {
   getSharedBackgroundTheme,
   mapFeatureBackgroundStyleToVariant,
 } from './backgroundTheme'
+import SectionShell from './SectionShell'
 import SectionHeader from './SectionHeader'
+import { bodyTextClass, cardTitleClass } from './sectionStyles'
 
 type FeatureIconImage = {
   alt?: string
@@ -95,9 +97,9 @@ export function FeatureListBlockContent({
       {hasHeader && (
         <SectionHeader
           title={block.title}
-          isDark={isDark}
-          className="mx-auto mb-10 max-w-[36rem]"
-          titleClassName={`text-3xl font-display font-extrabold leading-[1.05] tracking-[-0.02em] md:text-[2.5rem] ${titleClass}`}
+          tone={isDark ? 'dark' : 'light'}
+          className="mx-auto mb-10 max-w-[36rem] md:mb-12"
+          titleClassName={titleClass}
         />
       )}
 
@@ -118,13 +120,13 @@ export function FeatureListBlockContent({
                 <article className={mergedCardClass}>
                   <FeatureMedia item={item} />
                   <h3
-                    className={`mx-auto mb-3 max-w-[14ch] whitespace-pre-line text-lg font-display font-extrabold leading-[1.15] tracking-[-0.02em] md:text-xl ${itemTitleClass}`}
+                    className={`mx-auto mb-3 max-w-[14ch] whitespace-pre-line ${cardTitleClass} ${itemTitleClass}`}
                   >
                     {item.title}
                   </h3>
                   {item.description && (
                     <p
-                      className={`mx-auto max-w-[24ch] whitespace-pre-line text-sm font-normal leading-6 md:text-[0.95rem] md:leading-7 ${itemDescriptionClass}`}
+                      className={`mx-auto max-w-[24ch] whitespace-pre-line font-normal ${bodyTextClass} ${itemDescriptionClass}`}
                     >
                       {item.description}
                     </p>
@@ -143,13 +145,13 @@ export function FeatureListBlockContent({
             >
               <FeatureMedia item={item} />
               <h3
-                className={`mb-3 max-w-[12ch] whitespace-pre-line text-lg font-display font-extrabold leading-[1.15] tracking-[-0.02em] md:text-xl ${itemTitleClass}`}
+                className={`mb-3 max-w-[12ch] whitespace-pre-line ${cardTitleClass} ${itemTitleClass}`}
               >
                 {item.title}
               </h3>
               {item.description && (
                 <p
-                  className={`mx-auto max-w-[17ch] whitespace-pre-line text-sm font-normal leading-5 md:text-[0.95rem] md:leading-7 ${itemDescriptionClass}`}
+                  className={`mx-auto max-w-[17ch] whitespace-pre-line font-normal ${bodyTextClass} ${itemDescriptionClass}`}
                 >
                   {item.description}
                 </p>
@@ -170,8 +172,8 @@ export default function FeatureListBlock({ block }: FeatureListBlockProps) {
   const theme = getSharedBackgroundTheme(backgroundVariant)
 
   return (
-    <section className={`py-16 md:py-20 ${theme.section}`}>
+    <SectionShell spacing="compact" sectionClassName={theme.section}>
       <FeatureListBlockContent block={block} />
-    </section>
+    </SectionShell>
   )
 }

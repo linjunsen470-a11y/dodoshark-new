@@ -4,7 +4,9 @@ import Link from 'next/link'
 import { urlFor } from '@/app/lib/sanity'
 import Icon from '@/components/ui/Icon'
 import { getSharedBackgroundTheme } from './backgroundTheme'
+import SectionShell from './SectionShell'
 import SectionHeader from './SectionHeader'
+import { cardTitleClass, sectionSubtitleClass } from './sectionStyles'
 
 type SanityImage = {
   alt?: string
@@ -104,9 +106,9 @@ function ReferenceCard({ item }: { item: ReferenceItem }) {
           ) : null}
         </div>
 
-        <h3 className="mb-2 text-base font-display font-black text-slate-900 md:text-lg">{title}</h3>
+        <h3 className={`mb-2 ${cardTitleClass} text-slate-900`}>{title}</h3>
         {description && (
-          <p className="mb-4 max-w-[28ch] text-sm leading-relaxed text-slate-500">{description}</p>
+          <p className="mb-4 max-w-[28ch] text-sm leading-7 text-slate-500 md:text-base">{description}</p>
         )}
         {href && (
           <span className="mt-auto inline-flex items-center justify-center text-sm font-bold text-orange-600">
@@ -144,50 +146,48 @@ export default function CollectionReferenceBlock({
   if (!block.title && !block.subtitle && refs.length === 0) return null
 
   return (
-    <section className={`py-24 ${theme.section} ${sectionBorderClass}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {(block.title || block.subtitle) && (
-          <SectionHeader
-            title={block.title}
-            subtitle={block.subtitle}
-            isDark={isDark}
-            className="mb-12"
-            titleClassName={`text-3xl md:text-4xl font-display font-black tracking-tight ${theme.heading}`}
-            subtitleClassName={`${subtitleClass} max-w-3xl mx-auto`}
-          />
-        )}
+    <SectionShell sectionClassName={`${theme.section} ${sectionBorderClass}`}>
+      {(block.title || block.subtitle) && (
+        <SectionHeader
+          title={block.title}
+          subtitle={block.subtitle}
+          tone={isDark ? 'dark' : 'light'}
+          className="mb-10 md:mb-12"
+          titleClassName={theme.heading}
+          subtitleClassName={`${subtitleClass} ${sectionSubtitleClass} mx-auto max-w-3xl`}
+        />
+      )}
 
-        {layout === 'grid' && (
-          <div className={`grid gap-4 md:gap-8 ${columnsClass(block.columns)}`}>
-            {refs.map((item, idx) => (
-              <ReferenceCard key={item._key ?? idx} item={item} />
-            ))}
-          </div>
-        )}
+      {layout === 'grid' && (
+        <div className={`grid gap-4 md:gap-8 ${columnsClass(block.columns)}`}>
+          {refs.map((item, idx) => (
+            <ReferenceCard key={item._key ?? idx} item={item} />
+          ))}
+        </div>
+      )}
 
-        {layout === 'list' && (
-          <div className="space-y-6">
-            {refs.map((item, idx) => (
-              <div key={item._key ?? idx} className="max-w-5xl mx-auto">
-                <ReferenceCard item={item} />
-              </div>
-            ))}
-          </div>
-        )}
+      {layout === 'list' && (
+        <div className="space-y-6">
+          {refs.map((item, idx) => (
+            <div key={item._key ?? idx} className="mx-auto max-w-5xl">
+              <ReferenceCard item={item} />
+            </div>
+          ))}
+        </div>
+      )}
 
-        {layout === 'carousel' && (
-          <div className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-2">
-            {refs.map((item, idx) => (
-              <div
-                key={item._key ?? idx}
-                className="min-w-[280px] md:min-w-[360px] max-w-[400px] snap-start"
-              >
-                <ReferenceCard item={item} />
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </section>
+      {layout === 'carousel' && (
+        <div className="flex snap-x snap-mandatory gap-6 overflow-x-auto pb-2">
+          {refs.map((item, idx) => (
+            <div
+              key={item._key ?? idx}
+              className="max-w-[400px] min-w-[280px] snap-start md:min-w-[360px]"
+            >
+              <ReferenceCard item={item} />
+            </div>
+          ))}
+        </div>
+      )}
+    </SectionShell>
   )
 }

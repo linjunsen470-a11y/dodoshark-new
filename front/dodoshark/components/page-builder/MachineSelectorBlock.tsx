@@ -9,7 +9,9 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import { urlFor } from '@/app/lib/sanity'
 import Icon from '@/components/ui/Icon'
 import { getSharedBackgroundTheme } from './backgroundTheme'
+import SectionShell from './SectionShell'
 import SectionHeader from './SectionHeader'
+import { bodyTextClass, cardTitleClass, sectionSubtitleClass } from './sectionStyles'
 import 'swiper/css'
 
 type SelectorImage = {
@@ -235,12 +237,12 @@ function MachineCard({
         )}
       </div>
 
-      <h3 className="mb-2 text-center text-xl font-display font-black text-slate-900 md:text-2xl">
+      <h3 className={`mb-2 text-center ${cardTitleClass} text-slate-900`}>
         {title}
       </h3>
 
       {shouldShowModelDescription && description && (
-        <p className="text-center text-sm leading-relaxed text-slate-600 md:text-base">
+        <p className={`text-center ${bodyTextClass} text-slate-600`}>
           {description}
         </p>
       )}
@@ -319,21 +321,20 @@ export default function MachineSelectorBlock({ block }: { block: MachineSelector
   if (!block.title && !block.subtitle && groups.length === 0) return null
 
   return (
-    <section className={`py-24 ${theme.section}`}>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {(block.title || block.subtitle) && (
-          <SectionHeader
-            title={block.title}
-            subtitle={block.subtitle}
-            isDark={isDark}
-            className="mb-10"
-            titleClassName={`text-3xl md:text-4xl font-display font-black tracking-tight ${theme.heading}`}
-            subtitleClassName={`mx-auto max-w-3xl text-base md:text-lg ${subtitleClass}`}
-          />
-        )}
+    <SectionShell sectionClassName={theme.section}>
+      {(block.title || block.subtitle) && (
+        <SectionHeader
+          title={block.title}
+          subtitle={block.subtitle}
+          tone={isDark ? 'dark' : 'light'}
+          className="mb-10 md:mb-12"
+          titleClassName={theme.heading}
+          subtitleClassName={`mx-auto max-w-3xl ${sectionSubtitleClass} ${subtitleClass}`}
+        />
+      )}
 
-        {groups.length > 0 && (
-          <div className="mb-8 -mx-4 px-4 md:mx-0 md:mb-10 md:px-0">
+      {groups.length > 0 && (
+        <div className="mb-8 -mx-4 px-4 md:mx-0 md:mb-10 md:px-0">
             <div className="flex items-center md:justify-center">
               <div className={`min-w-0 flex-1 ${tabControls.hasOverflow ? 'md:max-w-4xl' : 'md:max-w-fit'}`}>
                 <Swiper
@@ -379,8 +380,8 @@ export default function MachineSelectorBlock({ block }: { block: MachineSelector
                 </Swiper>
               </div>
             </div>
-          </div>
-        )}
+        </div>
+      )}
 
         {activeGroup?.description && (
           <p className={`mb-8 text-center text-sm md:text-base ${groupDescriptionClass}`}>
@@ -481,7 +482,6 @@ export default function MachineSelectorBlock({ block }: { block: MachineSelector
         {block.footerText && (
           <p className={`mt-8 text-center text-md font-semibold ${footerClass}`}>{block.footerText}</p>
         )}
-      </div>
-    </section>
+    </SectionShell>
   )
 }

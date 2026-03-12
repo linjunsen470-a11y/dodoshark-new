@@ -28,11 +28,14 @@ import RichSectionBlock, {
 import ShowcaseBlock, {
   type ShowcaseBlockData,
 } from '@/components/page-builder/ShowcaseBlock'
+import SectionHeader from '@/components/page-builder/SectionHeader'
+import SectionShell from '@/components/page-builder/SectionShell'
 import TableBlock, { type TableBlockData } from '@/components/page-builder/TableBlock'
 import {
   groupPageBuilderBlocks,
   type PageBuilderRenderGroup,
 } from '@/components/page-builder/richFeatureMerge'
+import { bodyTextClass, cardTitleClass } from '@/components/page-builder/sectionStyles'
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>
@@ -378,83 +381,77 @@ function toImageSrc(image?: SanityImage, width = 1200) {
 
 function renderLegacyFeatureGrid(block: FeatureGridBlockData, key: string | number) {
   return (
-    <section key={key} className="py-24 bg-white text-slate-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-24">
-          <h2 className="text-3xl font-display font-black mb-12 text-center section-title relative inline-block uppercase tracking-tight left-1/2 -translate-x-1/2">
-            {block.title}
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {block.items?.map((item, idx) => {
-              const imageSrc = toImageSrc(item.image, 900)
-
-              return (
-                <div
-                  key={item._key ?? idx}
-                  className="bg-slate-50 rounded-lg p-8 premium-card"
-                >
-                  <div className="h-48 rounded-lg overflow-hidden mb-6 bg-white flex items-center justify-center p-4">
-                    {imageSrc && (
-                      <Image
-                        src={imageSrc}
-                        alt={item.image?.alt || item.title || 'Feature image'}
-                        width={500}
-                        height={350}
-                        className="w-full h-full object-contain"
-                      />
-                    )}
-                  </div>
-                  <h3 className="text-xl font-display font-black mb-3">{item.title}</h3>
-                  <p className="text-slate-500 text-sm leading-relaxed">{item.description}</p>
-                </div>
-              )
-            })}
-          </div>
-        </div>
+    <SectionShell key={key} sectionClassName="bg-white text-slate-900">
+      <div className="mb-10 md:mb-12">
+        <SectionHeader title={block.title} />
       </div>
-    </section>
+      <div className="grid gap-8 md:grid-cols-3">
+        {block.items?.map((item, idx) => {
+          const imageSrc = toImageSrc(item.image, 900)
+
+          return (
+            <div
+              key={item._key ?? idx}
+              className="premium-card rounded-lg bg-slate-50 p-8"
+            >
+              <div className="mb-6 flex h-48 items-center justify-center overflow-hidden rounded-lg bg-white p-4">
+                {imageSrc && (
+                  <Image
+                    src={imageSrc}
+                    alt={item.image?.alt || item.title || 'Feature image'}
+                    width={500}
+                    height={350}
+                    className="h-full w-full object-contain"
+                  />
+                )}
+              </div>
+              <h3 className={`mb-3 ${cardTitleClass}`}>{item.title}</h3>
+              <p className={`text-slate-500 ${bodyTextClass}`}>{item.description}</p>
+            </div>
+          )
+        })}
+      </div>
+    </SectionShell>
   )
 }
 
 function renderLegacyVideoGallery(block: VideoGalleryBlockData, key: string | number) {
   return (
-    <section key={key} className="py-24 bg-white text-slate-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-display font-black mb-12 text-center section-title relative inline-block uppercase tracking-tight left-1/2 -translate-x-1/2">
-          {block.title}
-        </h2>
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {block.videos?.map((video, idx) => {
-            const thumbnailSrc = toImageSrc(video.thumbnail, 1200)
+    <SectionShell key={key} sectionClassName="bg-white text-slate-900">
+      <div className="mb-10 md:mb-12">
+        <SectionHeader title={block.title} />
+      </div>
+      <div className="mx-auto grid max-w-4xl gap-8 md:grid-cols-2">
+        {block.videos?.map((video, idx) => {
+          const thumbnailSrc = toImageSrc(video.thumbnail, 1200)
 
-            return (
-              <div key={video._key ?? idx} className="group cursor-pointer">
-                <div className="aspect-video bg-slate-800 rounded-lg relative overflow-hidden mb-4 shadow-xl">
-                  {thumbnailSrc && (
-                    <Image
-                      src={thumbnailSrc}
-                      alt={video.thumbnail?.alt || video.title || 'Video thumbnail'}
-                      fill
-                      className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700"
-                    />
-                  )}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-md flex items-center justify-center group-hover:bg-orange-500 group-hover:scale-110 transition-all text-white">
-                      <svg className="w-6 h-6 fill-current ml-1" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                    </div>
+          return (
+            <div key={video._key ?? idx} className="group cursor-pointer">
+              <div className="relative mb-4 aspect-video overflow-hidden rounded-lg bg-slate-800 shadow-xl">
+                {thumbnailSrc && (
+                  <Image
+                    src={thumbnailSrc}
+                    alt={video.thumbnail?.alt || video.title || 'Video thumbnail'}
+                    fill
+                    className="h-full w-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-105"
+                  />
+                )}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-md bg-white/20 text-white transition-all group-hover:scale-110 group-hover:bg-orange-500 backdrop-blur-md">
+                    <svg className="ml-1 h-6 w-6 fill-current" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
                   </div>
                 </div>
-                <h5 className="text-center font-bold font-display uppercase tracking-widest text-sm">
-                  {video.title}
-                </h5>
               </div>
-            )
-          })}
-        </div>
+              <h5 className="text-center text-sm font-semibold tracking-[0.16em] text-slate-700">
+                {video.title}
+              </h5>
+            </div>
+          )
+        })}
       </div>
-    </section>
+    </SectionShell>
   )
 }
 

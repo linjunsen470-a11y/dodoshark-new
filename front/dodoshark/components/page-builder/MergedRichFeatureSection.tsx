@@ -4,6 +4,7 @@ import {
   RichSectionBlockContent,
   type RichSectionBlockData,
 } from './RichSectionBlock'
+import SectionShell from './SectionShell'
 
 type MergedRichFeatureSectionProps = {
   richBlock: RichSectionBlockData
@@ -19,7 +20,7 @@ export default function MergedRichFeatureSection({
   const anchorId = richBlock.anchorId?.trim() || undefined
 
   return (
-    <section id={anchorId} className={`py-24 ${theme.section}`}>
+    <SectionShell id={anchorId} sectionClassName={theme.section}>
       <RichSectionBlockContent block={richBlock} trimTrailingContentSpacing />
       <div className="mt-12 md:mt-16">
         <FeatureListBlockContent
@@ -28,6 +29,6 @@ export default function MergedRichFeatureSection({
           renderMode="mergedCards"
         />
       </div>
-    </section>
+    </SectionShell>
   )
 }

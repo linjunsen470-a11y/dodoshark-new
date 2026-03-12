@@ -6,7 +6,9 @@ import {
 
 import { getSharedBackgroundTheme } from './backgroundTheme'
 import RichSectionMediaCarousel from './RichSectionMediaCarousel'
+import SectionShell from './SectionShell'
 import SectionHeader from './SectionHeader'
+import { bodyTextClass, cardTitleClass, sectionSubtitleClass } from './sectionStyles'
 
 type RichSectionImage = {
   alt?: string
@@ -73,12 +75,12 @@ function getPortableTextComponents(isDark: boolean): PortableTextComponents {
   return {
     block: {
       normal: ({ children }) => (
-        <p className={`mb-5 text-[1.02rem] font-normal leading-[1.6] md:text-[1.06rem] ${textColor}`}>
+        <p className={`mb-5 font-normal ${bodyTextClass} ${textColor}`}>
           {children}
         </p>
       ),
       h2: ({ children }) => (
-        <h2 className={`mb-5 text-2xl font-display font-extrabold leading-[1.08] tracking-[-0.02em] md:text-3xl ${headingColor}`}>
+        <h2 className={`mb-5 ${cardTitleClass} ${headingColor}`}>
           {children}
         </h2>
       ),
@@ -152,8 +154,6 @@ export function RichSectionBlockContent({
 
   if (!hasRichSectionContent(block)) return null
 
-  const headingClass = theme.heading
-  const subtitleClass = theme.subtitle
   const layoutClass = 'grid items-start gap-14 lg:grid-cols-2 lg:gap-16'
 
   const textOrderClass =
@@ -172,11 +172,11 @@ export function RichSectionBlockContent({
             <SectionHeader
               title={block.heading}
               subtitle={hasSubtitle ? block.subtitle : undefined}
-              isDark={isDark}
+              tone={isDark ? 'dark' : 'light'}
               align="left"
-              className="mb-8 max-w-[36rem]"
-              titleClassName={`text-3xl font-display font-extrabold leading-[1.05] tracking-[-0.02em] md:text-[2.5rem] ${headingClass}`}
-              subtitleClassName={`max-w-[34rem] text-[0.98rem] font-normal leading-7 md:text-base ${subtitleClass}`}
+              className="mb-10 max-w-[36rem] md:mb-12"
+              titleClassName={theme.heading}
+              subtitleClassName={`max-w-[34rem] font-normal ${sectionSubtitleClass} ${theme.subtitle}`}
             />
           )}
 
@@ -213,8 +213,8 @@ export default function RichSectionBlock({ block }: RichSectionBlockProps) {
   const anchorId = block.anchorId?.trim() || undefined
 
   return (
-    <section id={anchorId} className={`py-24 ${theme.section}`}>
+    <SectionShell id={anchorId} sectionClassName={theme.section}>
       <RichSectionBlockContent block={block} />
-    </section>
+    </SectionShell>
   )
 }

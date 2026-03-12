@@ -9,6 +9,8 @@ import {
 import { urlFor } from '@/app/lib/sanity'
 import Icon from '@/components/ui/Icon'
 import { getSharedBackgroundTheme } from './backgroundTheme'
+import SectionShell from './SectionShell'
+import { bodyTextClass, cardTitleClass } from './sectionStyles'
 
 type SanityImage = {
   alt?: string
@@ -75,17 +77,17 @@ function getPortableTextComponents(isDark: boolean): PortableTextComponents {
   return {
     block: {
       normal: ({ children }) => (
-        <p className={`mb-6 text-base md:text-lg leading-loose font-light ${textColor}`}>
+        <p className={`mb-6 font-normal ${bodyTextClass} ${textColor}`}>
           {children}
         </p>
       ),
       h2: ({ children }) => (
-        <h2 className={`text-3xl font-display font-black mt-12 mb-6 tracking-tight ${headingColor}`}>
+        <h2 className={`mt-12 mb-6 text-2xl font-display font-extrabold tracking-[-0.02em] md:text-3xl ${headingColor}`}>
           {children}
         </h2>
       ),
       h3: ({ children }) => (
-        <h3 className={`text-2xl font-display font-bold mt-10 mb-4 tracking-tight ${headingColor}`}>
+        <h3 className={`mt-10 mb-4 ${cardTitleClass} ${headingColor}`}>
           {children}
         </h3>
       ),
@@ -196,9 +198,9 @@ function getPortableTextComponents(isDark: boolean): PortableTextComponents {
                 </div>
               </div>
               <div className="flex-1">
-                <h4 className={`text-xl font-display font-black mb-2 ${productTitleClass}`}>{title}</h4>
+                <h4 className={`mb-2 ${cardTitleClass} ${productTitleClass}`}>{title}</h4>
                 {data.product.shortDescription && (
-                  <p className={`text-sm leading-relaxed mb-4 ${productDescriptionClass}`}>
+                  <p className={`mb-4 ${bodyTextClass} ${productDescriptionClass}`}>
                     {data.product.shortDescription}
                   </p>
                 )}
@@ -227,12 +229,10 @@ export default function PortableTextBlockComponent({
   if (!block.content?.length) return null
 
   return (
-    <section className={`py-24 ${theme.section}`}>
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <article className="portable-text">
-          <PortableText value={block.content} components={getPortableTextComponents(isDark)} />
-        </article>
-      </div>
-    </section>
+    <SectionShell container="prose" sectionClassName={theme.section}>
+      <article className="portable-text">
+        <PortableText value={block.content} components={getPortableTextComponents(isDark)} />
+      </article>
+    </SectionShell>
   )
 }

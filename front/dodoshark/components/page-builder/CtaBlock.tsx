@@ -1,5 +1,9 @@
 import Link from 'next/link'
 
+import SectionShell from './SectionShell'
+import SectionHeader from './SectionHeader'
+import { sectionSubtitleClass } from './sectionStyles'
+
 type CtaButton = {
   _key?: string
   label?: string
@@ -113,11 +117,7 @@ export default function CtaBlock({ block }: { block: CtaBlockData }) {
   }
 
   const sectionClass =
-    variant === 'card'
-      ? 'py-24 bg-white'
-      : variant === 'form'
-        ? 'py-24 bg-slate-800'
-        : 'py-20 bg-slate-800'
+    variant === 'card' ? 'bg-white' : 'bg-slate-800'
 
   const wrapperClass =
     variant === 'card'
@@ -125,38 +125,39 @@ export default function CtaBlock({ block }: { block: CtaBlockData }) {
       : 'rounded-lg border border-white/10 bg-white/[0.06] p-8 md:p-12 text-white'
 
   return (
-    <section className={sectionClass}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={wrapperClass}>
-          <div className={variant === 'banner' ? 'md:flex md:items-center md:justify-between gap-6' : ''}>
-            <div>
-              {block.title && (
-                <h2 className="text-3xl md:text-4xl font-display font-black tracking-tight mb-3">
-                  {block.title}
-                </h2>
-              )}
-              {block.subtitle && (
-                <p className="text-white/75 max-w-3xl leading-relaxed">{block.subtitle}</p>
-              )}
-              {variant === 'form' && (
-                <p className="mt-3 text-xs uppercase tracking-[0.2em] text-orange-300 font-bold">
-                  {FormTitle(block.formType)}
-                </p>
-              )}
-            </div>
-
-            {variant !== 'form' && buttons.length > 0 && (
-              <div className="mt-6 md:mt-0 flex flex-wrap gap-3">
-                {buttons.map((button, idx) => (
-                  <CtaButtonLink key={button._key ?? `${button.label}-${idx}`} button={button} />
-                ))}
-              </div>
+    <SectionShell spacing="compact" sectionClassName={sectionClass}>
+      <div className={wrapperClass}>
+        <div className={variant === 'banner' ? 'gap-6 md:flex md:items-center md:justify-between' : ''}>
+          <div>
+            {(block.title || block.subtitle) && (
+              <SectionHeader
+                title={block.title}
+                subtitle={block.subtitle}
+                tone="dark"
+                align="left"
+                showDivider={variant !== 'banner'}
+                className={variant === 'banner' ? '' : 'max-w-3xl'}
+                subtitleClassName={`max-w-3xl ${sectionSubtitleClass} text-white/75`}
+              />
+            )}
+            {variant === 'form' && (
+              <p className="mt-4 text-xs font-bold uppercase tracking-[0.2em] text-orange-300">
+                {FormTitle(block.formType)}
+              </p>
             )}
           </div>
 
-          {variant === 'form' && <FormFields formType={block.formType} />}
+          {variant !== 'form' && buttons.length > 0 && (
+            <div className="mt-6 flex flex-wrap gap-3 md:mt-0">
+              {buttons.map((button, idx) => (
+                <CtaButtonLink key={button._key ?? `${button.label}-${idx}`} button={button} />
+              ))}
+            </div>
+          )}
         </div>
+
+        {variant === 'form' && <FormFields formType={block.formType} />}
       </div>
-    </section>
+    </SectionShell>
   )
 }
