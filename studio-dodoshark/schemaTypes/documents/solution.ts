@@ -1,91 +1,62 @@
-import { defineType, defineField } from 'sanity'
+import {BulbOutlineIcon} from '@sanity/icons'
+import {defineField, defineType} from 'sanity'
+import {pickText} from '../shared/studio'
 
 export default defineType({
-    name: 'solution',
-    title: '解决方案',
-    type: 'document',
-    icon: () => '💡',
-    groups: [
-        { name: 'basic', title: '基本信息', default: true },
-        { name: 'content', title: '页面内容' },
-        { name: 'seo', title: 'SEO' },
-    ],
-    fields: [
-        // --- SEO ---
-        defineField({
-            name: 'seo',
-            title: 'SEO 设置',
-            type: 'seoMeta',
-            group: 'seo',
-        }),
-        // --- 基本信息 ---
-        defineField({
-            name: 'title',
-            title: '方案标题',
-            type: 'string',
-            group: 'basic',
-            validation: (rule) => rule.required(),
-        }),
-        defineField({
-            name: 'slug',
-            title: 'URL 路径',
-            type: 'slug',
-            group: 'basic',
-            options: { source: 'title', maxLength: 96 },
-            validation: (rule) => rule.required(),
-        }),
-        defineField({
-            name: 'category',
-            title: '方案分类',
-            type: 'reference',
-            to: [{ type: 'category' }],
-            group: 'basic',
-        }),
-        defineField({
-            name: 'heroImage',
-            title: '头图',
-            type: 'image',
-            group: 'basic',
-            options: { hotspot: true },
-            fields: [
-                {
-                    name: 'alt',
-                    type: 'string',
-                    title: '替代文字 (Alt Text)',
-                    validation: (Rule) => Rule.required(),
-                },
-            ],
-        }),
-        defineField({
-            name: 'summary',
-            title: '方案概述',
-            type: 'text',
-            rows: 4,
-            group: 'basic',
-        }),
-        // --- 页面内容：构建器 ---
-        defineField({
-            name: 'contentBlocks',
-            title: '页面构建器',
-            type: 'array',
-            group: 'content',
-            of: [
-                { type: 'heroBlock' },
-                { type: 'richSectionBlock' },
-                { type: 'featureListBlock' },
-                { type: 'mediaGalleryBlock' },
-                { type: 'cardGridBlock' },
-                { type: 'tableBlock' },
-                { type: 'metricsBlock' },
-                { type: 'ctaBlock' },
-                { type: 'portableTextBlock' },
-                { type: 'collectionReferenceBlock' },
-                { type: 'machineSelectorBlock' },
-                { type: 'showcaseBlock' },
-            ],
-        }),
-    ],
-    preview: {
-        select: { title: 'title', subtitle: 'category.title', media: 'heroImage' },
+  name: 'solution',
+  title: 'Solution',
+  type: 'document',
+  icon: BulbOutlineIcon,
+  groups: [
+    {name: 'basic', title: 'Basic', default: true},
+    {name: 'content', title: 'Page Content'},
+    {name: 'seo', title: 'SEO'},
+  ],
+  fields: [
+    defineField({name: 'seo', title: 'SEO Settings', type: 'seoMeta', group: 'seo'}),
+    defineField({name: 'title', title: 'Solution Title', type: 'string', group: 'basic', description: 'Main solution title.', validation: (rule) => rule.required()}),
+    defineField({name: 'slug', title: 'URL Slug', type: 'slug', group: 'basic', options: {source: 'title', maxLength: 96}, description: 'Used for the solution detail URL.', validation: (rule) => rule.required()}),
+    defineField({name: 'category', title: 'Category', type: 'reference', to: [{type: 'category'}], group: 'basic', description: 'Used in solution filters and cards.'}),
+    defineField({
+      name: 'heroImage',
+      title: 'Hero Image',
+      type: 'image',
+      group: 'basic',
+      description: 'Main image used in Studio previews and solution cards.',
+      options: {hotspot: true},
+      fields: [{name: 'alt', type: 'string', title: 'Alt Text', validation: (Rule) => Rule.required()}],
+    }),
+    defineField({name: 'summary', title: 'Summary', type: 'text', rows: 4, group: 'basic', description: 'Short summary for cards and intros.'}),
+    defineField({
+      name: 'contentBlocks',
+      title: 'Page Builder',
+      type: 'array',
+      group: 'content',
+      description: 'Blocks are rendered in this order on the solution page.',
+      of: [
+        {type: 'heroBlock'},
+        {type: 'richSectionBlock'},
+        {type: 'featureListBlock'},
+        {type: 'mediaGalleryBlock'},
+        {type: 'cardGridBlock'},
+        {type: 'tableBlock'},
+        {type: 'metricsBlock'},
+        {type: 'ctaBlock'},
+        {type: 'portableTextBlock'},
+        {type: 'collectionReferenceBlock'},
+        {type: 'machineSelectorBlock'},
+        {type: 'showcaseBlock'},
+      ],
+    }),
+  ],
+  preview: {
+    select: {title: 'title', categoryTitle: 'category.title', summary: 'summary', media: 'heroImage'},
+    prepare({title, categoryTitle, summary, media}) {
+      return {
+        title: title || 'Untitled solution',
+        subtitle: pickText(categoryTitle, summary) || 'Solution document',
+        media,
+      }
     },
+  },
 })

@@ -1,87 +1,18 @@
-﻿import {defineType, defineField} from 'sanity'
+import {CogIcon} from '@sanity/icons'
+import {defineField, defineType} from 'sanity'
+import {itemCount, pickText} from '../shared/studio'
 
 export default defineType({
   name: 'globalSettings',
-  title: '全局设置',
+  title: 'Global Settings',
   type: 'document',
-  icon: () => '⚙️',
+  icon: CogIcon,
   fields: [
-    defineField({name: 'siteName', title: '站点名称', type: 'string'}),
-    defineField({
-      name: 'logo',
-      title: '站点 Logo',
-      type: 'image',
-      fields: [
-        {
-          name: 'alt',
-          type: 'string',
-          title: '替代文字 (Alt Text)',
-          validation: (Rule) => Rule.required(),
-        },
-      ],
-    }),
-    defineField({
-      name: 'contact',
-      title: '联系方式',
-      type: 'object',
-      fields: [
-        defineField({
-          name: 'phone',
-          title: '电话',
-          type: 'string',
-          validation: (rule) =>
-            rule.custom((value) => {
-              if (!value) return true
-              return /^[+]?[\d\s\-()]{7,20}$/.test(value) || 'Invalid phone number format'
-            }),
-        }),
-        defineField({
-          name: 'email',
-          title: '邮箱',
-          type: 'string',
-          validation: (rule) => rule.email().warning('Invalid email format'),
-        }),
-        defineField({
-          name: 'whatsapp',
-          title: 'WhatsApp',
-          type: 'string',
-          validation: (rule) =>
-            rule.custom((value) => {
-              if (!value) return true
-              return /^[+]?[\d\s\-()]{7,20}$/.test(value) || 'Invalid WhatsApp number format'
-            }),
-        }),
-      ],
-    }),
-    defineField({
-      name: 'hq',
-      title: '总部',
-      type: 'object',
-      fields: [
-        defineField({name: 'address', title: '地址', type: 'portableTextContent'}),
-      ],
-    }),
-    defineField({
-      name: 'footerLinks',
-      title: '页脚链接',
-      type: 'array',
-      of: [
-        {
-          type: 'object',
-          fields: [
-            defineField({name: 'label', title: '链接文字', type: 'string'}),
-            defineField({name: 'url', title: '链接地址', type: 'url'}),
-          ],
-          preview: {
-            select: {title: 'label', subtitle: 'url'},
-          },
-        },
-      ],
-    }),
+    defineField({name: 'siteName', title: 'Site Name', type: 'string', description: 'Brand or website name.'}),
+    defineField({name: 'logo', title: 'Site Logo', type: 'image', description: 'Used in shared header/footer areas.', fields: [{name: 'alt', type: 'string', title: 'Alt Text', validation: (Rule) => Rule.required()}]}),
+    defineField({name: 'contact', title: 'Contact Details', type: 'object', fields: [defineField({name: 'phone', title: 'Phone', type: 'string', description: 'Public phone number.', validation: (rule) => rule.custom((value) => { if (!value) return true; return /^[+]?[$\d\s\-()]{7,20}$/.test(value) || 'Invalid phone number format' })}), defineField({name: 'email', title: 'Email', type: 'string', description: 'Public email address.', validation: (rule) => rule.email().warning('Invalid email format')}), defineField({name: 'whatsapp', title: 'WhatsApp', type: 'string', description: 'Optional messaging number.', validation: (rule) => rule.custom((value) => { if (!value) return true; return /^[+]?[$\d\s\-()]{7,20}$/.test(value) || 'Invalid WhatsApp number format' })})]}),
+    defineField({name: 'hq', title: 'Headquarters', type: 'object', fields: [defineField({name: 'address', title: 'Address', type: 'portableTextContent', description: 'Rich text address content.'})]}),
+    defineField({name: 'footerLinks', title: 'Footer Links', type: 'array', description: 'Ordered links shown in the global footer.', of: [{type: 'object', fields: [defineField({name: 'label', title: 'Label', type: 'string'}), defineField({name: 'url', title: 'URL', type: 'url'})], preview: {select: {title: 'label', subtitle: 'url'}}}]}),
   ],
-  preview: {
-    prepare() {
-      return {title: '全局设置'}
-    },
-  },
+  preview: {select: {title: 'siteName', media: 'logo', footerLinks: 'footerLinks', email: 'contact.email'}, prepare({title, media, footerLinks, email}) { return {title: title || 'Global Settings', subtitle: pickText(email, itemCount(footerLinks) ? `${itemCount(footerLinks)} footer links` : undefined) || 'Global settings singleton', media} }},
 })

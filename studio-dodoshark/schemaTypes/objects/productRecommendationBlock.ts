@@ -1,35 +1,16 @@
-﻿import { defineType, defineField } from 'sanity'
+import {WrenchIcon} from '@sanity/icons'
+import {defineField, defineType} from 'sanity'
+import {itemCount} from '../shared/studio'
 
 export default defineType({
-    name: 'productRecommendationBlock',
-    title: '产品推荐',
-    type: 'object',
-    fields: [
-        defineField({
-            name: 'title',
-            title: '块标题',
-            type: 'string',
-        }),
-        defineField({
-            name: 'subtitle',
-            title: '块副标题',
-            type: 'text',
-            rows: 2,
-        }),
-        defineField({
-            name: 'recommendedProducts',
-            title: '推荐产品',
-            type: 'array',
-            of: [{ type: 'reference', to: [{ type: 'product' }] }],
-            validation: (rule) => rule.unique(),
-            description: '从产品库中选择推荐产品',
-        }),
-    ],
-    preview: {
-        select: { title: 'title' },
-        prepare({ title }) {
-            return { title: title || '产品推荐', subtitle: 'Product Recommendation' }
-        },
-    },
+  name: 'productRecommendationBlock',
+  title: 'Product Recommendation Block',
+  type: 'object',
+  icon: WrenchIcon,
+  fields: [
+    defineField({name: 'title', title: 'Block Title', type: 'string'}),
+    defineField({name: 'subtitle', title: 'Block Subtitle', type: 'text', rows: 2}),
+    defineField({name: 'recommendedProducts', title: 'Recommended Products', type: 'array', of: [{type: 'reference', to: [{type: 'product'}]}], validation: (rule) => rule.unique(), description: 'Choose one or more product documents.'}),
+  ],
+  preview: {select: {title: 'title', media: 'recommendedProducts.0.mainImage', items: 'recommendedProducts'}, prepare({title, media, items}) { return {title: title || 'Product Recommendation Block', subtitle: `${itemCount(items)} recommended products`, media} }},
 })
-

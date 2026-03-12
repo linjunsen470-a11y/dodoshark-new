@@ -1,40 +1,45 @@
-import { defineType, defineField } from 'sanity'
+import {PlugIcon} from '@sanity/icons'
+import {defineField, defineType} from 'sanity'
 
 export default defineType({
-    name: 'accessory',
-    title: '配件',
-    type: 'document',
-    icon: () => '🔩',
-    fields: [
-        defineField({
-            name: 'name',
-            title: '配件名称',
-            type: 'string',
-            description: '如 Pulse Dust Collector',
-            validation: (rule) => rule.required(),
-        }),
-        defineField({
-            name: 'image',
-            title: '配件图片',
-            type: 'image',
-            options: { hotspot: true },
-            fields: [
-                {
-                    name: 'alt',
-                    type: 'string',
-                    title: '替代文字 (Alt Text)',
-                    validation: (Rule) => Rule.required(),
-                },
-            ],
-        }),
-        defineField({
-            name: 'description',
-            title: '配件简介',
-            type: 'text',
-            rows: 3,
-        }),
-    ],
-    preview: {
-        select: { title: 'name', media: 'image' },
+  name: 'accessory',
+  title: 'Accessory',
+  type: 'document',
+  icon: PlugIcon,
+  fields: [
+    defineField({
+      name: 'name',
+      title: 'Accessory Name',
+      type: 'string',
+      description: 'Example: Pulse Dust Collector.',
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'image',
+      title: 'Accessory Image',
+      type: 'image',
+      description: 'Used in Studio previews and reference cards.',
+      options: {hotspot: true},
+      fields: [
+        {name: 'alt', type: 'string', title: 'Alt Text', validation: (Rule) => Rule.required()},
+      ],
+    }),
+    defineField({
+      name: 'description',
+      title: 'Description',
+      type: 'text',
+      rows: 3,
+      description: 'Optional short summary for editors and cards.',
+    }),
+  ],
+  preview: {
+    select: {title: 'name', subtitle: 'description', media: 'image'},
+    prepare({title, subtitle, media}) {
+      return {
+        title: title || 'Untitled accessory',
+        subtitle: subtitle || 'Accessory item',
+        media,
+      }
     },
+  },
 })

@@ -1,55 +1,17 @@
-﻿import { defineType, defineField } from 'sanity'
+import {DocumentTextIcon} from '@sanity/icons'
+import {defineField, defineType} from 'sanity'
+import {pickText} from '../shared/studio'
 
 export default defineType({
-    name: 'blogPage',
-    title: '博客聚合页',
-    type: 'document',
-    icon: () => '📰',
-    fields: [
-        defineField({ name: 'seo', title: 'SEO 设置', type: 'seoMeta' }),
-        defineField({
-            name: 'hero',
-            title: 'Hero 区',
-            type: 'object',
-            fields: [
-                defineField({ name: 'badge', title: '顶部标签', type: 'string' }),
-                defineField({ name: 'title', title: '主标题', type: 'string', validation: (rule) => rule.required() }),
-                defineField({ name: 'subtitle', title: '副标题', type: 'text', rows: 3 }),
-                defineField({
-                    name: 'image',
-                    title: 'Hero 背景图',
-                    type: 'image',
-                    options: { hotspot: true },
-                    fields: [
-                        {
-                            name: 'alt',
-                            type: 'string',
-                            title: '替代文字 (Alt Text)',
-                            validation: (Rule) => Rule.required(),
-                        },
-                    ],
-                }),
-            ],
-        }),
-        defineField({
-            name: 'categories',
-            title: '分类筛选器',
-            type: 'array',
-            of: [{ type: 'reference', to: [{ type: 'category' }] }],
-            validation: (rule) => rule.unique(),
-        }),
-        defineField({
-            name: 'featuredPost',
-            title: '推荐文章',
-            type: 'reference',
-            to: [{ type: 'post' }],
-            description: '顶部推荐展示的核心文章',
-        }),
-    ],
-    preview: {
-        prepare() {
-            return { title: '博客聚合页' }
-        },
-    },
+  name: 'blogPage',
+  title: 'Blog Listing Page',
+  type: 'document',
+  icon: DocumentTextIcon,
+  fields: [
+    defineField({name: 'seo', title: 'SEO Settings', type: 'seoMeta'}),
+    defineField({name: 'hero', title: 'Hero Section', type: 'object', fields: [defineField({name: 'badge', title: 'Badge', type: 'string'}), defineField({name: 'title', title: 'Title', type: 'string', description: 'Main listing page heading.', validation: (rule) => rule.required()}), defineField({name: 'subtitle', title: 'Subtitle', type: 'text', rows: 3}), defineField({name: 'image', title: 'Hero Image', type: 'image', options: {hotspot: true}, fields: [{name: 'alt', type: 'string', title: 'Alt Text', validation: (Rule) => Rule.required()}]})]}),
+    defineField({name: 'categories', title: 'Category Filters', type: 'array', of: [{type: 'reference', to: [{type: 'category'}]}], validation: (rule) => rule.unique(), description: 'Categories available as blog listing filters.'}),
+    defineField({name: 'featuredPost', title: 'Featured Post', type: 'reference', to: [{type: 'post'}], description: 'Highlighted article for the top section.'}),
+  ],
+  preview: {select: {title: 'hero.title', subtitle: 'hero.subtitle', media: 'hero.image', featuredTitle: 'featuredPost.title'}, prepare({title, subtitle, media, featuredTitle}) { return {title: title || 'Blog Listing Page', subtitle: pickText(subtitle, featuredTitle ? `Featured: ${featuredTitle}` : undefined) || 'Blog listing singleton', media} }},
 })
-

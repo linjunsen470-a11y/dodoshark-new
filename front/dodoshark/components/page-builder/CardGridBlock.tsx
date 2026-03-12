@@ -167,16 +167,18 @@ function resolveCard(item: CardItem) {
   const clickable = item.clickable !== false
 
   if (item.cardType === 'inline') {
-    const href = item.inlineCard?.cta?.href?.trim() || ''
+    const href = clickable ? item.inlineCard?.cta?.href?.trim() || '' : ''
     const legacyTitle = item.inlineCard?.title?.trim() || ''
     const legacyDescription = item.inlineCard?.description?.trim() || ''
+    const isInteractive = Boolean(href)
 
     return {
       title: title || legacyTitle,
       description: description || legacyDescription,
       image: item.inlineCard?.image,
-      ctaLabel: clickable ? item.inlineCard?.cta?.label?.trim() || '' : '',
-      href: clickable ? href : '',
+      ctaLabel: isInteractive ? item.inlineCard?.cta?.label?.trim() || '' : '',
+      href,
+      isInteractive,
     }
   }
 
@@ -187,14 +189,16 @@ function resolveCard(item: CardItem) {
     reference?.shortDescription?.trim() ||
     reference?.description?.trim() ||
     ''
-  const href = reference?.cta?.href?.trim() || getReferenceHref(reference)
+  const href = clickable ? reference?.cta?.href?.trim() || getReferenceHref(reference) : ''
+  const isInteractive = Boolean(href)
 
   return {
     title: resolvedTitle,
     description: resolvedDescription,
     image: reference?.mainImage || reference?.image,
-    ctaLabel: clickable ? reference?.cta?.label?.trim() || 'View Details' : '',
-    href: clickable ? href : '',
+    ctaLabel: isInteractive ? reference?.cta?.label?.trim() || 'View Details' : '',
+    href,
+    isInteractive,
   }
 }
 
@@ -257,9 +261,13 @@ function GridCard({
   const descriptionTone =
     disableCardFrameEffect && isDarkBackground ? 'text-slate-300' : 'text-slate-500'
   const ctaTone = disableCardFrameEffect && isDarkBackground ? 'text-orange-300' : 'text-orange-500'
+  const framedArticleBaseClass =
+    'overflow-hidden rounded-lg border border-slate-200 bg-white text-center shadow-[0_10px_30px_-24px_rgba(15,23,42,0.3)]'
   const articleClass = disableCardFrameEffect
     ? 'text-center'
-    : 'overflow-hidden rounded-lg border border-slate-100 bg-white text-center transition-shadow hover:shadow-lg'
+    : data.isInteractive
+      ? `${framedArticleBaseClass} transition-[box-shadow,border-color] duration-200 hover:border-slate-300 hover:shadow-md`
+      : framedArticleBaseClass
   const contentClass = size === 'large' ? 'p-6' : 'p-5'
   const imageBgClass = disableCardFrameEffect && isDarkBackground ? 'bg-slate-800' : 'bg-slate-100'
   const emptyImageClass = disableCardFrameEffect && isDarkBackground ? 'text-slate-500' : 'text-slate-300'
@@ -330,9 +338,11 @@ function MobileCarouselCard({
   const descriptionTone =
     disableCardFrameEffect && isDarkBackground ? 'text-slate-300' : 'text-slate-500'
   const ctaTone = disableCardFrameEffect && isDarkBackground ? 'text-orange-300' : 'text-orange-500'
+  const framedArticleBaseClass =
+    'overflow-hidden rounded-lg border border-slate-200 bg-white text-center shadow-[0_10px_30px_-24px_rgba(15,23,42,0.3)]'
   const articleClass = disableCardFrameEffect
     ? 'text-center'
-    : 'overflow-hidden rounded-lg border border-slate-100 bg-white text-center shadow-sm'
+    : framedArticleBaseClass
   const imageBgClass = disableCardFrameEffect && isDarkBackground ? 'bg-slate-800' : 'bg-slate-100'
   const emptyImageClass = disableCardFrameEffect && isDarkBackground ? 'text-slate-500' : 'text-slate-300'
   const dotsBaseClass = isDarkBackground ? 'bg-slate-500/50' : 'bg-slate-300'
@@ -420,12 +430,13 @@ function SectionTitle({
 
   return (
     <header className="mb-8 text-center md:mb-10">
-      <div className="flex items-center gap-6">
-        <span className={`h-px flex-1 ${separatorClass}`} />
-        <h3 className={`text-2xl font-display font-bold tracking-[-0.02em] md:text-[1.75rem] ${titleClass}`}>
+      <div className="flex justify-center">
+        <h3 className={`inline-block px-4 text-2xl font-display font-bold tracking-[-0.02em] md:text-[1.75rem] ${titleClass}`}>
           {title}
         </h3>
-        <span className={`h-px flex-1 ${separatorClass}`} />
+      </div>
+      <div className="mt-2 md:mt-3">
+        <span className={`block h-px w-full ${separatorClass}`} />
       </div>
     </header>
   )
@@ -451,7 +462,7 @@ function GroupGrid({
   if (cards.length === 0) return null
 
   return (
-    <section className="py-8">
+    <section className="pt-0 pb-8">
       <SectionTitle title={sectionTitle} isDarkBackground={isDarkBackground} />
 
       <div className="md:hidden">

@@ -1,3 +1,17 @@
+import {
+  BulbOutlineIcon,
+  CaseIcon,
+  CogIcon,
+  ControlsIcon,
+  DocumentTextIcon,
+  EnvelopeIcon,
+  HomeIcon,
+  PackageIcon,
+  PlugIcon,
+  TagIcon,
+  UserIcon,
+  WrenchIcon,
+} from '@sanity/icons'
 import {StructureResolver} from 'sanity/structure'
 
 export const structure: StructureResolver = (S) =>
@@ -5,58 +19,53 @@ export const structure: StructureResolver = (S) =>
     .id('doDoSharkCms')
     .title('DoDoShark CMS')
     .items([
-      // 内容管理 - 单页面
       S.listItem()
         .id('contentManagement')
-        .title('内容管理')
-        .icon(() => '📄')
+        .title('Site Pages')
+        .icon(HomeIcon)
         .child(
           S.list()
             .id('contentManagementList')
-            .title('内容管理')
+            .title('Site Pages')
             .items([
-              S.documentTypeListItem('homePage').title('首页'),
-              S.documentTypeListItem('aboutPage').title('关于我们'),
-              S.documentTypeListItem('contactPage').title('联系我们'),
-              S.documentTypeListItem('blogPage').title('博客聚合页'),
-              S.documentTypeListItem('solutionsPage').title('解决方案聚合页'),
-              S.documentTypeListItem('casesPage').title('客户案例聚合页'),
-              S.documentTypeListItem('productPage').title('产品聚合页'),
-            ])
+              S.documentTypeListItem('homePage').title('Home Page').icon(HomeIcon),
+              S.documentTypeListItem('aboutPage').title('About Page').icon(UserIcon),
+              S.documentTypeListItem('contactPage').title('Contact Page').icon(EnvelopeIcon),
+              S.documentTypeListItem('blogPage').title('Blog Listing Page').icon(DocumentTextIcon),
+              S.documentTypeListItem('solutionsPage').title('Solutions Listing Page').icon(BulbOutlineIcon),
+              S.documentTypeListItem('casesPage').title('Case Studies Listing Page').icon(CaseIcon),
+              S.documentTypeListItem('productPage').title('Products Listing Page').icon(PackageIcon),
+            ]),
         ),
-
-      // 动态内容 - 可重复文档
       S.listItem()
         .id('dynamicContent')
-        .title('动态内容')
-        .icon(() => '📝')
+        .title('Collections')
+        .icon(DocumentTextIcon)
         .child(
           S.list()
             .id('dynamicContentList')
-            .title('动态内容')
+            .title('Collections')
             .items([
-              S.documentTypeListItem('post').title('博客文章'),
-              S.documentTypeListItem('solution').title('解决方案'),
-              S.documentTypeListItem('caseStudy').title('客户案例'),
-              S.documentTypeListItem('product').title('产品'),
-            ])
+              S.documentTypeListItem('post').title('Blog Posts').icon(DocumentTextIcon),
+              S.documentTypeListItem('solution').title('Solutions').icon(BulbOutlineIcon),
+              S.documentTypeListItem('caseStudy').title('Case Studies').icon(CaseIcon),
+              S.documentTypeListItem('product').title('Products').icon(WrenchIcon),
+            ]),
         ),
-
-      // 数据库 - 参考资料
       S.listItem()
         .id('database')
-        .title('数据库')
-        .icon(() => '🗄️')
+        .title('Reference Library')
+        .icon(TagIcon)
         .child(
           S.list()
             .id('databaseList')
-            .title('数据库')
+            .title('Reference Library')
             .items([
-              S.documentTypeListItem('category').title('分类标签'),
-              S.documentTypeListItem('productVariant').title('产品型号'),
-              S.documentTypeListItem('accessory').title('配件'),
-              S.documentTypeListItem('author').title('人员'),
-              S.documentTypeListItem('globalSettings').title('全局设置'),
-            ])
+              S.documentTypeListItem('category').title('Categories').icon(TagIcon),
+              S.documentTypeListItem('productVariant').title('Product Variants').icon(ControlsIcon),
+              S.documentTypeListItem('accessory').title('Accessories').icon(PlugIcon),
+              S.documentTypeListItem('author').title('Authors').icon(UserIcon),
+              S.documentTypeListItem('globalSettings').title('Global Settings').icon(CogIcon),
+            ]),
         ),
     ])

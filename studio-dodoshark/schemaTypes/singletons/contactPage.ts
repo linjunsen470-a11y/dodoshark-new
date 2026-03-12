@@ -1,54 +1,17 @@
-import { defineType, defineField } from 'sanity'
+import {EnvelopeIcon} from '@sanity/icons'
+import {defineField, defineType} from 'sanity'
+import {itemCount, pickText} from '../shared/studio'
 
 export default defineType({
-    name: 'contactPage',
-    title: '联系我们',
-    type: 'document',
-    icon: () => '📞',
-    fields: [
-        defineField({ name: 'seo', title: 'SEO 设置', type: 'seoMeta' }),
-        defineField({
-            name: 'hero',
-            title: 'Hero 区',
-            type: 'object',
-            fields: [
-                defineField({ name: 'tag', title: '顶部标签', type: 'string' }),
-                defineField({ name: 'title', title: '主标题', type: 'string', validation: (rule) => rule.required() }),
-                defineField({ name: 'subtitle', title: '副标题', type: 'text', rows: 3 }),
-            ],
-        }),
-        defineField({
-            name: 'stats',
-            title: '响应统计',
-            type: 'object',
-            fields: [
-                defineField({ name: 'respTime', title: '响应时间', type: 'string', description: '如 24h' }),
-                defineField({ name: 'testCycle', title: '测试周期', type: 'string', description: '如 72h' }),
-            ],
-        }),
-        defineField({
-            name: 'globalOffices',
-            title: '全球办事处',
-            type: 'array',
-            of: [
-                {
-                    type: 'object',
-                    fields: [
-                        defineField({ name: 'region', title: '区域名称', type: 'string' }),
-                        defineField({ name: 'tag', title: '状态标签', type: 'string' }),
-                        defineField({ name: 'description', title: '描述', type: 'text', rows: 3 }),
-                        defineField({ name: 'hours', title: '工作时间', type: 'string' }),
-                    ],
-                    preview: {
-                        select: { title: 'region', subtitle: 'tag' },
-                    },
-                },
-            ],
-        }),
-    ],
-    preview: {
-        prepare() {
-            return { title: '联系我们' }
-        },
-    },
+  name: 'contactPage',
+  title: 'Contact Page',
+  type: 'document',
+  icon: EnvelopeIcon,
+  fields: [
+    defineField({name: 'seo', title: 'SEO Settings', type: 'seoMeta'}),
+    defineField({name: 'hero', title: 'Hero Section', type: 'object', fields: [defineField({name: 'tag', title: 'Top Tag', type: 'string'}), defineField({name: 'title', title: 'Title', type: 'string', description: 'Main contact page heading.', validation: (rule) => rule.required()}), defineField({name: 'subtitle', title: 'Subtitle', type: 'text', rows: 3, description: 'Supporting intro copy.'})]}),
+    defineField({name: 'stats', title: 'Response Stats', type: 'object', fields: [defineField({name: 'respTime', title: 'Response Time', type: 'string', description: 'Example: 24h'}), defineField({name: 'testCycle', title: 'Test Cycle', type: 'string', description: 'Example: 72h'})]}),
+    defineField({name: 'globalOffices', title: 'Global Offices', type: 'array', description: 'Office cards shown on the contact page.', of: [{type: 'object', fields: [defineField({name: 'region', title: 'Region', type: 'string'}), defineField({name: 'tag', title: 'Status Tag', type: 'string'}), defineField({name: 'description', title: 'Description', type: 'text', rows: 3}), defineField({name: 'hours', title: 'Working Hours', type: 'string'})], preview: {select: {title: 'region', subtitle: 'tag'}, prepare({title, subtitle}) { return {title: title || 'Untitled office', subtitle: subtitle || 'Office item'} }}}]}),
+  ],
+  preview: {select: {title: 'hero.title', subtitle: 'hero.subtitle', offices: 'globalOffices'}, prepare({title, subtitle, offices}) { return {title: title || 'Contact Page', subtitle: pickText(subtitle, itemCount(offices) ? `${itemCount(offices)} offices` : undefined) || 'Contact page singleton'} }},
 })

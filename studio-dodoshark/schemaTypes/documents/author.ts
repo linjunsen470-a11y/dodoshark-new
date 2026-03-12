@@ -1,52 +1,60 @@
-import { defineType, defineField } from 'sanity'
+import {UserIcon} from '@sanity/icons'
+import {defineField, defineType} from 'sanity'
+import {pickText} from '../shared/studio'
 
 export default defineType({
-    name: 'author',
-    title: '人员',
-    type: 'document',
-    icon: () => '👤',
-    fields: [
-        defineField({
-            name: 'name',
-            title: '姓名',
-            type: 'string',
-            validation: (rule) => rule.required(),
-        }),
-        defineField({
-            name: 'slug',
-            title: 'URL 路径',
-            type: 'slug',
-            options: { source: 'name', maxLength: 96 },
-            validation: (rule) => rule.required(),
-        }),
-        defineField({
-            name: 'image',
-            title: '头像',
-            type: 'image',
-            options: { hotspot: true },
-            fields: [
-                {
-                    name: 'alt',
-                    type: 'string',
-                    title: '替代文字 (Alt Text)',
-                    validation: (Rule) => Rule.required(),
-                },
-            ],
-        }),
-        defineField({
-            name: 'role',
-            title: '职位角色',
-            type: 'string',
-            description: '如 Chief Engineer',
-        }),
-        defineField({
-            name: 'bio',
-            title: '个人简介',
-            type: 'text',
-            rows: 4,
-        }),
-    ],
-    preview: {
-        select: { title: 'name', subtitle: 'role', media: 'image' },
+  name: 'author',
+  title: 'Author',
+  type: 'document',
+  icon: UserIcon,
+  fields: [
+    defineField({
+      name: 'name',
+      title: 'Name',
+      type: 'string',
+      description: 'Public display name for the author profile.',
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'slug',
+      title: 'URL Slug',
+      type: 'slug',
+      options: {source: 'name', maxLength: 96},
+      description: 'Used if you link to an author page.',
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'image',
+      title: 'Profile Image',
+      type: 'image',
+      description: 'Shown in author cards and metadata.',
+      options: {hotspot: true},
+      fields: [
+        {name: 'alt', type: 'string', title: 'Alt Text', validation: (Rule) => Rule.required()},
+      ],
+    }),
+    defineField({
+      name: 'role',
+      title: 'Role',
+      type: 'string',
+      description: 'Example: Chief Engineer.',
+    }),
+    defineField({
+      name: 'bio',
+      title: 'Bio',
+      type: 'text',
+      rows: 4,
+      description: 'Short profile summary.',
+    }),
+  ],
+  preview: {
+    select: {title: 'name', subtitle: 'role', bio: 'bio', media: 'image'},
+    prepare({title, subtitle, bio, media}) {
+      return {
+        title: title || 'Untitled author',
+        subtitle: pickText(subtitle, bio) || 'Author profile',
+        media,
+      }
     },
+  },
 })

@@ -1,167 +1,21 @@
-import { defineField, defineType } from 'sanity'
+import {ControlsIcon} from '@sanity/icons'
+import {defineField, defineType} from 'sanity'
+import {iconForSchemaType, itemCount, pickFirst, pickText} from '../../shared/studio'
 
 export default defineType({
   name: 'machineSelectorBlock',
-  title: 'Machine Selector (机型筛选器)',
+  title: 'Machine Selector',
   type: 'object',
-  icon: () => '🧭',
+  icon: ControlsIcon,
   fields: [
-    defineField({
-      name: 'title',
-      title: '区块标题',
-      type: 'string',
-      initialValue: 'Model Reference',
-    }),
-    defineField({
-      name: 'subtitle',
-      title: '区块副标题',
-      type: 'text',
-      rows: 2,
-    }),
-    defineField({
-      name: 'backgroundVariant',
-      title: '背景样式',
-      type: 'string',
-      options: {
-        list: [
-          { title: '默认白底', value: 'default' },
-          { title: '浅灰底', value: 'muted' },
-          { title: '深色底', value: 'dark' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'muted',
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'groups',
-      title: '筛选分组',
-      description: '前端将根据点击分组标签，自动显示该分组下对应型号。',
-      type: 'array',
-      of: [
-        defineField({
-          name: 'group',
-          title: '分组',
-          type: 'object',
-          fields: [
-            defineField({
-              name: 'label',
-              title: '分组名称',
-              type: 'string',
-              validation: (rule) => rule.required(),
-            }),
-            defineField({
-              name: 'description',
-              title: '分组说明',
-              type: 'string',
-              description: '可选，显示在分组下方的简要说明。',
-            }),
-            defineField({
-              name: 'items',
-              title: '型号列表',
-              type: 'array',
-              of: [
-                defineField({
-                  name: 'machineItem',
-                  title: '型号项',
-                  type: 'object',
-                  fields: [
-                    defineField({
-                      name: 'productVariant',
-                      title: '关联产品型号',
-                      type: 'reference',
-                      to: [{ type: 'productVariant' }],
-                      validation: (rule) => rule.required(),
-                    }),
-                    defineField({
-                      name: 'modelLabel',
-                      title: '型号名称覆盖',
-                      type: 'string',
-                      description: '留空则使用关联产品型号名称。',
-                    }),
-                    defineField({
-                      name: 'isFeatured',
-                      title: '高亮显示',
-                      type: 'boolean',
-                      initialValue: false,
-                    }),
-                  ],
-                  preview: {
-                    select: {
-                      title: 'modelLabel',
-                      fallbackTitle: 'productVariant.modelName',
-                      mediaVariant: 'productVariant.image',
-                    },
-                    prepare({ title, fallbackTitle, mediaVariant }) {
-                      return {
-                        title: title || fallbackTitle || '未命名型号',
-                        subtitle: '型号项',
-                        media: mediaVariant,
-                      }
-                    },
-                  },
-                }),
-              ],
-              validation: (rule) => rule.required().min(1).max(24),
-            }),
-          ],
-          preview: {
-            select: { title: 'label', itemCount: 'items' },
-            prepare({ title, itemCount }) {
-              const count = Array.isArray(itemCount) ? itemCount.length : 0
-              return {
-                title: title || '未命名分组',
-                subtitle: `${count} 个型号`,
-              }
-            },
-          },
-        }),
-      ],
-      validation: (rule) => rule.required().min(1).max(8),
-    }),
-    defineField({
-      name: 'defaultGroupIndex',
-      title: '默认选中分组序号',
-      type: 'number',
-      description: '从 0 开始计数。留空时默认选中第 1 个分组。',
-      validation: (rule) => rule.min(0).integer(),
-    }),
-    defineField({
-      name: 'maxItemsPerRow',
-      title: '桌面端每屏最大展示数量',
-      type: 'number',
-      description: 'Desktop 端 slider 每屏最多展示 1-4 个型号；移动端始终只展示 1 个。',
-      options: {
-        list: [1, 2, 3, 4],
-      },
-      initialValue: 4,
-      validation: (rule) => rule.required().min(1).max(4),
-    }),
-    defineField({
-      name: 'showModelDescription',
-      title: '显示型号简述',
-      type: 'boolean',
-      description: '开启后在卡片中显示产品型号的 shortDescription。',
-      initialValue: true,
-    }),
-    defineField({
-      name: 'footerText',
-      title: '底部补充文案',
-      type: 'string',
-      description: '例如：可根据需求定制更大型号。',
-    }),
+    defineField({name: 'title', title: 'Block Title', type: 'string', initialValue: 'Model Reference'}),
+    defineField({name: 'subtitle', title: 'Block Subtitle', type: 'text', rows: 2}),
+    defineField({name: 'backgroundVariant', title: 'Background Style', type: 'string', options: {list: [{title: 'Default', value: 'default'}, {title: 'Muted', value: 'muted'}, {title: 'Dark', value: 'dark'}], layout: 'radio'}, initialValue: 'muted', validation: (rule) => rule.required()}),
+    defineField({name: 'groups', title: 'Groups', description: 'Clicking a group tab reveals its related variants.', type: 'array', of: [defineField({name: 'group', title: 'Group', type: 'object', fields: [defineField({name: 'label', title: 'Group Label', type: 'string', validation: (rule) => rule.required()}), defineField({name: 'description', title: 'Group Description', type: 'string'}), defineField({name: 'items', title: 'Variants', type: 'array', of: [defineField({name: 'machineItem', title: 'Variant Item', type: 'object', fields: [defineField({name: 'productVariant', title: 'Product Variant', type: 'reference', to: [{type: 'productVariant'}], validation: (rule) => rule.required()}), defineField({name: 'modelLabel', title: 'Model Label Override', type: 'string', description: 'Leave empty to use the variant model name.'}), defineField({name: 'isFeatured', title: 'Featured', type: 'boolean', initialValue: false})], preview: {select: {title: 'modelLabel', fallbackTitle: 'productVariant.modelName', mediaVariant: 'productVariant.image', description: 'productVariant.shortDescription', refType: 'productVariant._type'}, prepare({title, fallbackTitle, mediaVariant, description, refType}) { return {title: title || fallbackTitle || 'Untitled variant', subtitle: description || 'Variant item', media: pickFirst(mediaVariant, iconForSchemaType(refType))} }}})], validation: (rule) => rule.required().min(1).max(24)} )], preview: {select: {title: 'label', description: 'description', itemCount: 'items'}, prepare({title, description, itemCount: items}) { return {title: title || 'Untitled group', subtitle: pickText(description, `${itemCount(items)} variants`) || 'Group'} }}})], validation: (rule) => rule.required().min(1).max(8)}),
+    defineField({name: 'defaultGroupIndex', title: 'Default Group Index', type: 'number', description: 'Starts from 0. Leave empty to default to the first group.', validation: (rule) => rule.min(0).integer()}),
+    defineField({name: 'maxItemsPerRow', title: 'Max Items Per Row (Desktop)', type: 'number', description: 'Desktop slider shows 1-4 items per view.', options: {list: [1, 2, 3, 4]}, initialValue: 4, validation: (rule) => rule.required().min(1).max(4)}),
+    defineField({name: 'showModelDescription', title: 'Show Model Description', type: 'boolean', description: 'Uses productVariant.shortDescription in cards.', initialValue: true}),
+    defineField({name: 'footerText', title: 'Footer Text', type: 'string', description: 'Optional note shown below the selector.'}),
   ],
-  preview: {
-    select: {
-      title: 'title',
-      groups: 'groups',
-    },
-    prepare({ title, groups }) {
-      const groupCount = Array.isArray(groups) ? groups.length : 0
-      return {
-        title: title || '机型筛选器',
-        subtitle: `分组数：${groupCount}`,
-      }
-    },
-  },
+  preview: {select: {title: 'title', subtitle: 'subtitle', groups: 'groups'}, prepare({title, subtitle, groups}) { return {title: title || 'Machine Selector', subtitle: pickText(subtitle, `${itemCount(groups)} groups`) || 'Machine selector block'} }},
 })
