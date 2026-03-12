@@ -473,7 +473,7 @@ function renderSolutionGroup(group: PageBuilderRenderGroup<SolutionBlock>) {
   }
 
   return (
-    <section key={key} className="py-24 bg-white text-slate-900">
+    <section key={key} className="bg-white py-16 text-slate-900 md:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {block._type === 'featureGridBlock' && (
           <div>

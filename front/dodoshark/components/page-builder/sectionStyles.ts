@@ -5,8 +5,8 @@ export const defaultSectionContainerClass = 'mx-auto max-w-7xl px-4 sm:px-6 lg:p
 export const proseSectionContainerClass = 'mx-auto max-w-5xl px-4 sm:px-6 lg:px-8'
 
 export const sectionSpacingClassMap: Record<SectionSpacing, string> = {
-  default: 'py-20 md:py-24',
-  compact: 'py-16 md:py-20',
+  default: 'py-16 md:py-20',
+  compact: 'py-14 md:py-16',
 }
 
 export const sectionTitleClass =

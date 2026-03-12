@@ -330,6 +330,7 @@ export default function ShowcaseBlock({ block }: { block: ShowcaseBlockData }) {
           <SplitCarousel items={items} isDark={isDark} footerCta={block.footerCta} />
         ) : (
           <div className={`${styles.shell} ${isDark ? styles.darkShell : ''}`.trim()}>
+            <div className={styles.carouselViewport}>
               <Swiper
                 modules={[Keyboard, A11y]}
                 className={styles.carousel}
@@ -358,6 +359,7 @@ export default function ShowcaseBlock({ block }: { block: ShowcaseBlockData }) {
                   syncControls(instance)
                 }}
                 onSlideChange={syncControls}
+                onBreakpoint={syncControls}
                 onResize={syncControls}
               >
                 {items.map((item, index) => (
@@ -366,47 +368,48 @@ export default function ShowcaseBlock({ block }: { block: ShowcaseBlockData }) {
                   </SwiperSlide>
                 ))}
               </Swiper>
+            </div>
 
-              <div className={styles.footerBar}>
-                <div className={styles.footerLead}>
-                  <div className={styles.controls}>
-                    <button
-                      type="button"
-                      aria-label="Previous showcase"
-                      className={styles.navButton}
-                      disabled={!canPrev}
-                      onClick={() => swiper?.slidePrev()}
-                    >
-                      <ArrowLeftIcon className={styles.navIcon} />
-                    </button>
-                    <button
-                      type="button"
-                      aria-label="Next showcase"
-                      className={styles.navButton}
-                      disabled={!canNext}
-                      onClick={() => swiper?.slideNext()}
-                    >
-                      <ArrowRightIcon className={styles.navIcon} />
-                    </button>
-                  </div>
-
-                  <p className={styles.mobileCounter} aria-live="polite">
-                    {Math.min(currentIndex + 1, items.length)} of {items.length}
-                  </p>
+            <div className={styles.footerBar}>
+              <div className={styles.footerLead}>
+                <div className={styles.controls}>
+                  <button
+                    type="button"
+                    aria-label="Previous showcase"
+                    className={styles.navButton}
+                    disabled={!canPrev}
+                    onClick={() => swiper?.slidePrev()}
+                  >
+                    <ArrowLeftIcon className={styles.navIcon} />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Next showcase"
+                    className={styles.navButton}
+                    disabled={!canNext}
+                    onClick={() => swiper?.slideNext()}
+                  >
+                    <ArrowRightIcon className={styles.navIcon} />
+                  </button>
                 </div>
 
-                {block.footerCta?.label?.trim() && block.footerCta?.href?.trim() ? (
-                  <a
-                    href={block.footerCta.href.trim()}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#fbbf24] px-8 py-3 font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-[#f59e0b] sm:w-auto"
-                  >
-                    {block.footerCta.label.trim()}
-                    <ArrowRightIcon className={styles.footerCtaIcon} />
-                  </a>
-                ) : null}
+                <p className={styles.mobileCounter} aria-live="polite">
+                  {Math.min(currentIndex + 1, items.length)} of {items.length}
+                </p>
               </div>
+
+              {block.footerCta?.label?.trim() && block.footerCta?.href?.trim() ? (
+                <a
+                  href={block.footerCta.href.trim()}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#fbbf24] px-8 py-3 font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-[#f59e0b] sm:w-auto"
+                >
+                  {block.footerCta.label.trim()}
+                  <ArrowRightIcon className={styles.footerCtaIcon} />
+                </a>
+              ) : null}
+            </div>
           </div>
         )
       )}

@@ -221,7 +221,7 @@ function MachineCard({
         item.isFeatured ? 'ring-2 ring-orange-400 bg-white shadow-lg' : 'border border-slate-200 bg-white'
       }`}
     >
-      <div className="mb-5 flex aspect-[4/3] items-center justify-center overflow-hidden rounded-sm bg-slate-100">
+      <div className="mb-5 flex aspect-[4/3] items-center justify-center overflow-hidden rounded-sm">
         {src ? (
           <Image
             src={src}
