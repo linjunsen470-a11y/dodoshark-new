@@ -478,9 +478,7 @@ export default async function HomePage() {
       <section className="home-about-bg relative overflow-hidden py-10 text-white sm:py-14">
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <div className="mx-auto mb-4 inline-flex h-40 w-60 items-center justify-center backdrop-blur-sm">
-              <Image src="/assets/images/dodoshark-logo-04.png" alt="DoDoShark" width={160} height={110} className="h-60 w-auto object-contain brightness-110" />
-            </div>
+            
             <h2 className="font-display text-3xl font-bold tracking-[0.08em] text-white sm:text-5xl">About &nbsp;Us</h2>
             <div className="mx-auto mt-6 h-1.5 w-20 rounded-full bg-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.6)]" />
           </div>
@@ -495,6 +493,12 @@ export default async function HomePage() {
                 <p className="mt-3 text-sm leading-7 text-white/60">{item.description}</p>
               </article>
             ))}
+          </div>
+                    <div className="text-center">
+            <div className="mx-auto mb-4 inline-flex h-40 w-60 items-center justify-center backdrop-blur-sm">
+              <Image src="/assets/images/dodoshark-logo-04.png" alt="DoDoShark" width={160} height={110} className="h-60 w-auto object-contain brightness-110" />
+            </div>
+           
           </div>
         </div>
       </section>

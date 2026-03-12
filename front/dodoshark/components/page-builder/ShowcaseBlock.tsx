@@ -203,8 +203,8 @@ function SplitCarousel({
 
           return (
             <SwiperSlide key={item._key ?? `${title}-${index}`} className="!h-auto">
-              <article className="grid h-full gap-8 md:items-center lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-16">
-                <div className="order-2 flex flex-col justify-center md:order-2 lg:order-1">
+              <article className="grid h-full gap-8 md:items-start lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-16">
+                <div className="order-2 flex md:pt-8 flex-col justify-center md:order-2 lg:order-1">
                   <h3 className={`${cardTitleClass} ${titleClass}`}>
                     {title}
                   </h3>
