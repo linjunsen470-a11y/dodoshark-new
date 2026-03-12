@@ -170,16 +170,18 @@ function SliderNavButton({
   isDark,
   label,
   onClick,
+  className = '',
 }: {
   direction: 'prev' | 'next'
   disabled: boolean
   isDark: boolean
   label: string
   onClick: () => void
+  className?: string
 }) {
   const buttonClass = isDark
-    ? 'border-slate-600 bg-slate-800 text-slate-100 hover:border-orange-300 hover:text-orange-300'
-    : 'border-slate-300 bg-white text-slate-900 hover:border-orange-400 hover:text-orange-500'
+    ? 'border-slate-600 bg-slate-900 text-slate-100 shadow-xl shadow-slate-950/30 hover:border-orange-300 hover:bg-slate-800 hover:text-orange-300'
+    : 'border-slate-200 bg-white text-slate-900 shadow-xl shadow-slate-900/15 hover:border-orange-400 hover:bg-orange-500 hover:text-white'
 
   return (
     <button
@@ -187,7 +189,7 @@ function SliderNavButton({
       aria-label={label}
       disabled={disabled}
       onClick={onClick}
-      className={`inline-flex h-11 w-11 items-center justify-center rounded-full border transition disabled:cursor-not-allowed disabled:opacity-35 ${buttonClass}`}
+      className={`inline-flex h-11 w-11 items-center justify-center rounded-full border transition disabled:cursor-not-allowed disabled:opacity-35 ${buttonClass} ${className}`}
     >
       {direction === 'prev' ? (
         <ArrowLeftIcon className="h-5 w-5" />
@@ -282,7 +284,6 @@ export default function MachineSelectorBlock({ block }: { block: MachineSelector
   const groupDescriptionClass = isDark ? 'text-slate-300' : theme.body
   const subtitleClass = isDark ? theme.subtitle : theme.body
   const shouldShowModelDescription = block.showModelDescription !== false
-  const desktopTabsNavClass = isDark ? 'bg-slate-900/80' : 'bg-slate-50/90'
   const maxItemsPerRow = block.maxItemsPerRow ?? 4
   const dotsBaseClass = isDark ? 'bg-slate-500/50' : 'bg-slate-300'
   const dotsActiveClass = isDark ? 'bg-orange-300' : 'bg-orange-500'
@@ -389,15 +390,16 @@ export default function MachineSelectorBlock({ block }: { block: MachineSelector
 
         {activeItems.length > 0 && (
           <div>
-            <div className="mb-4 hidden items-center justify-end md:flex">
+            <div className="group relative overflow-visible">
               {machineControls.hasOverflow && (
-                <div className={`inline-flex items-center gap-3 rounded-full px-2 py-2 ${desktopTabsNavClass}`}>
+                <>
                   <SliderNavButton
                     direction="prev"
                     disabled={!machineControls.canPrev}
                     isDark={isDark}
                     label="Previous machine"
                     onClick={() => machineSwiper?.slidePrev()}
+                    className="absolute left-2 top-[35%] z-20 hidden -translate-y-1/2 xl:inline-flex"
                   />
                   <SliderNavButton
                     direction="next"
@@ -405,49 +407,50 @@ export default function MachineSelectorBlock({ block }: { block: MachineSelector
                     isDark={isDark}
                     label="Next machine"
                     onClick={() => machineSwiper?.slideNext()}
+                    className="absolute right-2 top-[35%] z-20 hidden -translate-y-1/2 xl:inline-flex"
                   />
-                </div>
+                </>
               )}
+
+              <Swiper
+                key={activeGroup?._key ?? `group-${activeIndex}`}
+                modules={[Keyboard, A11y]}
+                slidesPerView={1}
+                slidesPerGroup={1}
+                breakpoints={getMachineSliderBreakpoints(maxItemsPerRow)}
+                centerInsufficientSlides
+                watchOverflow
+                grabCursor
+                keyboard={{ enabled: true }}
+                spaceBetween={16}
+                speed={500}
+                a11y={{
+                  prevSlideMessage: 'Previous machine',
+                  nextSlideMessage: 'Next machine',
+                }}
+                onSwiper={(instance) => {
+                  setMachineSwiper(instance)
+                  setMachineControls(getSliderControls(instance))
+                }}
+                onSlideChange={(instance) => setMachineControls(getSliderControls(instance))}
+                onResize={(instance) => setMachineControls(getSliderControls(instance))}
+                onBreakpoint={(instance) => setMachineControls(getSliderControls(instance))}
+              >
+                {activeItems.map((item, idx) => {
+                  const variantItem = item.productVariant
+                  const title = item.modelLabel?.trim() || variantItem?.modelName?.trim() || 'Unnamed Model'
+
+                  return (
+                    <SwiperSlide key={item._key ?? `${title}-${idx}`} className="!h-auto">
+                      <MachineCard
+                        item={item}
+                        shouldShowModelDescription={shouldShowModelDescription}
+                      />
+                    </SwiperSlide>
+                  )
+                })}
+              </Swiper>
             </div>
-
-            <Swiper
-              key={activeGroup?._key ?? `group-${activeIndex}`}
-              modules={[Keyboard, A11y]}
-              slidesPerView={1}
-              slidesPerGroup={1}
-              breakpoints={getMachineSliderBreakpoints(maxItemsPerRow)}
-              centerInsufficientSlides
-              watchOverflow
-              grabCursor
-              keyboard={{ enabled: true }}
-              spaceBetween={16}
-              speed={500}
-              a11y={{
-                prevSlideMessage: 'Previous machine',
-                nextSlideMessage: 'Next machine',
-              }}
-              onSwiper={(instance) => {
-                setMachineSwiper(instance)
-                setMachineControls(getSliderControls(instance))
-              }}
-              onSlideChange={(instance) => setMachineControls(getSliderControls(instance))}
-              onResize={(instance) => setMachineControls(getSliderControls(instance))}
-              onBreakpoint={(instance) => setMachineControls(getSliderControls(instance))}
-            >
-              {activeItems.map((item, idx) => {
-                const variantItem = item.productVariant
-                const title = item.modelLabel?.trim() || variantItem?.modelName?.trim() || 'Unnamed Model'
-
-                return (
-                  <SwiperSlide key={item._key ?? `${title}-${idx}`} className="!h-auto">
-                    <MachineCard
-                      item={item}
-                      shouldShowModelDescription={shouldShowModelDescription}
-                    />
-                  </SwiperSlide>
-                )
-              })}
-            </Swiper>
 
             {machineControls.hasOverflow && (
               <div className="mt-6 flex items-center justify-center gap-2">
