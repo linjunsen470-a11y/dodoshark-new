@@ -203,7 +203,7 @@ function RichSectionTwoColumnPanel({
     >
       {heading?.trim() && (
         <h3
-          className={`mb-5 ${twoColumnPanelBaseHeadingClass} md:mb-6 ${headingClass}`}
+          className={`mb-8 ${twoColumnPanelBaseHeadingClass} md:mb-9 ${headingClass}`}
         >
           {heading.trim()}
         </h3>
