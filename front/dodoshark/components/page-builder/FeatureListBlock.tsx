@@ -9,6 +9,7 @@ import {
   type FeatureListBackgroundStyle,
 } from './backgroundTheme'
 import {
+  FeatureListItemAccentTitle,
   type FeatureListImage,
   type FeatureListItem,
 } from './FeatureListBlockCard'
@@ -29,7 +30,10 @@ export function hasFeatureListContent(
   block: FeatureListBlockData,
   showHeader = true,
 ) {
-  const hasHeader = showHeader && Boolean(block.title?.trim())
+  const hasHeader =
+    showHeader &&
+    block.mergeWithPreviousRichSection !== true &&
+    Boolean(block.title?.trim())
   const items = (block.items ?? []).filter((item) => item?.title)
 
   return hasHeader || items.length > 0
@@ -68,10 +72,14 @@ export function FeatureListBlockContent({
   renderMode = 'default',
 }: FeatureListBlockContentProps) {
   const items = (block.items ?? []).filter((item) => item?.title)
+  const hasAnyAccentTitle = items.some((item) => Boolean(item.topAccentTitle?.trim()))
   const backgroundStyle = block.backgroundStyle ?? 'white'
   const backgroundVariant = mapFeatureBackgroundStyleToVariant(backgroundStyle)
   const theme = getSharedBackgroundTheme(backgroundVariant)
-  const hasHeader = showHeader && Boolean(block.title?.trim())
+  const hasHeader =
+    showHeader &&
+    block.mergeWithPreviousRichSection !== true &&
+    Boolean(block.title?.trim())
   const isMergedCards = renderMode === 'mergedCards'
   const useCarousel = renderMode === 'default' || renderMode === 'mergedCarousel'
 
@@ -98,6 +106,7 @@ export function FeatureListBlockContent({
           {items.map((item, index) => {
             const isLastOddMobileItem =
               items.length % 2 === 1 && index === items.length - 1
+            const accentTitle = item.topAccentTitle?.trim()
             const wrapperClass = isLastOddMobileItem
               ? 'col-span-2 mx-auto w-full max-w-[15rem] sm:col-span-1 sm:max-w-none'
               : 'min-w-0'
@@ -105,9 +114,14 @@ export function FeatureListBlockContent({
             return (
               <div
                 key={item._key ?? `${item.title}-${index}`}
-                className={wrapperClass}
+                className={`${wrapperClass} flex h-full flex-col`}
               >
-                <article className={mergedCardClass}>
+                <FeatureListItemAccentTitle
+                  title={accentTitle}
+                  reserveSpace={hasAnyAccentTitle}
+                  className="mb-4 max-w-[18rem] md:mb-5"
+                />
+                <article className={`${mergedCardClass} flex min-h-0 flex-1 flex-col`}>
                   <FeatureMedia item={item} />
                   <h3
                     className={`mx-auto mb-3 max-w-[14ch] whitespace-pre-line ${cardTitleClass} ${itemTitleClass}`}
@@ -131,6 +145,7 @@ export function FeatureListBlockContent({
           items={items}
           theme={theme}
           showMobileArrows={renderMode === 'mergedCarousel'}
+          reserveAccentSpace={hasAnyAccentTitle}
         />
       ) : null
       }

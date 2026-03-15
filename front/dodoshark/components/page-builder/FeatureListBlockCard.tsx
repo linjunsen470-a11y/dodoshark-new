@@ -25,9 +25,37 @@ export type FeatureListImage = {
 export type FeatureListItem = {
   _key?: string
   title?: string
+  topAccentTitle?: string
   description?: string
   icon?: FeatureListImage
   image?: FeatureListImage
+}
+
+export function FeatureListItemAccentTitle({
+  title,
+  reserveSpace = false,
+  className = '',
+}: {
+  title?: string
+  reserveSpace?: boolean
+  className?: string
+}) {
+  const resolvedTitle = title?.trim()
+
+  if (!resolvedTitle && !reserveSpace) return null
+
+  if (!resolvedTitle) {
+    return <div aria-hidden className={`min-h-[1.75rem] md:min-h-[2rem] ${className}`.trim()} />
+  }
+
+  return (
+    <div className={`flex min-h-[1.75rem] items-stretch gap-3 md:min-h-[2rem] ${className}`.trim()}>
+      <div className="w-1 shrink-0 self-stretch rounded-full bg-orange-500" />
+      <p className="font-display text-lg font-extrabold leading-[1.1] tracking-[-0.02em] text-slate-900 md:text-xl">
+        {resolvedTitle}
+      </p>
+    </div>
+  )
 }
 
 function hasImageIdentity(image?: FeatureListImage) {
@@ -77,12 +105,15 @@ export function FeatureListStandaloneCard({
   item,
   theme,
   sizes,
+  reserveAccentSpace = false,
 }: {
   item: FeatureListItem
   theme: SharedBackgroundTheme
   sizes: string
+  reserveAccentSpace?: boolean
 }) {
   const {image, isIconFallback} = resolveFeatureMedia(item)
+  const accentTitle = item.topAccentTitle?.trim()
   const imageSrc = resolveImageSrc(
     image,
     isIconFallback
@@ -98,37 +129,45 @@ export function FeatureListStandaloneCard({
   const descriptionClass = 'text-slate-700'
 
   return (
-    <article className={`flex h-full flex-col overflow-hidden rounded-[1.125rem] ${frameClass}`}>
-      <div className={`relative aspect-[5/4] overflow-hidden ${mediaBackgroundClass}`}>
-        {imageSrc ? (
-          <Image
-            src={imageSrc}
-            alt={image?.alt || item.title || 'Feature image'}
-            fill
-            sizes={sizes}
-            className={isIconFallback ? 'object-contain p-10' : 'object-cover'}
-            placeholder={hasLqip ? 'blur' : 'empty'}
-            blurDataURL={blurDataURL}
-          />
-        ) : (
-          <div className={`absolute inset-0 flex items-center justify-center ${placeholderClass}`}>
-            <Icon icon="image" className="h-10 w-10" />
-          </div>
-        )}
-      </div>
+    <div className="flex h-full flex-col">
+      <FeatureListItemAccentTitle
+        title={accentTitle}
+        reserveSpace={reserveAccentSpace}
+        className="mb-4 md:mb-5"
+      />
 
-      <div className={`flex flex-1 flex-col justify-start px-6 py-6 md:px-7 md:py-7 ${contentClass}`}>
-        {item.title && (
-          <h3 className={`mb-3 whitespace-pre-line ${cardTitleClass}`}>
-            {item.title}
-          </h3>
-        )}
-        {item.description && (
-          <p className={`whitespace-pre-line ${bodyTextClass} ${descriptionClass}`}>
-            {item.description}
-          </p>
-        )}
-      </div>
-    </article>
+      <article className={`flex min-h-0 flex-1 flex-col overflow-hidden rounded-[1.125rem] ${frameClass}`}>
+        <div className={`relative aspect-[5/4] overflow-hidden ${mediaBackgroundClass}`}>
+          {imageSrc ? (
+            <Image
+              src={imageSrc}
+              alt={image?.alt || item.title || 'Feature image'}
+              fill
+              sizes={sizes}
+              className={isIconFallback ? 'object-contain p-10' : 'object-cover'}
+              placeholder={hasLqip ? 'blur' : 'empty'}
+              blurDataURL={blurDataURL}
+            />
+          ) : (
+            <div className={`absolute inset-0 flex items-center justify-center ${placeholderClass}`}>
+              <Icon icon="image" className="h-10 w-10" />
+            </div>
+          )}
+        </div>
+
+        <div className={`flex flex-1 flex-col justify-start px-6 py-6 md:px-7 md:py-7 ${contentClass}`}>
+          {item.title && (
+            <h3 className={`mb-3 whitespace-pre-line ${cardTitleClass}`}>
+              {item.title}
+            </h3>
+          )}
+          {item.description && (
+            <p className={`whitespace-pre-line ${bodyTextClass} ${descriptionClass}`}>
+              {item.description}
+            </p>
+          )}
+        </div>
+      </article>
+    </div>
   )
 }

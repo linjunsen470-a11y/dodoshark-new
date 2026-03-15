@@ -24,25 +24,13 @@ export default defineType({
       type: 'boolean',
       initialValue: false,
       description:
-        'Enable only when the previous block uses the centered media-grid Rich Section layout and matches the same background style.',
+        'Enable only when the previous block is a Rich Section with the same background style.',
     }),
     defineField({
       name: 'title',
       title: 'Section Title',
       type: 'string',
       hidden: ({parent}) => parent?.mergeWithPreviousRichSection === true,
-      validation: (Rule) =>
-        Rule.custom((value, context) => {
-          const shouldMerge = (
-            context.parent as {mergeWithPreviousRichSection?: boolean} | undefined
-          )?.mergeWithPreviousRichSection
-
-          if (shouldMerge && typeof value === 'string' && value.trim()) {
-            return 'Clear the title when merging with the previous rich section.'
-          }
-
-          return true
-        }),
     }),
     defineField({
       name: 'backgroundStyle',
@@ -109,6 +97,13 @@ export default defineType({
               validation: (Rule) => Rule.required(),
             }),
             defineField({
+              name: 'topAccentTitle',
+              title: 'Top Accent Title',
+              type: 'string',
+              description:
+                'Optional compact title shown above this feature item with an orange accent line. Leave empty to hide it.',
+            }),
+            defineField({
               name: 'description',
               title: 'Description',
               type: 'text',
@@ -128,13 +123,16 @@ export default defineType({
           preview: {
             select: {
               title: 'title',
+              topAccentTitle: 'topAccentTitle',
               image: 'image',
               icon: 'icon',
             },
-            prepare({title, image, icon}) {
+            prepare({title, topAccentTitle, image, icon}) {
               return {
                 title: title || 'Untitled feature item',
-                subtitle: 'Feature item',
+                subtitle: topAccentTitle?.trim()
+                  ? 'Feature item | Top accent set'
+                  : 'Feature item',
                 media: pickFirst(image, icon),
               }
             },
@@ -158,9 +156,9 @@ export default defineType({
         : undefined
 
       return {
-        title: title || 'Feature List',
+        title: merged ? 'Feature List' : title || 'Feature List',
         subtitle: merged
-          ? `Merged with previous rich section | ${count} items`
+          ? joinPreview(['Merged with previous rich section', `${count} items`])
           : joinPreview([backgroundStyle, `${count} items`]),
         media,
       }
