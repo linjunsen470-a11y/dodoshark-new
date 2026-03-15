@@ -2,6 +2,7 @@ import Image from 'next/image'
 
 import { urlFor } from '@/app/lib/sanity'
 
+import AccentTitle from './AccentTitle'
 import {
   getSharedSurfaceClasses,
   type SharedBackgroundTheme,
@@ -28,6 +29,7 @@ export type RichSectionMediaItem = {
   image?: RichSectionImage
   alt?: string
   caption?: string
+  topAccentTitle?: string
 }
 
 export function hasRichSectionImageIdentity(image?: RichSectionImage) {
@@ -99,6 +101,53 @@ export function RichSectionMediaFigure({
   )
 }
 
+export function RichSectionMediaCard({
+  item,
+  title,
+  theme,
+  reserveAccentSpace = false,
+  accentClassName = 'mb-4 md:mb-5',
+  captionClassName,
+  disableMediaFrameEffect = false,
+}: {
+  item: RichSectionMediaItem
+  title?: string
+  theme: SharedBackgroundTheme
+  reserveAccentSpace?: boolean
+  accentClassName?: string
+  captionClassName?: string
+  disableMediaFrameEffect?: boolean
+}) {
+  const caption = item.caption?.trim()
+  const accentTitle = item.topAccentTitle?.trim()
+
+  return (
+    <article className="min-w-0">
+      <AccentTitle
+        title={accentTitle}
+        reserveSpace={reserveAccentSpace}
+        className={accentClassName}
+      />
+      <RichSectionMediaFigure
+        item={item}
+        title={title}
+        theme={theme}
+        disableMediaFrameEffect={disableMediaFrameEffect}
+      />
+      {caption ? (
+        <p
+          className={
+            captionClassName ??
+            `mt-3 text-center text-sm leading-6 md:text-[0.95rem] ${theme.subtitle}`
+          }
+        >
+          {caption}
+        </p>
+      ) : null}
+    </article>
+  )
+}
+
 export function RichSectionMediaGrid({
   items,
   title,
@@ -112,30 +161,36 @@ export function RichSectionMediaGrid({
 }) {
   if (items.length === 0) return null
 
+  const hasAnyAccentTitle = items.some((item) => Boolean(item.topAccentTitle?.trim()))
+
+  if (items.length === 1) {
+    const item = items[0]
+
+    return (
+      <div className="mx-auto w-full max-w-full md:max-w-[32rem] lg:max-w-[34rem]">
+        <RichSectionMediaCard
+          item={item}
+          title={title}
+          theme={theme}
+          reserveAccentSpace={hasAnyAccentTitle}
+          disableMediaFrameEffect={disableMediaFrameEffect}
+        />
+      </div>
+    )
+  }
+
   return (
     <div className="grid grid-cols-2 gap-4 md:gap-6">
       {items.map((item, index) => {
-        const caption = item.caption?.trim()
-
         return (
-          <article
+          <RichSectionMediaCard
             key={item._key ?? `rich-section-media-grid-${index}`}
-            className="min-w-0"
-          >
-            <RichSectionMediaFigure
-              item={item}
-              title={title}
-              theme={theme}
-              disableMediaFrameEffect={disableMediaFrameEffect}
-            />
-            {caption ? (
-              <p
-                className={`mt-3 text-center text-sm leading-6 md:text-[0.95rem] ${theme.subtitle}`}
-              >
-                {caption}
-              </p>
-            ) : null}
-          </article>
+            item={item}
+            title={title}
+            theme={theme}
+            reserveAccentSpace={hasAnyAccentTitle}
+            disableMediaFrameEffect={disableMediaFrameEffect}
+          />
         )
       })}
     </div>

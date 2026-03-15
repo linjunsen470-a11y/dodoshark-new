@@ -7,7 +7,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 
 import { type SharedBackgroundTheme } from './backgroundTheme'
 import {
-  RichSectionMediaFigure,
+  RichSectionMediaCard,
   type RichSectionMediaItem,
 } from './RichSectionMedia'
 import SplitHeroArrow from './SplitHeroArrow'
@@ -26,9 +26,8 @@ export default function RichSectionMediaCarousel({
 }) {
   const [swiper, setSwiper] = useState<SwiperInstance | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
-  const currentItem = items[Math.min(currentIndex, items.length - 1)]
-  const caption = currentItem?.caption?.trim()
-  const captionClass = theme.subtitle
+  const hasAnyAccentTitle = items.some((item) => Boolean(item.topAccentTitle?.trim()))
+  const captionClassName = `mx-auto mt-4 max-w-[42rem] text-center text-sm leading-6 md:text-[0.95rem] ${theme.subtitle}`
   const dotsBaseClass = theme.dotIdle
   const dotsActiveClass = theme.dotActive
   const canPrev = currentIndex > 0
@@ -39,17 +38,14 @@ export default function RichSectionMediaCarousel({
   if (items.length === 1) {
     return (
       <div className="w-full min-w-0">
-        <RichSectionMediaFigure
+        <RichSectionMediaCard
           item={items[0]}
           title={title}
           theme={theme}
+          reserveAccentSpace={hasAnyAccentTitle}
+          captionClassName={captionClassName}
           disableMediaFrameEffect={disableMediaFrameEffect}
         />
-        {caption ? (
-          <p className={`mx-auto mt-4 max-w-[42rem] text-center text-sm leading-6 md:text-[0.95rem] ${captionClass}`}>
-            {caption}
-          </p>
-        ) : null}
       </div>
     )
   }
@@ -83,10 +79,12 @@ export default function RichSectionMediaCarousel({
               key={item._key ?? `rich-section-media-${index}`}
               className="!h-auto min-w-0"
             >
-              <RichSectionMediaFigure
+              <RichSectionMediaCard
                 item={item}
                 title={title}
                 theme={theme}
+                reserveAccentSpace={hasAnyAccentTitle}
+                captionClassName={captionClassName}
                 disableMediaFrameEffect={disableMediaFrameEffect}
               />
             </SwiperSlide>
@@ -120,12 +118,6 @@ export default function RichSectionMediaCarousel({
           }}
         />
       </div>
-
-      {caption ? (
-        <p className={`mx-auto mt-4 max-w-[42rem] text-center text-sm leading-6 md:text-[0.95rem] ${captionClass}`}>
-          {caption}
-        </p>
-      ) : null}
 
       <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
         {items.map((item, index) => {

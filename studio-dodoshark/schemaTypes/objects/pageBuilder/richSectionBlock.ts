@@ -12,6 +12,12 @@ function isCenteredLayout(parent?: RichSectionParentValue) {
   return parent?.layout === 'centeredMediaGridBodyBelow'
 }
 
+function isSplitLayout(parent?: RichSectionParentValue) {
+  return (
+    parent?.layout === 'textLeftMediaRight' || parent?.layout === 'mediaLeftTextRight'
+  )
+}
+
 function showTwoColumnFields(parent?: RichSectionParentValue) {
   return isCenteredLayout(parent) && parent?.enableTwoColumnContent === true
 }
@@ -111,16 +117,25 @@ export default defineType({
               type: 'string',
               title: 'Caption',
             }),
+            defineField({
+              name: 'topAccentTitle',
+              title: 'Top Accent Title',
+              type: 'string',
+              description:
+                'Optional compact title shown above this media item with an orange accent line. Leave empty to hide it.',
+            }),
           ],
           preview: {
             select: {
               image: 'image',
               title: 'caption',
               alt: 'alt',
+              topAccentTitle: 'topAccentTitle',
             },
-            prepare({image, title, alt}) {
+            prepare({image, title, alt, topAccentTitle}) {
               return {
                 title: title || alt || 'Media Item',
+                subtitle: topAccentTitle?.trim() ? 'Media item | Top accent set' : 'Media item',
                 media: image,
               }
             },
@@ -141,6 +156,15 @@ export default defineType({
       },
       initialValue: 'textLeftMediaRight',
       validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'centerHeaderInSplitLayout',
+      title: 'Center Header In Split Layout',
+      type: 'boolean',
+      initialValue: false,
+      description:
+        'When enabled, the heading and subtitle move above the split layout and display centered.',
+      hidden: ({parent}) => !isSplitLayout(parent as RichSectionParentValue | undefined),
     }),
     defineField({
       name: 'enableTwoColumnContent',
@@ -165,6 +189,12 @@ export default defineType({
       hidden: ({parent}) => !showTwoColumnFields(parent as RichSectionParentValue | undefined),
     }),
     defineField({
+      name: 'leftColumnHeading',
+      title: 'Left Column Heading',
+      type: 'string',
+      hidden: ({parent}) => !showTwoColumnFields(parent as RichSectionParentValue | undefined),
+    }),
+    defineField({
       name: 'leftColumnItems',
       title: 'Left Column Items',
       type: 'array',
@@ -177,6 +207,12 @@ export default defineType({
           preview: twoColumnItemPreview,
         }),
       ],
+    }),
+    defineField({
+      name: 'rightColumnHeading',
+      title: 'Right Column Heading',
+      type: 'string',
+      hidden: ({parent}) => !showTwoColumnFields(parent as RichSectionParentValue | undefined),
     }),
     defineField({
       name: 'rightColumnItems',
@@ -230,10 +266,13 @@ export default defineType({
       subtitle: 'subtitle',
       disableMediaFrameEffect: 'disableMediaFrameEffect',
       body: 'body',
+      centerHeaderInSplitLayout: 'centerHeaderInSplitLayout',
       enableTwoColumnContent: 'enableTwoColumnContent',
       twoColumnHeading: 'twoColumnHeading',
       twoColumnSubtitle: 'twoColumnSubtitle',
+      leftColumnHeading: 'leftColumnHeading',
       leftColumnItems: 'leftColumnItems',
+      rightColumnHeading: 'rightColumnHeading',
       rightColumnItems: 'rightColumnItems',
     },
     prepare({
@@ -244,10 +283,13 @@ export default defineType({
       subtitle,
       disableMediaFrameEffect,
       body,
+      centerHeaderInSplitLayout,
       enableTwoColumnContent,
       twoColumnHeading,
       twoColumnSubtitle,
+      leftColumnHeading,
       leftColumnItems,
+      rightColumnHeading,
       rightColumnItems,
     }) {
       const layoutLabel =
@@ -262,9 +304,16 @@ export default defineType({
           ? joinPreview([
               'Two-column content',
               pickText(twoColumnHeading, twoColumnSubtitle) ? 'Section header set' : undefined,
+              leftColumnHeading?.trim() ? 'Left heading set' : undefined,
               itemCount(leftColumnItems) ? `Left ${itemCount(leftColumnItems)} items` : undefined,
+              rightColumnHeading?.trim() ? 'Right heading set' : undefined,
               itemCount(rightColumnItems) ? `Right ${itemCount(rightColumnItems)} items` : undefined,
             ])
+          : undefined
+
+      const splitHeaderSummary =
+        isSplitLayout({layout}) && centerHeaderInSplitLayout
+          ? 'Centered split header'
           : undefined
 
       return {
@@ -274,6 +323,7 @@ export default defineType({
             pickText(subtitle),
             layoutLabel,
             itemCount(mediaItems) ? `${itemCount(mediaItems)} media items` : undefined,
+            splitHeaderSummary,
             twoColumnSummary ||
               (itemCount(body) ? `${itemCount(body)} body blocks` : undefined),
             disableMediaFrameEffect ? 'Frame effect off' : undefined,

@@ -38,10 +38,13 @@ export type RichSectionBlockData = {
   body?: PortableTextBlock[]
   mediaItems?: RichSectionMediaItem[]
   layout?: RichSectionLayout
+  centerHeaderInSplitLayout?: boolean
   enableTwoColumnContent?: boolean
   twoColumnHeading?: string
   twoColumnSubtitle?: string
+  leftColumnHeading?: string
   leftColumnItems?: RichSectionColumnItem[]
+  rightColumnHeading?: string
   rightColumnItems?: RichSectionColumnItem[]
   disableMediaFrameEffect?: boolean
   backgroundVariant?: SharedBackgroundVariant
@@ -66,10 +69,23 @@ function hasTwoColumnHeader(block: RichSectionBlockData) {
   return Boolean(block.twoColumnHeading?.trim() || block.twoColumnSubtitle?.trim())
 }
 
+function hasTwoColumnPanelContent(heading?: string, items?: RichSectionColumnItem[]) {
+  return Boolean(heading?.trim()) || getValidRichSectionColumnItems(items).length > 0
+}
+
 function useTwoColumnContent(block: RichSectionBlockData) {
   return (
     normalizeRichSectionLayout(block.layout) === 'centeredMediaGridBodyBelow' &&
     block.enableTwoColumnContent === true
+  )
+}
+
+function centerHeaderInSplitLayout(block: RichSectionBlockData) {
+  const layout = normalizeRichSectionLayout(block.layout)
+
+  return (
+    block.centerHeaderInSplitLayout === true &&
+    (layout === 'textLeftMediaRight' || layout === 'mediaLeftTextRight')
   )
 }
 
@@ -79,10 +95,10 @@ export function hasRichSectionContent(block: RichSectionBlockData) {
   const hasSubtitle = Boolean(block.subtitle?.trim())
   const hasTwoColumnMode =
     layout === 'centeredMediaGridBodyBelow' && block.enableTwoColumnContent === true
-  const hasTwoColumnItems =
-    getValidRichSectionColumnItems(block.leftColumnItems).length > 0 ||
-    getValidRichSectionColumnItems(block.rightColumnItems).length > 0
-  const hasTwoColumnContent = hasTwoColumnMode && (hasTwoColumnHeader(block) || hasTwoColumnItems)
+  const hasTwoColumnPanels =
+    hasTwoColumnPanelContent(block.leftColumnHeading, block.leftColumnItems) ||
+    hasTwoColumnPanelContent(block.rightColumnHeading, block.rightColumnItems)
+  const hasTwoColumnContent = hasTwoColumnMode && (hasTwoColumnHeader(block) || hasTwoColumnPanels)
   const hasBody = hasTwoColumnMode ? false : Boolean(block.body?.length)
 
   return Boolean(block.heading || hasSubtitle || hasBody || hasMedia || hasTwoColumnContent)
@@ -153,6 +169,116 @@ function getPortableTextComponents(theme: SharedBackgroundTheme): PortableTextCo
   }
 }
 
+const twoColumnSectionHeadingClass =
+  'font-display text-xl font-extrabold leading-[1.08] tracking-[-0.02em] md:text-2xl lg:text-[1.75rem]'
+const twoColumnSectionSubtitleClass = 'text-sm leading-6 md:text-[0.95rem] md:leading-7'
+const twoColumnPanelBaseHeadingClass =
+  'text-center whitespace-pre-line font-display font-extrabold leading-[1.08] tracking-[-0.03em]'
+const twoColumnPillBaseClass =
+  'inline-flex min-h-9 max-w-full items-center justify-center rounded-full px-4 py-1.5 text-sm font-semibold leading-tight md:min-h-10 md:px-5 md:text-base'
+const twoColumnDescriptionBaseClass =
+  'mx-auto max-w-[20ch] whitespace-pre-line text-base font-normal leading-7 md:text-[1.125rem] md:leading-8'
+
+function RichSectionTwoColumnSectionHeader({
+  heading,
+  subtitle,
+  theme,
+}: {
+  heading?: string
+  subtitle?: string
+  theme: SharedBackgroundTheme
+}) {
+  if (!heading && !subtitle) return null
+
+  return (
+    <div className="mx-auto mb-8 max-w-4xl text-center md:mb-10">
+      {heading && (
+        <h3 className={`${twoColumnSectionHeadingClass} ${theme.heading}`}>{heading}</h3>
+      )}
+
+      <div className="mx-auto my-4 flex w-full max-w-4xl items-center gap-4 md:my-5">
+        <div className="h-px flex-1 bg-sky-200/70" />
+        <div className="h-1 w-20 rounded-full bg-gradient-to-r from-sky-300 via-cyan-400 to-sky-300 md:w-24" />
+        <div className="h-px flex-1 bg-sky-200/70" />
+      </div>
+
+      {subtitle && (
+        <p className={`mx-auto max-w-3xl whitespace-pre-line font-normal ${twoColumnSectionSubtitleClass} ${theme.subtitle}`}>
+          {subtitle}
+        </p>
+      )}
+    </div>
+  )
+}
+
+function RichSectionTwoColumnPanel({
+  heading,
+  items,
+  variant,
+  theme,
+}: {
+  heading?: string
+  items: RichSectionColumnItem[]
+  variant: 'left' | 'right'
+  theme: SharedBackgroundTheme
+}) {
+  if (!heading?.trim() && items.length === 0) return null
+
+  const isRight = variant === 'right'
+  const panelClass = isRight
+    ? 'border border-sky-200/70 bg-[linear-gradient(180deg,rgba(224,242,254,0.82)_0%,rgba(219,234,254,0.78)_100%)] shadow-[0_28px_60px_-40px_rgba(14,165,233,0.28)]'
+    : 'border border-slate-200/80 bg-white/82 shadow-[0_24px_56px_-40px_rgba(15,23,42,0.16)]'
+  const headingClass = isRight
+    ? `text-2xl md:text-[2rem] ${theme.heading}`
+    : `text-2xl md:text-[1.875rem] ${theme.heading}`
+  const pillClass = isRight
+    ? 'bg-slate-900 text-white shadow-[0_10px_24px_-18px_rgba(15,23,42,0.8)]'
+    : 'bg-[linear-gradient(90deg,#7dd3fc_0%,#38bdf8_100%)] text-slate-900 shadow-[0_10px_24px_-18px_rgba(14,165,233,0.7)]'
+  const descriptionClass = isRight ? 'text-slate-700' : theme.body
+
+  return (
+    <div
+      className={`mx-auto max-w-[30rem] rounded-[2rem] px-5 py-6 backdrop-blur-sm md:px-7 md:py-8 ${panelClass}`}
+    >
+      {heading?.trim() && (
+        <h3
+          className={`mb-5 ${twoColumnPanelBaseHeadingClass} md:mb-6 ${headingClass}`}
+        >
+          {heading.trim()}
+        </h3>
+      )}
+
+      {items.length > 0 && (
+        <div className="space-y-6 md:space-y-7">
+          {items.map((item, index) => (
+            <div
+              key={item._key ?? `${variant}-${item.title ?? 'item'}-${index}`}
+              className="text-center"
+            >
+              {item.title?.trim() && (
+                <div className="mb-3.5 flex justify-center md:mb-4">
+                  <span
+                    className={`${twoColumnPillBaseClass} ${pillClass}`}
+                  >
+                    <span className="whitespace-pre-line">{item.title.trim()}</span>
+                  </span>
+                </div>
+              )}
+              {item.description?.trim() && (
+                <p
+                  className={`${twoColumnDescriptionBaseClass} ${descriptionClass}`}
+                >
+                  {item.description.trim()}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function RichSectionTwoColumnContent({
   block,
   theme,
@@ -162,58 +288,50 @@ function RichSectionTwoColumnContent({
 }) {
   const heading = block.twoColumnHeading?.trim()
   const subtitle = block.twoColumnSubtitle?.trim()
+  const leftColumnHeading = block.leftColumnHeading?.trim()
+  const rightColumnHeading = block.rightColumnHeading?.trim()
   const leftItems = getValidRichSectionColumnItems(block.leftColumnItems)
   const rightItems = getValidRichSectionColumnItems(block.rightColumnItems)
   const columns = [
-    {key: 'left', items: leftItems},
-    {key: 'right', items: rightItems},
-  ].filter((column) => column.items.length > 0)
+    {
+      key: 'left' as const,
+      heading: leftColumnHeading,
+      items: leftItems,
+      variant: 'left' as const,
+    },
+    {
+      key: 'right' as const,
+      heading: rightColumnHeading,
+      items: rightItems,
+      variant: 'right' as const,
+    },
+  ].filter((column) => column.heading || column.items.length > 0)
 
   if (!heading && !subtitle && columns.length === 0) return null
 
   const gridClass =
     columns.length > 1
-      ? 'grid gap-8 md:grid-cols-2 md:gap-10'
+      ? 'grid gap-5 md:grid-cols-2 md:gap-6 lg:gap-8'
       : 'mx-auto max-w-3xl'
 
   return (
     <div className="mx-auto max-w-5xl">
-      {(heading || subtitle) && (
-        <SectionHeader
-          title={heading}
-          subtitle={subtitle}
-          tone="light"
-          align="center"
-          className="mx-auto mb-8 max-w-3xl md:mb-10"
-          titleClassName={theme.heading}
-          subtitleClassName={`mx-auto max-w-3xl font-normal ${sectionSubtitleClass} ${theme.subtitle}`}
-        />
-      )}
+      <RichSectionTwoColumnSectionHeader
+        heading={heading}
+        subtitle={subtitle}
+        theme={theme}
+      />
 
       {columns.length > 0 && (
         <div className={gridClass}>
           {columns.map((column) => (
-            <div
+            <RichSectionTwoColumnPanel
               key={column.key}
-              className="space-y-6 rounded-[1.5rem] border border-slate-200/80 bg-white/70 px-6 py-7 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.18)] backdrop-blur-sm md:px-8"
-            >
-              {column.items.map((item, index) => (
-                <div key={item._key ?? `${column.key}-${item.title ?? 'item'}-${index}`}>
-                  {item.title && (
-                    <h3 className={`mb-3 whitespace-pre-line ${cardTitleClass} ${theme.heading}`}>
-                      {item.title}
-                    </h3>
-                  )}
-                  {item.description?.trim() && (
-                    <p
-                      className={`whitespace-pre-line font-normal ${bodyTextClass} ${theme.body}`}
-                    >
-                      {item.description.trim()}
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
+              heading={column.heading}
+              items={column.items}
+              variant={column.variant}
+              theme={theme}
+            />
           ))}
         </div>
       )}
@@ -240,6 +358,7 @@ export function RichSectionBlockContent({
   const mediaItems = getValidRichSectionMediaItems(block.mediaItems)
   const hasMedia = mediaItems.length > 0
   const hasTwoColumnMode = useTwoColumnContent(block)
+  const hasCenteredSplitHeader = centerHeaderInSplitLayout(block)
   const hasBody = hasTwoColumnMode ? false : Boolean(block.body?.length)
   const hasSubtitle = Boolean(block.subtitle?.trim())
 
@@ -303,9 +422,21 @@ export function RichSectionBlockContent({
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {hasCenteredSplitHeader && (block.heading || hasSubtitle) && (
+        <SectionHeader
+          title={block.heading}
+          subtitle={hasSubtitle ? block.subtitle : undefined}
+          tone="light"
+          align="center"
+          className="mx-auto mb-10 max-w-4xl md:mb-12"
+          titleClassName={theme.heading}
+          subtitleClassName={`mx-auto max-w-3xl font-normal ${sectionSubtitleClass} ${theme.subtitle}`}
+        />
+      )}
+
       <div className={layoutClass}>
         <div className={`${textOrderClass} min-w-0 max-w-[36rem]`}>
-          {(block.heading || hasSubtitle) && (
+          {!hasCenteredSplitHeader && (block.heading || hasSubtitle) && (
             <SectionHeader
               title={block.heading}
               subtitle={hasSubtitle ? block.subtitle : undefined}

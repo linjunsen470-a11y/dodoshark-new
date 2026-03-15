@@ -3,6 +3,7 @@ import Image from 'next/image'
 import {urlFor} from '@/app/lib/sanity'
 import Icon from '@/components/ui/Icon'
 
+import AccentTitle from './AccentTitle'
 import type {SharedBackgroundTheme} from './backgroundTheme'
 import {bodyTextClass, cardTitleClass} from './sectionStyles'
 
@@ -31,32 +32,7 @@ export type FeatureListItem = {
   image?: FeatureListImage
 }
 
-export function FeatureListItemAccentTitle({
-  title,
-  reserveSpace = false,
-  className = '',
-}: {
-  title?: string
-  reserveSpace?: boolean
-  className?: string
-}) {
-  const resolvedTitle = title?.trim()
-
-  if (!resolvedTitle && !reserveSpace) return null
-
-  if (!resolvedTitle) {
-    return <div aria-hidden className={`min-h-[1.75rem] md:min-h-[2rem] ${className}`.trim()} />
-  }
-
-  return (
-    <div className={`flex min-h-[1.75rem] items-stretch gap-3 md:min-h-[2rem] ${className}`.trim()}>
-      <div className="w-1 shrink-0 self-stretch rounded-full bg-orange-500" />
-      <p className="font-display text-lg font-extrabold leading-[1.1] tracking-[-0.02em] text-slate-900 md:text-xl">
-        {resolvedTitle}
-      </p>
-    </div>
-  )
-}
+export const FeatureListItemAccentTitle = AccentTitle
 
 function hasImageIdentity(image?: FeatureListImage) {
   const ref = image?.asset?._ref?.trim()
