@@ -26,7 +26,6 @@ export default function RichSectionMediaCarousel({
 }) {
   const [swiper, setSwiper] = useState<SwiperInstance | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
-  const hasAnyAccentTitle = items.some((item) => Boolean(item.topAccentTitle?.trim()))
   const captionClassName = `mx-auto mt-4 max-w-[42rem] text-center text-sm leading-6 md:text-[0.95rem] ${theme.subtitle}`
   const dotsBaseClass = theme.dotIdle
   const dotsActiveClass = theme.dotActive
@@ -42,7 +41,6 @@ export default function RichSectionMediaCarousel({
           item={items[0]}
           title={title}
           theme={theme}
-          reserveAccentSpace={hasAnyAccentTitle}
           captionClassName={captionClassName}
           disableMediaFrameEffect={disableMediaFrameEffect}
         />
@@ -83,7 +81,6 @@ export default function RichSectionMediaCarousel({
                 item={item}
                 title={title}
                 theme={theme}
-                reserveAccentSpace={hasAnyAccentTitle}
                 captionClassName={captionClassName}
                 disableMediaFrameEffect={disableMediaFrameEffect}
               />

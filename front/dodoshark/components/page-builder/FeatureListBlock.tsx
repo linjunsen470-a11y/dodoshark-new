@@ -2,17 +2,14 @@ import Image from 'next/image'
 
 import {urlFor} from '@/app/lib/sanity'
 
+import AccentTitle from './AccentTitle'
 import FeatureListBlockCarousel from './FeatureListBlockCarousel'
 import {
   getSharedBackgroundTheme,
   mapFeatureBackgroundStyleToVariant,
   type FeatureListBackgroundStyle,
 } from './backgroundTheme'
-import {
-  FeatureListItemAccentTitle,
-  type FeatureListImage,
-  type FeatureListItem,
-} from './FeatureListBlockCard'
+import {type FeatureListImage, type FeatureListItem} from './FeatureListBlockCard'
 import SectionShell from './SectionShell'
 import SectionHeader from './SectionHeader'
 import {bodyTextClass, cardTitleClass} from './sectionStyles'
@@ -21,6 +18,7 @@ export type FeatureListBlockData = {
   _type: 'featureListBlock'
   _key?: string
   title?: string
+  topAccentTitle?: string
   mergeWithPreviousRichSection?: boolean
   backgroundStyle?: FeatureListBackgroundStyle
   items?: FeatureListItem[]
@@ -72,7 +70,7 @@ export function FeatureListBlockContent({
   renderMode = 'default',
 }: FeatureListBlockContentProps) {
   const items = (block.items ?? []).filter((item) => item?.title)
-  const hasAnyAccentTitle = items.some((item) => Boolean(item.topAccentTitle?.trim()))
+  const topAccentTitle = block.topAccentTitle?.trim()
   const backgroundStyle = block.backgroundStyle ?? 'white'
   const backgroundVariant = mapFeatureBackgroundStyleToVariant(backgroundStyle)
   const theme = getSharedBackgroundTheme(backgroundVariant)
@@ -101,12 +99,13 @@ export function FeatureListBlockContent({
         />
       )}
 
+      <AccentTitle title={topAccentTitle} className="mb-6 max-w-[20rem] md:mb-7" />
+
       {isMergedCards ? (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-[repeat(auto-fit,minmax(220px,1fr))] sm:gap-6 lg:gap-7">
           {items.map((item, index) => {
             const isLastOddMobileItem =
               items.length % 2 === 1 && index === items.length - 1
-            const accentTitle = item.topAccentTitle?.trim()
             const wrapperClass = isLastOddMobileItem
               ? 'col-span-2 mx-auto w-full max-w-[15rem] sm:col-span-1 sm:max-w-none'
               : 'min-w-0'
@@ -116,11 +115,6 @@ export function FeatureListBlockContent({
                 key={item._key ?? `${item.title}-${index}`}
                 className={`${wrapperClass} flex h-full flex-col`}
               >
-                <FeatureListItemAccentTitle
-                  title={accentTitle}
-                  reserveSpace={hasAnyAccentTitle}
-                  className="mb-4 max-w-[18rem] md:mb-5"
-                />
                 <article className={`${mergedCardClass} flex min-h-0 flex-1 flex-col`}>
                   <FeatureMedia item={item} />
                   <h3
@@ -145,7 +139,6 @@ export function FeatureListBlockContent({
           items={items}
           theme={theme}
           showMobileArrows={renderMode === 'mergedCarousel'}
-          reserveAccentSpace={hasAnyAccentTitle}
         />
       ) : null
       }

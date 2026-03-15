@@ -9,6 +9,7 @@ import {
   type SharedBackgroundTheme,
   type SharedBackgroundVariant,
 } from './backgroundTheme'
+import AccentTitle from './AccentTitle'
 import RichSectionMediaCarousel from './RichSectionMediaCarousel'
 import {
   getValidRichSectionMediaItems,
@@ -37,11 +38,10 @@ export type RichSectionBlockData = {
   subtitle?: string
   body?: PortableTextBlock[]
   mediaItems?: RichSectionMediaItem[]
+  mediaTopAccentTitle?: string
   layout?: RichSectionLayout
   centerHeaderInSplitLayout?: boolean
   enableTwoColumnContent?: boolean
-  twoColumnHeading?: string
-  twoColumnSubtitle?: string
   leftColumnHeading?: string
   leftColumnItems?: RichSectionColumnItem[]
   rightColumnHeading?: string
@@ -63,10 +63,6 @@ function getValidRichSectionColumnItems(items?: RichSectionColumnItem[]) {
   return (items ?? []).filter(
     (item) => Boolean(item?.title?.trim()) || Boolean(item?.description?.trim()),
   )
-}
-
-function hasTwoColumnHeader(block: RichSectionBlockData) {
-  return Boolean(block.twoColumnHeading?.trim() || block.twoColumnSubtitle?.trim())
 }
 
 function hasTwoColumnPanelContent(heading?: string, items?: RichSectionColumnItem[]) {
@@ -98,7 +94,7 @@ export function hasRichSectionContent(block: RichSectionBlockData) {
   const hasTwoColumnPanels =
     hasTwoColumnPanelContent(block.leftColumnHeading, block.leftColumnItems) ||
     hasTwoColumnPanelContent(block.rightColumnHeading, block.rightColumnItems)
-  const hasTwoColumnContent = hasTwoColumnMode && (hasTwoColumnHeader(block) || hasTwoColumnPanels)
+  const hasTwoColumnContent = hasTwoColumnMode && hasTwoColumnPanels
   const hasBody = hasTwoColumnMode ? false : Boolean(block.body?.length)
 
   return Boolean(block.heading || hasSubtitle || hasBody || hasMedia || hasTwoColumnContent)
@@ -169,47 +165,12 @@ function getPortableTextComponents(theme: SharedBackgroundTheme): PortableTextCo
   }
 }
 
-const twoColumnSectionHeadingClass =
-  'font-display text-xl font-extrabold leading-[1.08] tracking-[-0.02em] md:text-2xl lg:text-[1.75rem]'
-const twoColumnSectionSubtitleClass = 'text-sm leading-6 md:text-[0.95rem] md:leading-7'
 const twoColumnPanelBaseHeadingClass =
   'text-center whitespace-pre-line font-display font-extrabold leading-[1.08] tracking-[-0.03em]'
 const twoColumnPillBaseClass =
   'inline-flex min-h-9 max-w-full items-center justify-center rounded-full px-4 py-1.5 text-sm font-semibold leading-tight md:min-h-10 md:px-5 md:text-base'
 const twoColumnDescriptionBaseClass =
   'mx-auto max-w-[20ch] whitespace-pre-line text-base font-normal leading-7 md:text-[1.125rem] md:leading-8'
-
-function RichSectionTwoColumnSectionHeader({
-  heading,
-  subtitle,
-  theme,
-}: {
-  heading?: string
-  subtitle?: string
-  theme: SharedBackgroundTheme
-}) {
-  if (!heading && !subtitle) return null
-
-  return (
-    <div className="mx-auto mb-8 max-w-4xl text-center md:mb-10">
-      {heading && (
-        <h3 className={`${twoColumnSectionHeadingClass} ${theme.heading}`}>{heading}</h3>
-      )}
-
-      <div className="mx-auto my-4 flex w-full max-w-4xl items-center gap-4 md:my-5">
-        <div className="h-px flex-1 bg-sky-200/70" />
-        <div className="h-1 w-20 rounded-full bg-gradient-to-r from-sky-300 via-cyan-400 to-sky-300 md:w-24" />
-        <div className="h-px flex-1 bg-sky-200/70" />
-      </div>
-
-      {subtitle && (
-        <p className={`mx-auto max-w-3xl whitespace-pre-line font-normal ${twoColumnSectionSubtitleClass} ${theme.subtitle}`}>
-          {subtitle}
-        </p>
-      )}
-    </div>
-  )
-}
 
 function RichSectionTwoColumnPanel({
   heading,
@@ -238,7 +199,7 @@ function RichSectionTwoColumnPanel({
 
   return (
     <div
-      className={`mx-auto max-w-[30rem] rounded-[2rem] px-5 py-6 backdrop-blur-sm md:px-7 md:py-8 ${panelClass}`}
+      className={`mx-auto h-full w-full max-w-[30rem] rounded-[2rem] px-5 py-6 backdrop-blur-sm md:px-7 md:py-8 ${panelClass}`}
     >
       {heading?.trim() && (
         <h3
@@ -286,8 +247,6 @@ function RichSectionTwoColumnContent({
   block: RichSectionBlockData
   theme: SharedBackgroundTheme
 }) {
-  const heading = block.twoColumnHeading?.trim()
-  const subtitle = block.twoColumnSubtitle?.trim()
   const leftColumnHeading = block.leftColumnHeading?.trim()
   const rightColumnHeading = block.rightColumnHeading?.trim()
   const leftItems = getValidRichSectionColumnItems(block.leftColumnItems)
@@ -307,7 +266,7 @@ function RichSectionTwoColumnContent({
     },
   ].filter((column) => column.heading || column.items.length > 0)
 
-  if (!heading && !subtitle && columns.length === 0) return null
+  if (columns.length === 0) return null
 
   const gridClass =
     columns.length > 1
@@ -316,25 +275,17 @@ function RichSectionTwoColumnContent({
 
   return (
     <div className="mx-auto max-w-5xl">
-      <RichSectionTwoColumnSectionHeader
-        heading={heading}
-        subtitle={subtitle}
-        theme={theme}
-      />
-
-      {columns.length > 0 && (
-        <div className={gridClass}>
-          {columns.map((column) => (
-            <RichSectionTwoColumnPanel
-              key={column.key}
-              heading={column.heading}
-              items={column.items}
-              variant={column.variant}
-              theme={theme}
-            />
-          ))}
-        </div>
-      )}
+      <div className={gridClass}>
+        {columns.map((column) => (
+          <RichSectionTwoColumnPanel
+            key={column.key}
+            heading={column.heading}
+            items={column.items}
+            variant={column.variant}
+            theme={theme}
+          />
+        ))}
+      </div>
     </div>
   )
 }
@@ -356,6 +307,7 @@ export function RichSectionBlockContent({
   const variant = block.backgroundVariant ?? 'white'
   const theme = getSharedBackgroundTheme(variant)
   const mediaItems = getValidRichSectionMediaItems(block.mediaItems)
+  const mediaTopAccentTitle = block.mediaTopAccentTitle?.trim()
   const hasMedia = mediaItems.length > 0
   const hasTwoColumnMode = useTwoColumnContent(block)
   const hasCenteredSplitHeader = centerHeaderInSplitLayout(block)
@@ -396,6 +348,7 @@ export function RichSectionBlockContent({
         <div className="space-y-10 md:space-y-12">
           {hasMedia && (
             <div className="mx-auto max-w-5xl">
+              <AccentTitle title={mediaTopAccentTitle} className="mb-6 max-w-[20rem] md:mb-7" />
               <RichSectionMediaGrid
                 items={mediaItems}
                 title={block.heading}
@@ -460,6 +413,7 @@ export function RichSectionBlockContent({
 
         {hasMedia && (
           <div className={`${mediaOrderClass} min-w-0`}>
+            <AccentTitle title={mediaTopAccentTitle} className="mb-6 max-w-[20rem] md:mb-7" />
             <RichSectionMediaCarousel
               items={mediaItems}
               title={block.heading}

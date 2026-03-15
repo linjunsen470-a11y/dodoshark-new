@@ -33,6 +33,13 @@ export default defineType({
       hidden: ({parent}) => parent?.mergeWithPreviousRichSection === true,
     }),
     defineField({
+      name: 'topAccentTitle',
+      title: 'Top Accent Title',
+      type: 'string',
+      description:
+        'Optional compact title shown above the feature list content with an orange accent line. Leave empty to hide it.',
+    }),
+    defineField({
       name: 'backgroundStyle',
       title: 'Background Style',
       type: 'string',
@@ -97,13 +104,6 @@ export default defineType({
               validation: (Rule) => Rule.required(),
             }),
             defineField({
-              name: 'topAccentTitle',
-              title: 'Top Accent Title',
-              type: 'string',
-              description:
-                'Optional compact title shown above this feature item with an orange accent line. Leave empty to hide it.',
-            }),
-            defineField({
               name: 'description',
               title: 'Description',
               type: 'text',
@@ -123,16 +123,13 @@ export default defineType({
           preview: {
             select: {
               title: 'title',
-              topAccentTitle: 'topAccentTitle',
               image: 'image',
               icon: 'icon',
             },
-            prepare({title, topAccentTitle, image, icon}) {
+            prepare({title, image, icon}) {
               return {
                 title: title || 'Untitled feature item',
-                subtitle: topAccentTitle?.trim()
-                  ? 'Feature item | Top accent set'
-                  : 'Feature item',
+                subtitle: 'Feature item',
                 media: pickFirst(image, icon),
               }
             },
@@ -145,11 +142,12 @@ export default defineType({
   preview: {
     select: {
       title: 'title',
+      topAccentTitle: 'topAccentTitle',
       items: 'items',
       merged: 'mergeWithPreviousRichSection',
       backgroundStyle: 'backgroundStyle',
     },
-    prepare({title, items, merged, backgroundStyle}) {
+    prepare({title, topAccentTitle, items, merged, backgroundStyle}) {
       const count = itemCount(items)
       const media = Array.isArray(items)
         ? pickFirst(...items.map((item) => pickFirst(item?.image, item?.icon)))
@@ -158,8 +156,16 @@ export default defineType({
       return {
         title: merged ? 'Feature List' : title || 'Feature List',
         subtitle: merged
-          ? joinPreview(['Merged with previous rich section', `${count} items`])
-          : joinPreview([backgroundStyle, `${count} items`]),
+          ? joinPreview([
+              'Merged with previous rich section',
+              topAccentTitle?.trim() ? 'Top accent set' : undefined,
+              `${count} items`,
+            ])
+          : joinPreview([
+              backgroundStyle,
+              topAccentTitle?.trim() ? 'Top accent set' : undefined,
+              `${count} items`,
+            ]),
         media,
       }
     },

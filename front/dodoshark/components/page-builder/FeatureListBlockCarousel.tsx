@@ -19,7 +19,6 @@ type FeatureListBlockCarouselProps = {
   items: FeatureListItem[]
   theme: SharedBackgroundTheme
   showMobileArrows?: boolean
-  reserveAccentSpace?: boolean
 }
 
 const carouselBreakpoints = {
@@ -31,7 +30,6 @@ export default function FeatureListBlockCarousel({
   items,
   theme,
   showMobileArrows = false,
-  reserveAccentSpace = false,
 }: FeatureListBlockCarouselProps) {
   const [swiper, setSwiper] = useState<SwiperInstance | null>(null)
   const [controls, setControls] = useState(defaultSliderControls)
@@ -101,7 +99,6 @@ export default function FeatureListBlockCarousel({
                 item={item}
                 theme={theme}
                 sizes={cardSizes}
-                reserveAccentSpace={reserveAccentSpace}
               />
             </SwiperSlide>
           ))}

@@ -2,7 +2,6 @@ import Image from 'next/image'
 
 import { urlFor } from '@/app/lib/sanity'
 
-import AccentTitle from './AccentTitle'
 import {
   getSharedSurfaceClasses,
   type SharedBackgroundTheme,
@@ -29,7 +28,6 @@ export type RichSectionMediaItem = {
   image?: RichSectionImage
   alt?: string
   caption?: string
-  topAccentTitle?: string
 }
 
 export function hasRichSectionImageIdentity(image?: RichSectionImage) {
@@ -105,29 +103,19 @@ export function RichSectionMediaCard({
   item,
   title,
   theme,
-  reserveAccentSpace = false,
-  accentClassName = 'mb-4 md:mb-5',
   captionClassName,
   disableMediaFrameEffect = false,
 }: {
   item: RichSectionMediaItem
   title?: string
   theme: SharedBackgroundTheme
-  reserveAccentSpace?: boolean
-  accentClassName?: string
   captionClassName?: string
   disableMediaFrameEffect?: boolean
 }) {
   const caption = item.caption?.trim()
-  const accentTitle = item.topAccentTitle?.trim()
 
   return (
     <article className="min-w-0">
-      <AccentTitle
-        title={accentTitle}
-        reserveSpace={reserveAccentSpace}
-        className={accentClassName}
-      />
       <RichSectionMediaFigure
         item={item}
         title={title}
@@ -161,8 +149,6 @@ export function RichSectionMediaGrid({
 }) {
   if (items.length === 0) return null
 
-  const hasAnyAccentTitle = items.some((item) => Boolean(item.topAccentTitle?.trim()))
-
   if (items.length === 1) {
     const item = items[0]
 
@@ -172,7 +158,6 @@ export function RichSectionMediaGrid({
           item={item}
           title={title}
           theme={theme}
-          reserveAccentSpace={hasAnyAccentTitle}
           disableMediaFrameEffect={disableMediaFrameEffect}
         />
       </div>
@@ -188,7 +173,6 @@ export function RichSectionMediaGrid({
             item={item}
             title={title}
             theme={theme}
-            reserveAccentSpace={hasAnyAccentTitle}
             disableMediaFrameEffect={disableMediaFrameEffect}
           />
         )

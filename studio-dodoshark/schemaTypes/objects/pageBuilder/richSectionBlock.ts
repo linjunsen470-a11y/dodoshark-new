@@ -117,31 +117,30 @@ export default defineType({
               type: 'string',
               title: 'Caption',
             }),
-            defineField({
-              name: 'topAccentTitle',
-              title: 'Top Accent Title',
-              type: 'string',
-              description:
-                'Optional compact title shown above this media item with an orange accent line. Leave empty to hide it.',
-            }),
           ],
           preview: {
             select: {
               image: 'image',
               title: 'caption',
               alt: 'alt',
-              topAccentTitle: 'topAccentTitle',
             },
-            prepare({image, title, alt, topAccentTitle}) {
+            prepare({image, title, alt}) {
               return {
                 title: title || alt || 'Media Item',
-                subtitle: topAccentTitle?.trim() ? 'Media item | Top accent set' : 'Media item',
+                subtitle: 'Media item',
                 media: image,
               }
             },
           },
         }),
       ],
+    }),
+    defineField({
+      name: 'mediaTopAccentTitle',
+      title: 'Media Top Accent Title',
+      type: 'string',
+      description:
+        'Optional compact title shown above the media module with an orange accent line. Leave empty to hide it.',
     }),
     defineField({
       name: 'layout',
@@ -174,19 +173,6 @@ export default defineType({
       description:
         'Replaces the body rich text with a dedicated two-column content area for the centered layout.',
       hidden: ({parent}) => !isCenteredLayout(parent as RichSectionParentValue | undefined),
-    }),
-    defineField({
-      name: 'twoColumnHeading',
-      title: 'Two-Column Section Heading',
-      type: 'string',
-      hidden: ({parent}) => !showTwoColumnFields(parent as RichSectionParentValue | undefined),
-    }),
-    defineField({
-      name: 'twoColumnSubtitle',
-      title: 'Two-Column Section Subtitle',
-      type: 'text',
-      rows: 3,
-      hidden: ({parent}) => !showTwoColumnFields(parent as RichSectionParentValue | undefined),
     }),
     defineField({
       name: 'leftColumnHeading',
@@ -263,13 +249,12 @@ export default defineType({
       layout: 'layout',
       media: 'mediaItems.0.image',
       mediaItems: 'mediaItems',
+      mediaTopAccentTitle: 'mediaTopAccentTitle',
       subtitle: 'subtitle',
       disableMediaFrameEffect: 'disableMediaFrameEffect',
       body: 'body',
       centerHeaderInSplitLayout: 'centerHeaderInSplitLayout',
       enableTwoColumnContent: 'enableTwoColumnContent',
-      twoColumnHeading: 'twoColumnHeading',
-      twoColumnSubtitle: 'twoColumnSubtitle',
       leftColumnHeading: 'leftColumnHeading',
       leftColumnItems: 'leftColumnItems',
       rightColumnHeading: 'rightColumnHeading',
@@ -280,13 +265,12 @@ export default defineType({
       layout,
       media,
       mediaItems,
+      mediaTopAccentTitle,
       subtitle,
       disableMediaFrameEffect,
       body,
       centerHeaderInSplitLayout,
       enableTwoColumnContent,
-      twoColumnHeading,
-      twoColumnSubtitle,
       leftColumnHeading,
       leftColumnItems,
       rightColumnHeading,
@@ -303,7 +287,6 @@ export default defineType({
         layout === 'centeredMediaGridBodyBelow' && enableTwoColumnContent
           ? joinPreview([
               'Two-column content',
-              pickText(twoColumnHeading, twoColumnSubtitle) ? 'Section header set' : undefined,
               leftColumnHeading?.trim() ? 'Left heading set' : undefined,
               itemCount(leftColumnItems) ? `Left ${itemCount(leftColumnItems)} items` : undefined,
               rightColumnHeading?.trim() ? 'Right heading set' : undefined,
@@ -323,6 +306,7 @@ export default defineType({
             pickText(subtitle),
             layoutLabel,
             itemCount(mediaItems) ? `${itemCount(mediaItems)} media items` : undefined,
+            mediaTopAccentTitle?.trim() ? 'Media accent set' : undefined,
             splitHeaderSummary,
             twoColumnSummary ||
               (itemCount(body) ? `${itemCount(body)} body blocks` : undefined),
