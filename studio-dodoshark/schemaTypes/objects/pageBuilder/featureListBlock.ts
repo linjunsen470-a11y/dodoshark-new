@@ -136,7 +136,7 @@ export default defineType({
           },
         }),
       ],
-      validation: (Rule) => Rule.required().min(3).max(6),
+      validation: (Rule) => Rule.required().min(3).max(12),
     }),
   ],
   preview: {
