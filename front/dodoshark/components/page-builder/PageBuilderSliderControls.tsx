@@ -111,3 +111,21 @@ export function SliderNavButton({
     </button>
   )
 }
+
+export function getEdgeAlignedNavButtonClass(
+  direction: 'prev' | 'next',
+  visibilityClass = '',
+) {
+  const positionClass =
+    direction === 'prev'
+      ? 'left-0 -translate-x-1/2'
+      : 'right-0 translate-x-1/2'
+
+  return [
+    'absolute top-1/2 z-20 -translate-y-1/2',
+    positionClass,
+    visibilityClass,
+  ]
+    .filter(Boolean)
+    .join(' ')
+}

@@ -8,7 +8,7 @@ export default defineType({
   type: 'object',
   icon: BarChartIcon,
   fields: [
-    defineField({name: 'title', title: 'Section Title', type: 'string'}),
+    defineField({name: 'title', title: 'Section Title', type: 'text', rows: 2, description: 'Press Enter to control line breaks.'}),
     defineField({name: 'backgroundVariant', title: 'Background Style', type: 'string', options: {list: [{title: 'White', value: 'white'}, {title: 'Light Gray', value: 'lightGray'}, {title: 'Blue Gradient Soft', value: 'blueGradientSoft'}, {title: 'Blue Gradient Air', value: 'blueGradientAir'}], layout: 'radio'}, initialValue: 'white', validation: (rule) => rule.required()}),
     defineField({name: 'items', title: 'Metric Items', type: 'array', description: 'Each item represents one metric card.', of: [{type: 'object', fields: [{name: 'value', title: 'Value', type: 'string', validation: (rule) => rule.required()}, {name: 'unit', title: 'Unit', type: 'string'}, {name: 'label', title: 'Label', type: 'string', validation: (rule) => rule.required()}, {name: 'icon', title: 'Icon Class', type: 'string', description: 'Example: fas fa-users'}], preview: {select: {value: 'value', label: 'label', unit: 'unit'}, prepare({value, label, unit}) { return {title: `${value}${unit || ''} - ${label}`} }}}]}),
   ],

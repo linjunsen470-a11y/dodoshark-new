@@ -43,7 +43,7 @@ export default defineType({
   type: 'object',
   icon: ImagesIcon,
   fields: [
-    defineField({name: 'title', title: 'Title', type: 'string'}),
+    defineField({name: 'title', title: 'Title', type: 'text', rows: 2, description: 'Press Enter to control line breaks.'}),
     defineField({name: 'layout', title: 'Layout', type: 'string', options: {list: [{title: 'Carousel', value: 'carousel'}, {title: 'Thumbnail Gallery', value: 'thumbnailGallery'}, {title: 'Video Card Carousel', value: 'videoCardCarousel'}], layout: 'radio'}, description: 'Choose the frontend layout style.', initialValue: 'thumbnailGallery'}),
     defineField({name: 'backgroundVariant', title: 'Background Style', type: 'string', options: {list: [{title: 'White', value: 'white'}, {title: 'Light Gray', value: 'lightGray'}, {title: 'Blue Gradient Soft', value: 'blueGradientSoft'}, {title: 'Blue Gradient Air', value: 'blueGradientAir'}], layout: 'radio'}, initialValue: 'white', validation: (rule) => rule.required()}),
     defineField({name: 'cta', title: 'Section CTA', type: 'object', description: 'Optional CTA displayed near the section heading.', fields: [defineField({name: 'label', title: 'Button Label', type: 'string'}), defineField({name: 'href', title: 'Button Link', type: 'url', validation: (rule) => rule.uri({allowRelative: true, scheme: ['http', 'https', 'mailto', 'tel']})})]}),

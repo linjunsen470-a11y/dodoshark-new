@@ -11,6 +11,7 @@ import { urlFor } from '@/app/lib/sanity'
 import Icon from '@/components/ui/Icon'
 import {
   defaultSliderControls,
+  getEdgeAlignedNavButtonClass,
   getSliderControls,
   getSlidesPerGroup,
   SliderNavButton,
@@ -175,58 +176,60 @@ function CollectionReferenceCarousel({
 
   return (
     <div className="group relative">
-      {controls.hasOverflow && (
-        <>
-          <SliderNavButton
-            direction="prev"
-            disabled={!controls.canPrev}
-            isDark={false}
-            buttonClassName={`${theme.control} ${theme.controlHover}`}
-            label="Previous collection references"
-            onClick={() => swiper?.slidePrev()}
-            className="absolute left-2 top-[35%] z-20 -translate-y-1/2 md:left-0 md:-left-5 lg:-left-6"
-          />
+      <div className="relative overflow-x-hidden px-5 sm:px-6">
+        {controls.hasOverflow && (
+          <>
+            <SliderNavButton
+              direction="prev"
+              disabled={!controls.canPrev}
+              isDark={false}
+              buttonClassName={`${theme.control} ${theme.controlHover}`}
+              label="Previous collection references"
+              onClick={() => swiper?.slidePrev()}
+              className={getEdgeAlignedNavButtonClass('prev')}
+            />
 
-          <SliderNavButton
-            direction="next"
-            disabled={!controls.canNext}
-            isDark={false}
-            buttonClassName={`${theme.control} ${theme.controlHover}`}
-            label="Next collection references"
-            onClick={() => swiper?.slideNext()}
-            className="absolute right-2 top-[35%] z-20 -translate-y-1/2 md:right-0 md:-right-5 lg:-right-6"
-          />
-        </>
-      )}
+            <SliderNavButton
+              direction="next"
+              disabled={!controls.canNext}
+              isDark={false}
+              buttonClassName={`${theme.control} ${theme.controlHover}`}
+              label="Next collection references"
+              onClick={() => swiper?.slideNext()}
+              className={getEdgeAlignedNavButtonClass('next')}
+            />
+          </>
+        )}
 
-      <Swiper
-        modules={[A11y, Keyboard]}
-        slidesPerView={1}
-        slidesPerGroup={1}
-        spaceBetween={16}
-        speed={500}
-        keyboard={{ enabled: true }}
-        watchOverflow
-        breakpoints={carouselBreakpoints}
-        a11y={{
-          slideLabelMessage: 'Collection reference {{index}}',
-          prevSlideMessage: 'Previous collection references',
-          nextSlideMessage: 'Next collection references',
-        }}
-        onSwiper={(instance) => {
-          setSwiper(instance)
-          setControls(getSliderControls(instance))
-        }}
-        onSlideChange={(instance) => setControls(getSliderControls(instance))}
-        onResize={(instance) => setControls(getSliderControls(instance))}
-        onBreakpoint={(instance) => setControls(getSliderControls(instance))}
-      >
-        {items.map((item, idx) => (
-          <SwiperSlide key={item._key ?? idx} className="!h-auto">
-            <ReferenceCard item={item} theme={theme} />
-          </SwiperSlide>
-        ))}
-      </Swiper>
+        <Swiper
+          modules={[A11y, Keyboard]}
+          slidesPerView={1}
+          slidesPerGroup={1}
+          spaceBetween={16}
+          speed={500}
+          keyboard={{ enabled: true }}
+          watchOverflow
+          breakpoints={carouselBreakpoints}
+          a11y={{
+            slideLabelMessage: 'Collection reference {{index}}',
+            prevSlideMessage: 'Previous collection references',
+            nextSlideMessage: 'Next collection references',
+          }}
+          onSwiper={(instance) => {
+            setSwiper(instance)
+            setControls(getSliderControls(instance))
+          }}
+          onSlideChange={(instance) => setControls(getSliderControls(instance))}
+          onResize={(instance) => setControls(getSliderControls(instance))}
+          onBreakpoint={(instance) => setControls(getSliderControls(instance))}
+        >
+          {items.map((item, idx) => (
+            <SwiperSlide key={item._key ?? idx} className="!h-auto">
+              <ReferenceCard item={item} theme={theme} />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
 
       {controls.hasOverflow && (
         <div className="mt-6 flex items-center justify-center gap-2">

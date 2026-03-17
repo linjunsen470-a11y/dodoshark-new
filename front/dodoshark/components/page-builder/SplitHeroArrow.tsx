@@ -24,12 +24,14 @@ export default function SplitHeroArrow({
       aria-label={ariaLabel}
       disabled={disabled}
       className={[
-        'absolute top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full',
+        'absolute top-1/2 z-20 flex h-10 w-10 items-center justify-center rounded-full',
         'border border-slate-300/80 bg-white/85 text-slate-700 shadow-md backdrop-blur-sm transition-colors',
         'hover:bg-white hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400',
         'disabled:cursor-not-allowed disabled:opacity-40',
         'sm:h-11 sm:w-11',
-        isPrevious ? 'left-0 sm:left-1' : 'right-0 sm:right-1',
+        isPrevious
+          ? 'left-0 -translate-x-1/2 -translate-y-1/2'
+          : 'right-0 translate-x-1/2 -translate-y-1/2',
         className,
       ].join(' ')}
     >

@@ -29,15 +29,18 @@ export default defineType({
     defineField({
       name: 'title',
       title: 'Section Title',
-      type: 'string',
+      type: 'text',
+      rows: 2,
+      description: 'Press Enter to control line breaks.',
       hidden: ({parent}) => parent?.mergeWithPreviousRichSection === true,
     }),
     defineField({
       name: 'topAccentTitle',
       title: 'Top Accent Title',
-      type: 'string',
+      type: 'text',
+      rows: 2,
       description:
-        'Optional compact title shown above the feature list content with an orange accent line. Leave empty to hide it.',
+        'Optional compact title shown above the feature list content with an orange accent line. Press Enter to control line breaks. Leave empty to hide it.',
     }),
     defineField({
       name: 'backgroundStyle',

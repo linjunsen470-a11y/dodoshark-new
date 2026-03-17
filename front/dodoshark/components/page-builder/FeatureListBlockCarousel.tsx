@@ -7,6 +7,7 @@ import {Swiper, SwiperSlide} from 'swiper/react'
 
 import {
   defaultSliderControls,
+  getEdgeAlignedNavButtonClass,
   getSliderControls,
   getSlidesPerGroup,
   SliderNavButton,
@@ -44,65 +45,67 @@ export default function FeatureListBlockCarousel({
   return (
     <div className="group relative">
       <div className="mx-auto max-w-7xl">
-        {controls.hasOverflow && (
-          <>
-            <SliderNavButton
-              direction="prev"
-              disabled={!controls.canPrev}
-              isDark={false}
-              buttonClassName={`${theme.control} ${theme.controlHover}`}
-              label="Previous feature cards"
-              onClick={() => swiper?.slidePrev()}
-              className={`absolute left-2 top-[35%] z-20 -translate-y-1/2 ${arrowVisibilityClass} md:left-0 md:-left-5 lg:-left-6`}
-            />
-
-            <SliderNavButton
-              direction="next"
-              disabled={!controls.canNext}
-              isDark={false}
-              buttonClassName={`${theme.control} ${theme.controlHover}`}
-              label="Next feature cards"
-              onClick={() => swiper?.slideNext()}
-              className={`absolute right-2 top-[35%] z-20 -translate-y-1/2 ${arrowVisibilityClass} md:right-0 md:-right-5 lg:-right-6`}
-            />
-          </>
-        )}
-
-        <Swiper
-          modules={[A11y, Keyboard]}
-          slidesPerView={1}
-          slidesPerGroup={1}
-          spaceBetween={16}
-          speed={500}
-          keyboard={{enabled: true}}
-          watchOverflow
-          breakpoints={carouselBreakpoints}
-          a11y={{
-            slideLabelMessage: 'Feature card {{index}}',
-            prevSlideMessage: 'Previous feature cards',
-            nextSlideMessage: 'Next feature cards',
-          }}
-          onSwiper={(instance) => {
-            setSwiper(instance)
-            setControls(getSliderControls(instance))
-          }}
-          onSlideChange={(instance) => setControls(getSliderControls(instance))}
-          onResize={(instance) => setControls(getSliderControls(instance))}
-          onBreakpoint={(instance) => setControls(getSliderControls(instance))}
-        >
-          {items.map((item, index) => (
-            <SwiperSlide
-              key={item._key ?? `${item.title ?? 'feature-card'}-${index}`}
-              className="!h-auto"
-            >
-              <FeatureListStandaloneCard
-                item={item}
-                theme={theme}
-                sizes={cardSizes}
+        <div className="relative overflow-x-hidden px-5 sm:px-6">
+          {controls.hasOverflow && (
+            <>
+              <SliderNavButton
+                direction="prev"
+                disabled={!controls.canPrev}
+                isDark={false}
+                buttonClassName={`${theme.control} ${theme.controlHover}`}
+                label="Previous feature cards"
+                onClick={() => swiper?.slidePrev()}
+                className={getEdgeAlignedNavButtonClass('prev', arrowVisibilityClass)}
               />
-            </SwiperSlide>
-          ))}
-        </Swiper>
+
+              <SliderNavButton
+                direction="next"
+                disabled={!controls.canNext}
+                isDark={false}
+                buttonClassName={`${theme.control} ${theme.controlHover}`}
+                label="Next feature cards"
+                onClick={() => swiper?.slideNext()}
+                className={getEdgeAlignedNavButtonClass('next', arrowVisibilityClass)}
+              />
+            </>
+          )}
+
+          <Swiper
+            modules={[A11y, Keyboard]}
+            slidesPerView={1}
+            slidesPerGroup={1}
+            spaceBetween={16}
+            speed={500}
+            keyboard={{enabled: true}}
+            watchOverflow
+            breakpoints={carouselBreakpoints}
+            a11y={{
+              slideLabelMessage: 'Feature card {{index}}',
+              prevSlideMessage: 'Previous feature cards',
+              nextSlideMessage: 'Next feature cards',
+            }}
+            onSwiper={(instance) => {
+              setSwiper(instance)
+              setControls(getSliderControls(instance))
+            }}
+            onSlideChange={(instance) => setControls(getSliderControls(instance))}
+            onResize={(instance) => setControls(getSliderControls(instance))}
+            onBreakpoint={(instance) => setControls(getSliderControls(instance))}
+          >
+            {items.map((item, index) => (
+              <SwiperSlide
+                key={item._key ?? `${item.title ?? 'feature-card'}-${index}`}
+                className="!h-auto"
+              >
+                <FeatureListStandaloneCard
+                  item={item}
+                  theme={theme}
+                  sizes={cardSizes}
+                />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
       </div>
 
       {controls.hasOverflow && (

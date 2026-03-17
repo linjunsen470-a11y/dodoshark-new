@@ -15,6 +15,10 @@ import {
   type SharedBackgroundTheme,
   type SharedBackgroundVariant,
 } from './backgroundTheme'
+import {
+  getEdgeAlignedNavButtonClass,
+  SliderNavButton,
+} from './PageBuilderSliderControls'
 import SectionShell from './SectionShell'
 import SectionHeader from './SectionHeader'
 import { sectionSubtitleClass } from './sectionStyles'
@@ -221,21 +225,6 @@ function resolveVideoEmbedSrc(url?: string) {
   if (pathname.includes('/embed/')) return withParam('autoplay', '1')
 
   return withParam('autoplay', '1')
-}
-
-function ArrowLeftIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      className={className}
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-    </svg>
-  )
 }
 
 function ArrowRightIcon({ className }: { className?: string }) {
@@ -746,57 +735,59 @@ function VideoCardCarousel({
 
       {items.length > 0 && (
         <div className="group relative mx-auto max-w-7xl">
-          <button
-            type="button"
-            aria-label="Previous videos"
-            className={`absolute left-2 top-[35%] z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full transition disabled:cursor-not-allowed disabled:opacity-35 md:-left-3 md:h-11 md:w-11 xl:opacity-0 xl:group-hover:opacity-100 ${theme.control} ${theme.controlHover}`}
-            disabled={isBeginning}
-            onClick={() => swiper?.slidePrev()}
-          >
-            <ArrowLeftIcon className="h-5 w-5" />
-          </button>
+          <div className="relative overflow-x-hidden px-5 sm:px-6">
+            <SliderNavButton
+              direction="prev"
+              disabled={isBeginning}
+              isDark={false}
+              buttonClassName={`${theme.control} ${theme.controlHover}`}
+              label="Previous videos"
+              onClick={() => swiper?.slidePrev()}
+              className={getEdgeAlignedNavButtonClass('prev', 'xl:opacity-0 xl:group-hover:opacity-100')}
+            />
 
-          <button
-            type="button"
-            aria-label="Next videos"
-            className={`absolute right-2 top-[35%] z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full transition disabled:cursor-not-allowed disabled:opacity-35 md:-right-3 md:h-11 md:w-11 xl:opacity-0 xl:group-hover:opacity-100 ${theme.control} ${theme.controlHover}`}
-            disabled={isEnd}
-            onClick={() => swiper?.slideNext()}
-          >
-            <ArrowRightIcon className="h-5 w-5" />
-          </button>
+            <SliderNavButton
+              direction="next"
+              disabled={isEnd}
+              isDark={false}
+              buttonClassName={`${theme.control} ${theme.controlHover}`}
+              label="Next videos"
+              onClick={() => swiper?.slideNext()}
+              className={getEdgeAlignedNavButtonClass('next', 'xl:opacity-0 xl:group-hover:opacity-100')}
+            />
 
-          <Swiper
-            key={items.length}
-            modules={[A11y, Keyboard]}
-            slidesPerView={1}
-            spaceBetween={24}
-            speed={500}
-            keyboard={{ enabled: true }}
-            watchOverflow
-            breakpoints={{
-              768: { slidesPerView: 2 },
-              1200: { slidesPerView: 4 },
-            }}
-            onSwiper={(instance) => {
-              setSwiper(instance)
-              syncSwiperState(instance)
-            }}
-            onSlideChange={syncSwiperState}
-            onBreakpoint={syncSwiperState}
-            onResize={syncSwiperState}
-            a11y={{
-              slideLabelMessage: 'Video card {{index}}',
-              prevSlideMessage: 'Previous videos',
-              nextSlideMessage: 'Next videos',
-            }}
-          >
-            {items.map((item, index) => (
-              <SwiperSlide key={item._key ?? `${item.caption ?? 'media-card'}-${index}`} className="h-auto">
-                <HomeStyleVideoCard item={item} theme={theme} onOpenVideo={onOpenVideo} />
-              </SwiperSlide>
-            ))}
-          </Swiper>
+            <Swiper
+              key={items.length}
+              modules={[A11y, Keyboard]}
+              slidesPerView={1}
+              spaceBetween={24}
+              speed={500}
+              keyboard={{ enabled: true }}
+              watchOverflow
+              breakpoints={{
+                768: { slidesPerView: 2 },
+                1200: { slidesPerView: 4 },
+              }}
+              onSwiper={(instance) => {
+                setSwiper(instance)
+                syncSwiperState(instance)
+              }}
+              onSlideChange={syncSwiperState}
+              onBreakpoint={syncSwiperState}
+              onResize={syncSwiperState}
+              a11y={{
+                slideLabelMessage: 'Video card {{index}}',
+                prevSlideMessage: 'Previous videos',
+                nextSlideMessage: 'Next videos',
+              }}
+            >
+              {items.map((item, index) => (
+                <SwiperSlide key={item._key ?? `${item.caption ?? 'media-card'}-${index}`} className="h-auto">
+                  <HomeStyleVideoCard item={item} theme={theme} onOpenVideo={onOpenVideo} />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
         </div>
       )}
 

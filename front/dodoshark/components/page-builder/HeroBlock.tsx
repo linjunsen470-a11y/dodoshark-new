@@ -161,18 +161,24 @@ function HeroTextContent({
   accentAlignClass?: string
   actionsClassName?: string
 }) {
+  const title = block.title?.trim()
+  const subtitle = block.subtitle?.trim()
+  const description = block.description?.trim()
+
   return (
     <>
-      {block.title && <h1 className={titleClassName}>{block.title}</h1>}
+      {title && <h1 className={`whitespace-pre-line ${titleClassName}`}>{title}</h1>}
 
-      {block.subtitle && <p className={subtitleClassName}>{block.subtitle}</p>}
+      {subtitle && <p className={`whitespace-pre-line ${subtitleClassName}`}>{subtitle}</p>}
 
       <HeroAccent
         className={accentAlignClass}
         tone={titleClassName.includes('text-white') ? 'dark' : 'light'}
       />
 
-      {block.description && <p className={descriptionClassName}>{block.description}</p>}
+      {description && (
+        <p className={`whitespace-pre-line ${descriptionClassName}`}>{description}</p>
+      )}
 
       {!!block.ctaButtons?.length && (
         <div className={actionsClassName}>
@@ -227,6 +233,7 @@ function SplitHeroMedia({
   showControls,
   onPrevious,
   onNext,
+  frameClassName = '',
 }: {
   image?: HeroImage
   title?: string
@@ -234,65 +241,75 @@ function SplitHeroMedia({
   showControls: boolean
   onPrevious: () => void
   onNext: () => void
+  frameClassName?: string
 }) {
-  const src = resolveHeroImageSrc(image, 1400, 78)
+  const src = resolveHeroImageSrc(image, 1800, 78)
+  const resolvedFrameClassName = frameClassName || 'w-full'
 
   if (!src) {
     return (
-      <div className="relative px-10 sm:px-12">
-        {showControls && (
-          <>
-            <SplitHeroArrow
-              direction="previous"
-              onClick={onPrevious}
-              ariaLabel="Previous hero image"
-            />
-            <SplitHeroArrow
-              direction="next"
-              onClick={onNext}
-              ariaLabel="Next hero image"
-            />
-          </>
-        )}
-        <div className="flex h-[260px] w-full items-center justify-center rounded-[1.5rem] border border-slate-300/60 bg-white/35 sm:h-[340px] lg:h-[520px]">
-          <span className="text-sm font-medium text-slate-500">Product image</span>
+      <div className="overflow-x-hidden px-5 sm:px-6">
+        <div className={`mx-auto ${resolvedFrameClassName}`}>
+          <div className="relative">
+            {showControls && (
+              <>
+                <SplitHeroArrow
+                  direction="previous"
+                  onClick={onPrevious}
+                  ariaLabel="Previous hero image"
+                />
+                <SplitHeroArrow
+                  direction="next"
+                  onClick={onNext}
+                  ariaLabel="Next hero image"
+                />
+              </>
+            )}
+
+            <div className="flex aspect-[4/3] w-full items-center justify-center rounded-[1.5rem] border border-slate-300/60 bg-white/35">
+              <span className="text-sm font-medium text-slate-500">Product image</span>
+            </div>
+          </div>
         </div>
       </div>
     )
   }
 
-  const dimensions = resolveHeroImageDimensions(image, 1400, 1050)
+  const dimensions = resolveHeroImageDimensions(image, 1800, 1350)
   const hasLqip = Boolean(image?.asset?.metadata?.lqip)
 
   return (
-    <div className="relative px-10 sm:px-12">
-      {showControls && (
-        <>
-          <SplitHeroArrow
-            direction="previous"
-            onClick={onPrevious}
-            ariaLabel="Previous hero image"
-          />
-          <SplitHeroArrow
-            direction="next"
-            onClick={onNext}
-            ariaLabel="Next hero image"
-          />
-        </>
-      )}
+    <div className="overflow-x-hidden px-5 sm:px-6">
+      <div className={`mx-auto ${resolvedFrameClassName}`}>
+        <div className="relative">
+          {showControls && (
+            <>
+              <SplitHeroArrow
+                direction="previous"
+                onClick={onPrevious}
+                ariaLabel="Previous hero image"
+              />
+              <SplitHeroArrow
+                direction="next"
+                onClick={onNext}
+                ariaLabel="Next hero image"
+              />
+            </>
+          )}
 
-      <div className="relative h-[260px] w-full sm:h-[340px] lg:h-[520px]">
-        <Image
-          key={image?._key ?? src}
-          src={src}
-          alt={image?.alt || title || `Hero product image ${index + 1}`}
-          width={dimensions.width}
-          height={dimensions.height}
-          className="h-full w-full object-contain"
-          placeholder={hasLqip ? 'blur' : 'empty'}
-          blurDataURL={image?.asset?.metadata?.lqip}
-          priority={index === 0}
-        />
+          <Image
+            key={image?._key ?? src}
+            src={src}
+            alt={image?.alt || title || `Hero product image ${index + 1}`}
+            width={dimensions.width}
+            height={dimensions.height}
+            sizes="(min-width: 1024px) 45vw, 90vw"
+            className="h-auto w-full object-contain"
+            placeholder={hasLqip ? 'blur' : 'empty'}
+            blurDataURL={image?.asset?.metadata?.lqip}
+            priority={index === 0}
+          />
+        </div>
       </div>
     </div>
   )
@@ -381,10 +398,14 @@ function SplitHero({
   const backgroundSrc = resolveHeroImageSrc(backgroundImage, 2200, 72)
   const hasBackgroundLqip = Boolean(backgroundImage?.asset?.metadata?.lqip)
 
+  const desktopGridClass =
+    layout === 'imageLeftTextRight'
+      ? 'lg:grid-cols-[45vw_minmax(0,1fr)]'
+      : 'lg:grid-cols-[minmax(0,1fr)_45vw]'
   const textDesktopOrderClass = layout === 'imageLeftTextRight' ? 'lg:order-2' : 'lg:order-1'
   const mediaDesktopOrderClass = layout === 'imageLeftTextRight' ? 'lg:order-1' : 'lg:order-2'
-  const textSpacingClass = layout === 'imageLeftTextRight' ? 'lg:pl-8 xl:pl-12' : 'lg:pr-8 xl:pr-12'
-  const mediaSpacingClass = layout === 'imageLeftTextRight' ? 'lg:pr-4 xl:pr-8' : 'lg:pl-4 xl:pl-8'
+  const textSpacingClass = layout === 'imageLeftTextRight' ? 'lg:pl-10 xl:pl-14' : 'lg:pr-10 xl:pr-14'
+  const mediaAlignClass = layout === 'imageLeftTextRight' ? 'lg:justify-start' : 'lg:justify-end'
   const canPaginate = images.length > 1
 
   function showPreviousImage() {
@@ -420,30 +441,62 @@ function SplitHero({
 
         <div className="absolute inset-0 bg-white/38" />
 
-        <div className="relative z-10 mx-auto grid min-h-[620px] max-w-7xl grid-cols-1 gap-8 px-4 py-10 sm:min-h-[680px] sm:px-6 sm:py-14 lg:min-h-[720px] lg:grid-cols-2 lg:items-center lg:gap-10 lg:px-8 lg:py-16">
-          <div className={`order-1 ${mediaDesktopOrderClass} ${mediaSpacingClass}`}>
-            <div className="mx-auto w-full max-w-[560px] lg:max-w-[640px]">
-              <div className="flex flex-col items-center">
-                <SplitHeroMedia
-                  image={activeImage}
-                  title={block.title}
-                  index={safeActiveImageIndex}
-                  showControls={canPaginate}
-                  onPrevious={showPreviousImage}
-                  onNext={showNextImage}
-                />
-                <HeroIndicators
-                  images={images}
-                  activeIndex={safeActiveImageIndex}
-                  onSelect={setActiveImageIndex}
-                  layout="mediaBelow"
-                />
-              </div>
+        <div className="relative z-10 lg:hidden">
+          <div className="flex min-h-[620px] flex-col gap-8 px-4 py-10 sm:min-h-[680px] sm:px-6 sm:py-14">
+            <div className="flex flex-col items-center">
+              <SplitHeroMedia
+                image={activeImage}
+                title={block.title}
+                index={safeActiveImageIndex}
+                showControls={canPaginate}
+                onPrevious={showPreviousImage}
+                onNext={showNextImage}
+                frameClassName="w-[90vw] max-w-none"
+              />
+              <HeroIndicators
+                images={images}
+                activeIndex={safeActiveImageIndex}
+                onSelect={setActiveImageIndex}
+                layout="mediaBelow"
+              />
+            </div>
+
+            <div className="mx-auto w-full max-w-7xl">
+              <HeroTextContent
+                block={block}
+                titleClassName={`mb-3 text-slate-900 ${heroTitleClass}`}
+                subtitleClassName={`mb-3 ${heroSubtitleClass} text-slate-500`}
+                descriptionClassName={`whitespace-pre-line ${heroDescriptionClass} text-slate-700`}
+                accentAlignClass="justify-start"
+                actionsClassName="mt-8 flex flex-wrap gap-3 justify-start"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className={`relative z-10 hidden min-h-[720px] items-center gap-8 px-[5vw] py-16 lg:grid ${desktopGridClass}`}>
+          <div className={`flex ${mediaAlignClass} ${mediaDesktopOrderClass}`}>
+            <div className="flex flex-col items-center">
+              <SplitHeroMedia
+                image={activeImage}
+                title={block.title}
+                index={safeActiveImageIndex}
+                showControls={canPaginate}
+                onPrevious={showPreviousImage}
+                onNext={showNextImage}
+                frameClassName="w-[45vw] max-w-none"
+              />
+              <HeroIndicators
+                images={images}
+                activeIndex={safeActiveImageIndex}
+                onSelect={setActiveImageIndex}
+                layout="mediaBelow"
+              />
             </div>
           </div>
 
-          <div className={`order-2 ${textDesktopOrderClass} ${textSpacingClass}`}>
-            <div className="max-w-xl text-left">
+          <div className={`flex ${textDesktopOrderClass}`}>
+            <div className={`max-w-xl text-left ${textSpacingClass}`}>
               <HeroTextContent
                 block={block}
                 titleClassName={`mb-3 text-slate-900 ${heroTitleClass}`}

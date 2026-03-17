@@ -36,16 +36,18 @@ export default function SectionHeader({
   titleClassName = '',
   subtitleClassName = '',
 }: SectionHeaderProps) {
-  if (!eyebrow && !title && !subtitle) return null
-
   const resolvedTone = tone ?? (isDark ? 'dark' : 'light')
   const toneClasses = getSectionToneClasses(resolvedTone)
   const alignClass = align === 'left' ? 'text-left' : 'text-center'
   const lineAlignClass = align === 'left' ? 'mx-0' : 'mx-auto'
   const stackClass = spacing === 'compact' ? 'space-y-3' : 'space-y-4'
   const dividerSpacingClass = spacing === 'compact' ? 'mt-4' : 'mt-5'
+  const resolvedTitle = typeof title === 'string' ? title.trim() : title
+  const resolvedSubtitle = typeof subtitle === 'string' ? subtitle.trim() : subtitle
   const resolvedSubtitleClass =
     subtitleClassName || `${sectionSubtitleClass} max-w-3xl ${toneClasses.subtitle}`
+
+  if (!eyebrow && !resolvedTitle && !resolvedSubtitle) return null
 
   return (
     <header className={`${alignClass} ${className}`.trim()}>
@@ -55,18 +57,20 @@ export default function SectionHeader({
             {eyebrow}
           </p>
         )}
-        {title && (
-          <h2 className={`${sectionTitleClass} ${toneClasses.title} ${titleClassName}`.trim()}>
-            {title}
+        {resolvedTitle && (
+          <h2
+            className={`${sectionTitleClass} whitespace-pre-line ${toneClasses.title} ${titleClassName}`.trim()}
+          >
+            {resolvedTitle}
           </h2>
         )}
-        {subtitle && (
-          <p className={`${resolvedSubtitleClass}`.trim()}>
-            {subtitle}
+        {resolvedSubtitle && (
+          <p className={`whitespace-pre-line ${resolvedSubtitleClass}`.trim()}>
+            {resolvedSubtitle}
           </p>
         )}
       </div>
-      {showDivider && (title || subtitle) && (
+      {showDivider && (resolvedTitle || resolvedSubtitle) && (
         <div
           className={`${dividerSpacingClass} h-1.5 w-20 rounded-full ${toneClasses.divider} ${lineAlignClass}`}
         />

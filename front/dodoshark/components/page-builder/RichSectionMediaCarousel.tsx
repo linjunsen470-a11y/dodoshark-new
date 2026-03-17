@@ -50,70 +50,66 @@ export default function RichSectionMediaCarousel({
 
   return (
     <div className="w-full min-w-0">
-      <div className="relative md:px-10 lg:px-12">
-        <Swiper
-          className="w-full overflow-hidden"
-          modules={[Keyboard, A11y]}
-          slidesPerView={1}
-          spaceBetween={16}
-          speed={550}
-          grabCursor
-          watchOverflow
-          allowTouchMove={items.length > 1}
-          keyboard={{ enabled: true }}
-          a11y={{
-            prevSlideMessage: 'Previous media item',
-            nextSlideMessage: 'Next media item',
-            slideLabelMessage: 'Media item {{index}}',
-          }}
-          onSwiper={(instance) => {
-            setSwiper(instance)
-            setCurrentIndex(instance.realIndex)
-          }}
-          onSlideChange={(instance) => setCurrentIndex(instance.realIndex)}
-        >
-          {items.map((item, index) => (
-            <SwiperSlide
-              key={item._key ?? `rich-section-media-${index}`}
-              className="!h-auto min-w-0"
-            >
-              <RichSectionMediaCard
-                item={item}
-                title={title}
-                theme={theme}
-                captionClassName={captionClassName}
-                disableMediaFrameEffect={disableMediaFrameEffect}
-              />
-            </SwiperSlide>
-          ))}
-        </Swiper>
+      <div className="overflow-x-hidden px-5 sm:px-6">
+        <div className="relative">
+          <Swiper
+            className="w-full overflow-hidden"
+            modules={[Keyboard, A11y]}
+            slidesPerView={1}
+            spaceBetween={16}
+            speed={550}
+            grabCursor
+            watchOverflow
+            allowTouchMove={items.length > 1}
+            keyboard={{ enabled: true }}
+            a11y={{
+              prevSlideMessage: 'Previous media item',
+              nextSlideMessage: 'Next media item',
+              slideLabelMessage: 'Media item {{index}}',
+            }}
+            onSwiper={(instance) => {
+              setSwiper(instance)
+              setCurrentIndex(instance.realIndex)
+            }}
+            onSlideChange={(instance) => setCurrentIndex(instance.realIndex)}
+          >
+            {items.map((item, index) => (
+              <SwiperSlide
+                key={item._key ?? `rich-section-media-${index}`}
+                className="!h-auto min-w-0"
+              >
+                <RichSectionMediaCard
+                  item={item}
+                  title={title}
+                  theme={theme}
+                  captionClassName={captionClassName}
+                  disableMediaFrameEffect={disableMediaFrameEffect}
+                />
+              </SwiperSlide>
+            ))}
+          </Swiper>
 
-        <SplitHeroArrow
-          direction="previous"
-          ariaLabel="Previous media item"
-          disabled={!canPrev}
-          className={[
-            'left-2 sm:left-3 md:left-0 lg:left-1',
-            theme.accentDarkSoft,
-          ].join(' ')}
-          onClick={() => {
-            if (!swiper || swiper.destroyed || !canPrev) return
-            swiper.slidePrev()
-          }}
-        />
-        <SplitHeroArrow
-          direction="next"
-          ariaLabel="Next media item"
-          disabled={!canNext}
-          className={[
-            'right-2 sm:right-3 md:right-0 lg:right-1',
-            theme.accentDarkSoft,
-          ].join(' ')}
-          onClick={() => {
-            if (!swiper || swiper.destroyed || !canNext) return
-            swiper.slideNext()
-          }}
-        />
+          <SplitHeroArrow
+            direction="previous"
+            ariaLabel="Previous media item"
+            disabled={!canPrev}
+            className={theme.accentDarkSoft}
+            onClick={() => {
+              if (!swiper || swiper.destroyed || !canPrev) return
+              swiper.slidePrev()
+            }}
+          />
+          <SplitHeroArrow
+            direction="next"
+            ariaLabel="Next media item"
+            disabled={!canNext}
+            className={theme.accentDarkSoft}
+            onClick={() => {
+              if (!swiper || swiper.destroyed || !canNext) return
+              swiper.slideNext()
+            }}
+          />
+        </div>
       </div>
 
       <div className="mt-5 flex flex-wrap items-center justify-center gap-2">

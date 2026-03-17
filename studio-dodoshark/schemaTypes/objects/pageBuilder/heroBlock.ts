@@ -9,9 +9,9 @@ export default defineType({
   icon: PresentationIcon,
   fields: [
     defineField({name: 'variant', title: 'Variant', type: 'string', options: {list: [{title: 'Legacy Background Slider', value: 'legacyBackgroundSlider'}, {title: 'Split Product Showcase', value: 'splitProductShowcase'}], layout: 'radio'}, description: 'Choose the hero layout style.', initialValue: 'legacyBackgroundSlider'}),
-    defineField({name: 'title', title: 'Title', type: 'string'}),
-    defineField({name: 'subtitle', title: 'Subtitle', type: 'string'}),
-    defineField({name: 'description', title: 'Description', type: 'text', rows: 3}),
+    defineField({name: 'title', title: 'Title', type: 'text', rows: 2, description: 'Press Enter to control line breaks.'}),
+    defineField({name: 'subtitle', title: 'Subtitle', type: 'text', rows: 2, description: 'Press Enter to control line breaks.'}),
+    defineField({name: 'description', title: 'Description', type: 'text', rows: 3, description: 'Press Enter to control line breaks.'}),
     defineField({name: 'images', title: 'Images', description: 'At least one image is required.', type: 'array', of: [{type: 'image', options: {hotspot: true}, fields: [{name: 'alt', type: 'string', title: 'Alt Text', validation: (Rule) => Rule.required()}]}], validation: (rule) => rule.min(1)}),
     defineField({name: 'backgroundImage', title: 'Background Image', description: 'Used only by the split product showcase variant.', type: 'image', options: {hotspot: true}, hidden: ({parent}) => parent?.variant !== 'splitProductShowcase', validation: (rule) => rule.custom((value, context) => { if (context.parent?.variant === 'splitProductShowcase' && !value) return 'Background image is required for split product showcase.'; return true }), fields: [{name: 'alt', type: 'string', title: 'Alt Text', validation: (Rule) => Rule.required()}]}),
     defineField({name: 'ctaButtons', title: 'CTA Buttons', type: 'array', of: [{type: 'object', fields: [{name: 'label', title: 'Label', type: 'string'}, {name: 'href', title: 'URL', type: 'url', validation: (rule) => rule.uri({allowRelative: true, scheme: ['http', 'https', 'mailto', 'tel']})}, {name: 'primary', title: 'Primary Button', type: 'boolean', initialValue: false}], preview: {select: {title: 'label', subtitle: 'href', primary: 'primary'}, prepare({title, subtitle, primary}) { return {title: title || 'Untitled button', subtitle: primary ? `Primary | ${subtitle || 'No link yet'}` : subtitle || 'Secondary button'} }}}]}),

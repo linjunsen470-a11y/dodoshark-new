@@ -28,6 +28,7 @@ export type RichSectionMediaItem = {
   image?: RichSectionImage
   alt?: string
   caption?: string
+  description?: string
 }
 
 export function hasRichSectionImageIdentity(image?: RichSectionImage) {
@@ -103,16 +104,21 @@ export function RichSectionMediaCard({
   item,
   title,
   theme,
+  showDescription = false,
   captionClassName,
+  descriptionClassName,
   disableMediaFrameEffect = false,
 }: {
   item: RichSectionMediaItem
   title?: string
   theme: SharedBackgroundTheme
+  showDescription?: boolean
   captionClassName?: string
+  descriptionClassName?: string
   disableMediaFrameEffect?: boolean
 }) {
   const caption = item.caption?.trim()
+  const description = showDescription ? item.description?.trim() : undefined
 
   return (
     <article className="min-w-0">
@@ -132,6 +138,15 @@ export function RichSectionMediaCard({
           {caption}
         </p>
       ) : null}
+      {description ? (
+        <p
+          className={`whitespace-pre-line ${
+            caption ? 'mt-1.5 md:mt-2' : 'mt-3 md:mt-4'
+          } ${descriptionClassName ?? `text-center text-sm leading-6 md:text-[0.95rem] ${theme.subtitle}`}`}
+        >
+          {description}
+        </p>
+      ) : null}
     </article>
   )
 }
@@ -140,11 +155,17 @@ export function RichSectionMediaGrid({
   items,
   title,
   theme,
+  showDescription = false,
+  captionClassName,
+  descriptionClassName,
   disableMediaFrameEffect = false,
 }: {
   items: RichSectionMediaItem[]
   title?: string
   theme: SharedBackgroundTheme
+  showDescription?: boolean
+  captionClassName?: string
+  descriptionClassName?: string
   disableMediaFrameEffect?: boolean
 }) {
   if (items.length === 0) return null
@@ -158,6 +179,9 @@ export function RichSectionMediaGrid({
           item={item}
           title={title}
           theme={theme}
+          showDescription={showDescription}
+          captionClassName={captionClassName}
+          descriptionClassName={descriptionClassName}
           disableMediaFrameEffect={disableMediaFrameEffect}
         />
       </div>
@@ -173,6 +197,9 @@ export function RichSectionMediaGrid({
             item={item}
             title={title}
             theme={theme}
+            showDescription={showDescription}
+            captionClassName={captionClassName}
+            descriptionClassName={descriptionClassName}
             disableMediaFrameEffect={disableMediaFrameEffect}
           />
         )

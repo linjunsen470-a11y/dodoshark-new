@@ -8,8 +8,8 @@ export default defineType({
   type: 'object',
   icon: LinkIcon,
   fields: [
-    defineField({name: 'title', title: 'Block Title', type: 'string'}),
-    defineField({name: 'subtitle', title: 'Subtitle', type: 'string'}),
+    defineField({name: 'title', title: 'Block Title', type: 'text', rows: 2, description: 'Press Enter to control line breaks.'}),
+    defineField({name: 'subtitle', title: 'Subtitle', type: 'text', rows: 2, description: 'Press Enter to control line breaks.'}),
     defineField({name: 'backgroundVariant', title: 'Background Style', type: 'string', options: {list: [{title: 'White', value: 'white'}, {title: 'Light Gray', value: 'lightGray'}, {title: 'Blue Gradient Soft', value: 'blueGradientSoft'}, {title: 'Blue Gradient Air', value: 'blueGradientAir'}], layout: 'radio'}, initialValue: 'lightGray', validation: (rule) => rule.required()}),
     defineField({name: 'layout', title: 'Layout', type: 'string', options: {list: [{title: 'Grid', value: 'grid'}, {title: 'List', value: 'list'}, {title: 'Carousel', value: 'carousel'}]}, initialValue: 'grid', description: 'Controls how referenced content is displayed.'}),
     defineField({name: 'columns', title: 'Columns (Grid Only)', type: 'number', options: {list: [2, 3, 4]}, initialValue: 3, hidden: ({parent}) => parent?.layout !== 'grid'}),

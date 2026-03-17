@@ -18,7 +18,7 @@ export default function AccentTitle({
   return (
     <div className={`flex min-h-[1.75rem] items-stretch gap-3 md:min-h-[2rem] ${className}`.trim()}>
       <div className="w-1 shrink-0 self-stretch rounded-full bg-orange-500" />
-      <p className="font-display text-lg font-extrabold leading-[1.1] tracking-[-0.02em] text-slate-900 md:text-xl">
+      <p className="whitespace-pre-line font-display text-lg font-extrabold leading-[1.1] tracking-[-0.02em] text-slate-900 md:text-xl">
         {resolvedTitle}
       </p>
     </div>

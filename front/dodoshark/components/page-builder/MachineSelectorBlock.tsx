@@ -13,6 +13,7 @@ import {
   type SharedBackgroundTheme,
   type SharedBackgroundVariant,
 } from './backgroundTheme'
+import { getEdgeAlignedNavButtonClass } from './PageBuilderSliderControls'
 import SectionShell from './SectionShell'
 import SectionHeader from './SectionHeader'
 import { bodyTextClass, cardTitleClass, sectionSubtitleClass } from './sectionStyles'
@@ -335,52 +336,52 @@ export default function MachineSelectorBlock({ block }: { block: MachineSelector
       )}
 
       {groups.length > 0 && (
-        <div className="mb-8 -mx-4 px-4 md:mx-0 md:mb-10 md:px-0">
-            <div className="flex items-center md:justify-center">
-              <div className={`min-w-0 flex-1 ${tabControls.hasOverflow ? 'md:max-w-4xl' : 'md:max-w-fit'}`}>
-                <Swiper
-                  modules={[Keyboard, A11y]}
-                  slidesPerView="auto"
-                  centeredSlides
-                  centeredSlidesBounds
-                  centerInsufficientSlides
-                  watchOverflow
-                  grabCursor
-                  keyboard={{ enabled: true }}
-                  spaceBetween={12}
-                  speed={450}
-                  initialSlide={activeIndex}
-                  a11y={{
-                    prevSlideMessage: 'Previous filter',
-                    nextSlideMessage: 'Next filter',
-                  }}
-                  onSwiper={(instance) => {
-                    setTabsSwiper(instance)
-                    setTabControls(getSliderControls(instance))
-                  }}
-                  onSlideChange={(instance) => setTabControls(getSliderControls(instance))}
-                  onResize={(instance) => setTabControls(getSliderControls(instance))}
-                  onBreakpoint={(instance) => setTabControls(getSliderControls(instance))}
-                  className="!overflow-visible"
-                >
-                  {groups.map((group, idx) => {
-                    const active = idx === activeIndex
-                    return (
-                      <SwiperSlide key={group._key ?? `${group.label}-${idx}`} className="!w-auto">
-                        <button
-                          type="button"
-                          onClick={() => setActiveIndex(idx)}
-                          aria-pressed={active}
-                          className={`min-w-[132px] rounded-sm px-4 py-2 text-xs font-black uppercase tracking-wider transition-colors md:min-w-[180px] md:px-6 md:py-3 md:text-base ${active ? tabActiveClass : tabInactiveClass}`}
-                        >
-                          {group.label}
-                        </button>
-                      </SwiperSlide>
-                    )
-                  })}
-                </Swiper>
-              </div>
+        <div className="mb-8 overflow-x-hidden md:mb-10">
+          <div className="flex items-center md:justify-center">
+            <div className={`min-w-0 flex-1 ${tabControls.hasOverflow ? 'md:max-w-4xl' : 'md:max-w-fit'}`}>
+              <Swiper
+                modules={[Keyboard, A11y]}
+                slidesPerView="auto"
+                centeredSlides
+                centeredSlidesBounds
+                centerInsufficientSlides
+                watchOverflow
+                grabCursor
+                keyboard={{ enabled: true }}
+                spaceBetween={12}
+                speed={450}
+                initialSlide={activeIndex}
+                a11y={{
+                  prevSlideMessage: 'Previous filter',
+                  nextSlideMessage: 'Next filter',
+                }}
+                onSwiper={(instance) => {
+                  setTabsSwiper(instance)
+                  setTabControls(getSliderControls(instance))
+                }}
+                onSlideChange={(instance) => setTabControls(getSliderControls(instance))}
+                onResize={(instance) => setTabControls(getSliderControls(instance))}
+                onBreakpoint={(instance) => setTabControls(getSliderControls(instance))}
+                className="w-full"
+              >
+                {groups.map((group, idx) => {
+                  const active = idx === activeIndex
+                  return (
+                    <SwiperSlide key={group._key ?? `${group.label}-${idx}`} className="!w-auto">
+                      <button
+                        type="button"
+                        onClick={() => setActiveIndex(idx)}
+                        aria-pressed={active}
+                        className={`min-w-[132px] rounded-sm px-4 py-2 text-xs font-black uppercase tracking-wider transition-colors md:min-w-[180px] md:px-6 md:py-3 md:text-base ${active ? tabActiveClass : tabInactiveClass}`}
+                      >
+                        {group.label}
+                      </button>
+                    </SwiperSlide>
+                  )
+                })}
+              </Swiper>
             </div>
+          </div>
         </div>
       )}
 
@@ -392,7 +393,7 @@ export default function MachineSelectorBlock({ block }: { block: MachineSelector
 
         {activeItems.length > 0 && (
           <div>
-            <div className="group relative overflow-visible">
+            <div className="group relative overflow-x-hidden px-5 sm:px-6">
               {machineControls.hasOverflow && (
                 <>
                   <SliderNavButton
@@ -401,7 +402,7 @@ export default function MachineSelectorBlock({ block }: { block: MachineSelector
                     theme={theme}
                     label="Previous machine"
                     onClick={() => machineSwiper?.slidePrev()}
-                    className="absolute left-2 top-[35%] z-20 hidden -translate-y-1/2 xl:inline-flex"
+                    className={getEdgeAlignedNavButtonClass('prev', 'hidden xl:inline-flex')}
                   />
                   <SliderNavButton
                     direction="next"
@@ -409,7 +410,7 @@ export default function MachineSelectorBlock({ block }: { block: MachineSelector
                     theme={theme}
                     label="Next machine"
                     onClick={() => machineSwiper?.slideNext()}
-                    className="absolute right-2 top-[35%] z-20 hidden -translate-y-1/2 xl:inline-flex"
+                    className={getEdgeAlignedNavButtonClass('next', 'hidden xl:inline-flex')}
                   />
                 </>
               )}

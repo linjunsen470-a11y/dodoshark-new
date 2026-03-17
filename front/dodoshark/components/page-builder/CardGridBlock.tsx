@@ -17,6 +17,7 @@ import {
 } from './backgroundTheme'
 import {
   defaultSliderControls,
+  getEdgeAlignedNavButtonClass,
   getSliderControls,
   SliderNavButton,
   type SliderControls,
@@ -406,15 +407,19 @@ function SectionTitle({
   title?: string
   theme: SharedBackgroundTheme
 }) {
-  if (!title) return null
+  const resolvedTitle = title?.trim()
+
+  if (!resolvedTitle) return null
 
   const titleClass = theme.heading
 
   return (
     <header className="mb-3 text-center md:mb-4">
       <div className="flex justify-center">
-        <h3 className={`inline-block px-4 text-2xl font-display font-bold tracking-[-0.02em] md:text-[1.75rem] ${titleClass}`}>
-          {title}
+        <h3
+          className={`inline-block whitespace-pre-line px-4 text-2xl font-display font-bold tracking-[-0.02em] md:text-[1.75rem] ${titleClass}`}
+        >
+          {resolvedTitle}
         </h3>
       </div>
     </header>
@@ -448,7 +453,7 @@ function GroupGrid({
       <SectionTitle title={sectionTitle} theme={theme} />
 
       <div className="md:hidden">
-        <div className="relative px-2">
+        <div className="relative overflow-x-hidden px-5 sm:px-6">
           {mobileControls.hasOverflow && (
             <div className="pointer-events-none absolute inset-x-0 top-0 z-10 aspect-[16/10]">
               <SliderNavButton
@@ -458,7 +463,7 @@ function GroupGrid({
                 buttonClassName={mobileButtonClassName}
                 label="Previous card"
                 onClick={() => mobileSwiper?.slidePrev()}
-                className="pointer-events-auto absolute left-0 top-1/2 z-10 h-10 w-10 -translate-x-1/3 -translate-y-1/2"
+                className={`pointer-events-auto ${getEdgeAlignedNavButtonClass('prev')}`}
               />
 
               <SliderNavButton
@@ -468,7 +473,7 @@ function GroupGrid({
                 buttonClassName={mobileButtonClassName}
                 label="Next card"
                 onClick={() => mobileSwiper?.slideNext()}
-                className="pointer-events-auto absolute right-0 top-1/2 z-10 h-10 w-10 translate-x-1/3 -translate-y-1/2"
+                className={`pointer-events-auto ${getEdgeAlignedNavButtonClass('next')}`}
               />
             </div>
           )}
