@@ -78,24 +78,12 @@ const productCountQuery = `count(*[
   _type == "product"
   && defined(slug.current)
   && ($category == "" || category->slug.current == $category)
-  && (
-    $search == ""
-    || title match $search
-    || shortDescription match $search
-    || seriesTag match $search
-  )
 ])`
 
 const productListQuery = `*[
   _type == "product"
   && defined(slug.current)
   && ($category == "" || category->slug.current == $category)
-  && (
-    $search == ""
-    || title match $search
-    || shortDescription match $search
-    || seriesTag match $search
-  )
 ] | order(_createdAt desc)[$start...$end]{
   _id,
   title,
@@ -148,16 +136,13 @@ function toImageSrc(image?: SanityImage, width = 1200) {
 
 function buildHref({
   category,
-  q,
   page,
 }: {
   category?: string
-  q?: string
   page?: number
 }) {
   const params = new URLSearchParams()
   if (category) params.set('category', category)
-  if (q) params.set('q', q)
   if (page && page > 1) params.set('page', String(page))
   const query = params.toString()
   return query ? `/products?${query}` : '/products'
@@ -179,19 +164,17 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
   const params = await searchParams
   const category = firstParam(params.category)?.trim() || ''
-  const q = firstParam(params.q)?.trim() || ''
   const requestedPage = parsePositiveInt(firstParam(params.page), 1)
-  const search = q ? `*${q}*` : ''
 
   const landing = await client.fetch<ProductLandingData | null>(productLandingQuery)
-  const total = await client.fetch<number>(productCountQuery, { category, search })
+  const total = await client.fetch<number>(productCountQuery, { category })
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
   const currentPage = Math.min(requestedPage, totalPages)
   const start = (currentPage - 1) * PAGE_SIZE
   const end = start + PAGE_SIZE
 
   const [products, fallbackCategories] = await Promise.all([
-    client.fetch<ProductCard[]>(productListQuery, { category, search, start, end }),
+    client.fetch<ProductCard[]>(productListQuery, { category, start, end }),
     client.fetch<CategoryItem[]>(allCategoriesQuery),
   ])
 
@@ -237,53 +220,42 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
       <section id="catalog" className="py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-10 flex flex-wrap justify-center gap-3 rounded-lg border border-slate-100 bg-white p-4 shadow-sm">
-            <Link
-              href={buildHref({ q })}
-              className={`rounded-md border-2 px-6 py-2.5 text-[11px] font-black uppercase tracking-widest transition-all ${
-                category
-                  ? 'border-slate-200 text-slate-700 hover:border-slate-300'
-                  : 'border-orange-500 bg-orange-500 text-white shadow-lg shadow-orange-500/25'
-              }`}
-            >
-              All Machines
-            </Link>
-            {categories.map((item) => {
-              const slug = item.slug?.current
-              if (!slug) return null
-              const active = slug === category
-              return (
-                <Link
-                  key={item._id ?? slug}
-                  href={buildHref({ category: slug, q })}
-                  className={`rounded-md border-2 px-6 py-2.5 text-[11px] font-black uppercase tracking-widest transition-all ${
-                    active
-                      ? 'border-orange-500 bg-orange-500 text-white shadow-lg shadow-orange-500/25'
-                      : 'border-slate-200 text-slate-700 hover:border-slate-300'
-                  }`}
-                >
-                  {item.title || slug}
-                </Link>
-              )
-            })}
-          </div>
-
-          <form action="/products" method="get" className="mx-auto mb-12 max-w-2xl">
-            {category && <input type="hidden" name="category" value={category} />}
-            <div className="relative">
-              <i className="fas fa-search pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                name="q"
-                defaultValue={q}
-                placeholder="Search products..."
-                className="w-full rounded-lg border border-slate-200 bg-slate-50 py-4 pl-12 pr-4 text-sm font-medium text-slate-900 transition-all focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-500/10"
-              />
+          <div className="mb-12 -mx-4 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:overflow-visible md:px-0">
+            <div className="inline-flex min-w-full gap-3 rounded-lg border border-slate-100 bg-white p-4 shadow-sm md:flex md:w-full md:flex-wrap md:justify-center">
+              <Link
+                href={buildHref({})}
+                className={`shrink-0 whitespace-nowrap rounded-md border-2 px-5 py-2.5 text-[11px] font-black uppercase tracking-widest transition-all md:px-6 ${
+                  category
+                    ? 'border-slate-200 text-slate-700 hover:border-slate-300'
+                    : 'border-orange-500 bg-orange-500 text-white shadow-lg shadow-orange-500/25'
+                }`}
+              >
+                All Machines
+              </Link>
+              {categories.map((item) => {
+                const slug = item.slug?.current
+                if (!slug) return null
+                const active = slug === category
+                return (
+                  <Link
+                    key={item._id ?? slug}
+                    href={buildHref({ category: slug })}
+                    className={`shrink-0 whitespace-nowrap rounded-md border-2 px-5 py-2.5 text-[11px] font-black uppercase tracking-widest transition-all md:px-6 ${
+                      active
+                        ? 'border-orange-500 bg-orange-500 text-white shadow-lg shadow-orange-500/25'
+                        : 'border-slate-200 text-slate-700 hover:border-slate-300'
+                    }`}
+                  >
+                    {item.title || slug}
+                  </Link>
+                )
+              })}
             </div>
-          </form>
+          </div>
 
           {products.length === 0 ? (
             <div className="rounded-lg border border-dashed border-slate-300 bg-white p-16 text-center text-slate-500">
-              No products found for current filter/search.
+              No products found for the current filter.
             </div>
           ) : (
             <div className="mb-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -334,7 +306,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
               {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
                 <Link
                   key={pageNumber}
-                  href={buildHref({ category, q, page: pageNumber })}
+                  href={buildHref({ category, page: pageNumber })}
                   className={`h-3 rounded-full transition-all ${
                     pageNumber === currentPage ? 'w-8 bg-orange-500' : 'w-3 bg-slate-200 hover:bg-slate-300'
                   }`}
