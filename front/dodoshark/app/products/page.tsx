@@ -262,6 +262,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
               {products.map((product) => {
                 const imageSrc = toImageSrc(product.mainImage, 900)
                 const href = product.slug?.current ? `/products/${product.slug.current}` : '#'
+                const productTag = product.category?.title || product.seriesTag || 'Machine'
                 return (
                   <article key={product._id} className="premium-card overflow-hidden group">
                     <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
@@ -277,15 +278,21 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                           <i className="fas fa-image text-3xl" aria-hidden />
                         </div>
                       )}
-                      <div className="absolute left-4 top-4 rounded-md bg-white/90 px-3 py-1 text-[9px] font-black tracking-widest text-slate-900 shadow-sm backdrop-blur-md">
-                        {product.category?.title || product.seriesTag || 'Machine'}
-                      </div>
                     </div>
                     <div className="p-7">
+                      <div className="mb-4 flex justify-center">
+                        <div
+                          className="inline-flex max-w-full items-center gap-2 whitespace-nowrap rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-[13px] font-semibold leading-none text-orange-600 shadow-[0_8px_24px_rgba(249,115,22,0.08)]"
+                          title={productTag}
+                        >
+                          <span className="h-2 w-2 shrink-0 rounded-full bg-orange-400" />
+                          <span className="block max-w-[180px] truncate">{productTag}</span>
+                        </div>
+                      </div>
                       <h3 className="mb-3 text-xl font-display font-black leading-tight text-slate-900 transition-colors group-hover:text-orange-600">
                         {product.title}
                       </h3>
-                      <p className="mb-6 line-clamp-2 text-sm font-light leading-relaxed text-slate-500">
+                      <p className="mb-6 line-clamp-3 text-sm font-light leading-relaxed text-slate-500">
                         {product.shortDescription || 'High performance industrial processing equipment.'}
                       </p>
                       <Link
