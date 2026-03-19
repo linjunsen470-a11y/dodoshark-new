@@ -87,7 +87,7 @@ function buildHref({
 
 function CardCta() {
   return (
-    <span className="inline-flex items-center gap-1 text-center text-sm font-semibold text-[#14b8a6] underline decoration-current underline-offset-4 transition-colors duration-200 group-hover:text-[#0d9488] group-focus-within:text-[#0d9488]">
+    <span className="inline-flex items-center gap-1 text-center text-sm font-semibold text-[#14b8a6] underline decoration-current underline-offset-4 transition-colors duration-200 group-hover:text-[#f59e0b] group-focus-within:text-[#f59e0b]">
       View Details
       <Icon
         icon="arrow-right"
