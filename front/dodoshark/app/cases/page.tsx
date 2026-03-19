@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { getSafeHref, isExternalHref } from '@/app/lib/safeHref'
 import { client, urlFor } from '@/app/lib/sanity'
 import Icon from '@/components/ui/Icon'
 
@@ -57,11 +56,6 @@ type CasesLandingData = {
     stats?: CaseStat[]
   }
   industries?: CategoryItem[]
-  cta?: {
-    title?: string
-    buttonText?: string
-    buttonLink?: string
-  }
 }
 
 type CasesPageProps = {
@@ -89,11 +83,6 @@ const casesLandingQuery = `*[_type == "casesPage"][0]{
     _id,
     title,
     slug{current}
-  },
-  cta{
-    title,
-    buttonText,
-    buttonLink
   }
 }`
 
@@ -208,13 +197,9 @@ export default async function CasesPage({ searchParams }: CasesPageProps) {
     landing?.hero?.subtitle?.trim() ||
     'Discover how industrial partners improve throughput and efficiency with real deployments.'
   const heroStats = landing?.hero?.stats ?? []
-  const ctaTitle = landing?.cta?.title?.trim()
-  const ctaHref = getSafeHref(landing?.cta?.buttonLink) || '/contact'
-  const ctaButtonText = landing?.cta?.buttonText || 'Request Simulation Hub'
-  const ctaIsExternal = isExternalHref(ctaHref)
 
   return (
-    <main className="bg-[#f8fafc] text-slate-900">
+    <main className="bg-[#fcfdfd] text-slate-900">
       <section className="relative overflow-hidden bg-slate-800 pb-24 pt-32">
         {heroImageSrc && (
           <Image
@@ -225,30 +210,31 @@ export default async function CasesPage({ searchParams }: CasesPageProps) {
             className="object-cover opacity-20"
           />
         )}
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="relative z-10 max-w-3xl">
+        <div className="absolute inset-0 bg-[radial-gradient(#f97316_1px,transparent_1px)] [background-size:40px_40px] opacity-20" />
+        <div className="relative z-10 mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-4xl">
             {heroBadge && (
-              <div className="mb-8 inline-flex items-center gap-3 rounded-md border border-blue-500/30 bg-blue-500/20 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-blue-400">
+              <div className="mb-8 inline-flex items-center gap-3 rounded-md border border-orange-500/20 bg-orange-500/10 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-orange-400">
                 <Icon icon="globe" className="h-4 w-4" />
                 <span>{heroBadge}</span>
               </div>
             )}
-            <h1 className="mb-8 text-6xl font-display font-black leading-tight tracking-tight text-white md:text-8xl">
+            <h1 className="mb-8 text-5xl font-display font-black leading-tight tracking-tight text-white md:text-7xl">
               {heroTitle ? (
                 heroTitle
               ) : (
                 <>
-                  Success in <span className="text-blue-500">Operation</span>
+                  Success Stories <span className="accent-gradient-text">in Action</span>
                 </>
               )}
             </h1>
-            <p className="mb-12 text-xl font-light leading-relaxed text-slate-400">{heroSubtitle}</p>
+            <p className="mx-auto max-w-3xl text-xl font-light leading-relaxed text-slate-400">{heroSubtitle}</p>
             {heroStats.length ? (
-              <div className="flex flex-wrap items-center gap-10">
+              <div className="mt-12 flex flex-wrap items-center justify-center gap-8 md:gap-10">
                 {heroStats.slice(0, 3).map((stat, index) => (
-                  <div key={`${stat.label}-${index}`}>
+                  <div key={`${stat.label}-${index}`} className="min-w-[120px]">
                     <div className="text-3xl font-display font-black text-white">{stat.value}</div>
-                    <div className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                    <div className="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-500">
                       {stat.label}
                     </div>
                   </div>
@@ -259,59 +245,27 @@ export default async function CasesPage({ searchParams }: CasesPageProps) {
         </div>
       </section>
 
-      <section className="sticky top-20 z-40 border-b border-slate-100 bg-white/80 py-6 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center gap-3 overflow-x-auto px-4 sm:px-6 lg:px-8">
-          <Link
-            href={buildHref({})}
-            className={`rounded-md border px-5 py-2 text-xs font-black uppercase tracking-widest transition-all ${
-              industry
-                ? 'border-slate-200 bg-white text-slate-500 hover:border-slate-300'
-                : 'border-blue-600 bg-blue-600 text-white'
-            }`}
-          >
-            All Industries
-          </Link>
-          {industries.map((item) => {
-            const slug = item.slug?.current
-            if (!slug) return null
-            const active = slug === industry
-            return (
-              <Link
-                key={item._id ?? slug}
-                href={buildHref({ industry: slug })}
-                className={`whitespace-nowrap rounded-md border px-5 py-2 text-xs font-black uppercase tracking-widest transition-all ${
-                  active
-                    ? 'border-blue-600 bg-blue-600 text-white'
-                    : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300'
-                }`}
-              >
-                {item.title || slug}
-              </Link>
-            )
-          })}
-        </div>
-      </section>
-
-      <section className="py-24">
+      <section id="cases" className="py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {cases.length === 0 ? (
             <div className="rounded-lg border border-dashed border-slate-300 bg-white p-16 text-center text-slate-500">
               No case studies found for current industry filter.
             </div>
           ) : (
-            <div className="grid gap-12 lg:grid-cols-2">
+            <div className="mb-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
               {cases.map((item) => {
-                const cover = toImageSrc(item.coverImage, 1200)
-                const caseHref = item.slug?.current ? `/cases/${item.slug.current}` : undefined
+                const cover = toImageSrc(item.coverImage, 900)
+                const caseHref = item.slug?.current ? `/cases/${item.slug.current}` : '#'
+                const caseTag = item.industry?.title || 'Case Study'
                 return (
-                  <article key={item._id} className="premium-card group relative overflow-hidden">
-                    <div className="relative h-80 overflow-hidden bg-slate-100">
+                  <article key={item._id} className="premium-card group overflow-hidden">
+                    <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
                       {cover ? (
                         <Image
                           src={cover}
                           alt={item.coverImage?.alt || item.title || 'Case cover'}
                           fill
-                          sizes="(min-width: 1024px) 50vw, 100vw"
+                          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
                           className="object-cover transition-transform duration-700 group-hover:scale-105"
                         />
                       ) : (
@@ -319,53 +273,48 @@ export default async function CasesPage({ searchParams }: CasesPageProps) {
                           <Icon icon="image" className="h-10 w-10" />
                         </div>
                       )}
-                      <div className="absolute left-8 top-8 flex flex-col gap-2">
-                        {item.industry?.title && (
-                          <span className="rounded-md bg-blue-600 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-xl">
-                            {item.industry.title}
-                          </span>
-                        )}
-                        {item.location && (
-                          <span className="rounded-md bg-white/90 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-slate-900 shadow-xl backdrop-blur-md">
-                            <Icon icon="location" className="mr-2 inline h-4 w-4" />
-                            {item.location}
-                          </span>
-                        )}
-                      </div>
                     </div>
-                    <div className="p-10">
+                    <div className="p-7">
+                      <div className="mb-4 flex justify-center">
+                        <div
+                          className="inline-flex max-w-full items-center gap-2 whitespace-nowrap rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-[13px] font-semibold leading-none text-orange-600 shadow-[0_8px_24px_rgba(249,115,22,0.08)]"
+                          title={caseTag}
+                        >
+                          <span className="h-2 w-2 shrink-0 rounded-full bg-orange-400" />
+                          <span className="block max-w-[180px] truncate">{caseTag}</span>
+                        </div>
+                      </div>
+                      {item.location ? (
+                        <div className="mb-4 flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">
+                          <Icon icon="location" className="h-4 w-4 shrink-0" />
+                          <span className="truncate">{item.location}</span>
+                        </div>
+                      ) : null}
                       {!!item.impactStats?.length && (
-                        <div className="mb-6 flex flex-wrap items-center gap-3">
-                          {item.impactStats.slice(0, 3).map((stat, idx) => (
+                        <div className="mb-4 flex flex-wrap items-center justify-center gap-2">
+                          {item.impactStats.slice(0, 2).map((stat, idx) => (
                             <span
                               key={`${stat.label}-${idx}`}
-                              className="rounded-lg bg-blue-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-blue-600"
+                              className="rounded-lg bg-orange-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-orange-600"
                             >
                               {stat.value || stat.label}
                             </span>
                           ))}
                         </div>
                       )}
-                      <h3 className="mb-6 text-3xl font-display font-black leading-tight text-slate-900">
+                      <h3 className="mb-3 text-xl font-display font-black leading-tight text-slate-900 transition-colors group-hover:text-orange-600">
                         {item.title}
                       </h3>
-                      <p className="mb-8 font-light leading-relaxed text-slate-500">
+                      <p className="mb-6 line-clamp-3 text-sm font-light leading-relaxed text-slate-500">
                         {item.excerpt || 'Detailed case study content is available in the full project report.'}
                       </p>
-                      <div className="flex items-center justify-between border-t border-slate-100 pt-6">
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                          Case Study
-                        </span>
-                        <span className="flex h-12 w-12 items-center justify-center rounded-md bg-slate-50 text-slate-900 transition-colors group-hover:bg-blue-600 group-hover:text-white">
-                          <Icon icon="arrow-right" className="h-4 w-4" />
-                        </span>
-                      </div>
-                    </div>
-                    {caseHref && (
-                      <Link href={caseHref} className="absolute inset-0 z-10">
-                        <span className="sr-only">View case detail</span>
+                      <Link
+                        href={caseHref}
+                        className="flex w-full items-center justify-center rounded-lg bg-slate-50 py-3 text-[11px] font-black tracking-widest transition-all hover:bg-slate-800 hover:text-white"
+                      >
+                        View&nbsp; Details
                       </Link>
-                    )}
+                    </div>
                   </article>
                 )
               })}
@@ -379,7 +328,7 @@ export default async function CasesPage({ searchParams }: CasesPageProps) {
                   key={pageNumber}
                   href={buildHref({ industry, page: pageNumber })}
                   className={`h-3 rounded-full transition-all ${
-                    pageNumber === currentPage ? 'w-8 bg-blue-600' : 'w-3 bg-slate-200 hover:bg-slate-300'
+                    pageNumber === currentPage ? 'w-8 bg-orange-500' : 'w-3 bg-slate-200 hover:bg-slate-300'
                   }`}
                   aria-label={`Go to page ${pageNumber}`}
                 />
@@ -387,31 +336,38 @@ export default async function CasesPage({ searchParams }: CasesPageProps) {
             </div>
           )}
 
-          {(ctaTitle || landing?.cta?.buttonText) && (
-            <div className="relative mt-24 overflow-hidden rounded-lg bg-slate-800 p-12 text-center text-white md:p-16">
-              <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
-              <div className="relative z-10">
-                {ctaTitle && <h2 className="mb-8 text-4xl font-display font-black md:text-5xl">{ctaTitle}</h2>}
-                {ctaIsExternal ? (
-                  <a
-                    href={ctaHref}
-                    target={ctaHref.startsWith('http') ? '_blank' : undefined}
-                    rel={ctaHref.startsWith('http') ? 'noreferrer' : undefined}
-                    className="inline-block rounded-md bg-blue-600 px-12 py-4 text-xs font-black uppercase tracking-widest text-white transition-all hover:bg-blue-500"
-                  >
-                    {ctaButtonText}
-                  </a>
-                ) : (
+          <div className="mt-20 -mx-4 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:overflow-visible md:px-0">
+            <div className="inline-flex min-w-full gap-3 md:flex md:w-full md:flex-wrap md:justify-center">
+              <Link
+                href={buildHref({})}
+                className={`shrink-0 whitespace-nowrap rounded-md border-2 px-5 py-2.5 text-[11px] font-black tracking-widest transition-all md:px-6 ${
+                  industry
+                    ? 'border-slate-200 text-slate-700 hover:border-slate-300'
+                    : 'border-orange-500 bg-orange-500 text-white shadow-lg shadow-orange-500/25'
+                }`}
+              >
+                All Industries
+              </Link>
+              {industries.map((item) => {
+                const slug = item.slug?.current
+                if (!slug) return null
+                const active = slug === industry
+                return (
                   <Link
-                    href={ctaHref}
-                    className="inline-block rounded-md bg-blue-600 px-12 py-4 text-xs font-black uppercase tracking-widest text-white transition-all hover:bg-blue-500"
+                    key={item._id ?? slug}
+                    href={buildHref({ industry: slug })}
+                    className={`shrink-0 whitespace-nowrap rounded-md border-2 px-5 py-2.5 text-[11px] font-black tracking-widest transition-all md:px-6 ${
+                      active
+                        ? 'border-orange-500 bg-orange-500 text-white shadow-lg shadow-orange-500/25'
+                        : 'border-slate-200 text-slate-700 hover:border-slate-300'
+                    }`}
                   >
-                    {ctaButtonText}
+                    {item.title || slug}
                   </Link>
-                )}
-              </div>
+                )
+              })}
             </div>
-          )}
+          </div>
         </div>
       </section>
     </main>

@@ -325,7 +325,7 @@ export default function MachineSelectorBlock({ block }: { block: MachineSelector
                         type="button"
                         onClick={() => setActiveIndex(idx)}
                         aria-pressed={active}
-                        className={`min-w-[132px] rounded-sm px-4 py-2 text-xs font-black uppercase tracking-wider transition-colors md:min-w-[180px] md:px-6 md:py-3 md:text-base ${active ? tabActiveClass : tabInactiveClass}`}
+                        className={`min-w-[132px] rounded-sm px-4 py-2 text-xs font-black tracking-wider transition-colors md:min-w-[180px] md:px-6 md:py-3 md:text-base ${active ? tabActiveClass : tabInactiveClass}`}
                       >
                         {group.label}
                       </button>
