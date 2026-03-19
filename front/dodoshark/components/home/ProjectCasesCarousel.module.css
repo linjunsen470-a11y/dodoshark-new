@@ -23,8 +23,8 @@
   overflow: hidden;
   border: 1px solid rgb(148 163 184 / 0.18);
   border-radius: 1.5rem;
-  background: linear-gradient(180deg, rgb(51 65 85 / 0.9) 0%, rgb(30 41 59 / 0.94) 100%);
-  box-shadow: 0 24px 56px -32px rgb(15 23 42 / 0.42);
+  background: #ffffff;
+  box-shadow: 0 10px 24px -18px rgb(15 23 42 / 0.12);
   transition:
     transform 220ms ease,
     border-color 220ms ease,
@@ -33,15 +33,15 @@
 
 .cardLink:hover {
   transform: translateY(-4px);
-  border-color: rgb(148 163 184 / 0.34);
-  box-shadow: 0 28px 64px -34px rgb(15 23 42 / 0.5);
+  border-color: rgb(148 163 184 / 0.26);
+  box-shadow: 0 16px 32px -24px rgb(15 23 42 / 0.16);
 }
 
 .imageWrap {
   position: relative;
   aspect-ratio: 3 / 2;
   overflow: hidden;
-  background: rgb(51 65 85 / 0.72);
+  background: #ffffff;
 }
 
 .image {
@@ -85,7 +85,7 @@
 .title {
   display: -webkit-box;
   overflow: hidden;
-  color: #f8fafc;
+  color: #0f172a;
   font-size: 1.55rem;
   font-weight: 700;
   line-height: 1.2;
@@ -98,7 +98,7 @@
   display: -webkit-box;
   overflow: hidden;
   margin-top: 1rem;
-  color: rgb(203 213 225 / 0.84);
+  color: #475569;
   font-size: 0.98rem;
   line-height: 1.75;
   min-height: calc(1.75em * 3);
@@ -108,15 +108,17 @@
 
 .inlineCta {
   display: inline-flex;
-  justify-content: flex-end;
+  width: 100%;
   align-items: center;
+  justify-content: center;
   gap: 0.625rem;
   margin-top: auto;
   padding-top: 1.375rem;
-  color: #5eead4;
+  color: #ea580c;
   font-size: 0.88rem;
   font-weight: 700;
   letter-spacing: 0.01em;
+  text-align: center;
 }
 
 .inlineArrow {
@@ -150,7 +152,7 @@
   justify-content: center;
   width: 3rem;
   height: 3rem;
-  border: 1px solid rgb(255 255 255 / 0.16);
+  border: 1px solid rgb(203 213 225 / 0.92);
   border-radius: 9999px;
   background: rgb(255 255 255 / 0.92);
   color: #0f172a;
@@ -166,7 +168,7 @@
 .navButton:hover:not(:disabled) {
   transform: translateY(-1px);
   background: #ffffff;
-  border-color: rgb(255 255 255 / 0.4);
+  border-color: rgb(148 163 184 / 0.26);
 }
 
 .navButton:disabled {
@@ -181,7 +183,7 @@
 
 .mobileCounter {
   display: none;
-  color: rgba(35, 37, 39, 0.92);
+  color: rgba(15, 23, 42, 0.92);
   font-size: 0.95rem;
   font-weight: 500;
   letter-spacing: 0.01em;
