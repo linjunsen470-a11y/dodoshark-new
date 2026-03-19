@@ -614,7 +614,7 @@ export default async function HomePage() {
         <div className="relative z-20 mx-auto -mt-24 max-w-6xl px-4 sm:px-6 lg:px-8 lg:-mt-28">
           <div className="rounded-lg bg-white shadow-xl">
             <div className="border-b border-slate-200 py-8 text-center">
-              <h3 className="text-2xl font-bold text-slate-900 md:text-3xl">Grinding Solutions (Dust-Free)</h3>
+              <h3 className="text-2xl font-bold text-slate-900 md:text-3xl">Grinding & Mixing Solutions <br/>(Dust-Free)</h3>
             </div>
             <div className="p-6 sm:p-8 md:p-12">
               <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
@@ -633,7 +633,7 @@ export default async function HomePage() {
         </div>
 
         <div className="mx-auto max-w-6xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
-          <div className="rounded-lg bg-white shadow-lg">
+          {/* <div className="rounded-lg bg-white shadow-lg">
             <div className="border-b border-slate-200 py-8 text-center">
               <h3 className="text-2xl font-bold text-slate-900 md:text-3xl">Efficient Mixing Solutions</h3>
             </div>
@@ -650,7 +650,7 @@ export default async function HomePage() {
                 </Link>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </section>
 
