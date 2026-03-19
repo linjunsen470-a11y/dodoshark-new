@@ -111,19 +111,34 @@
   width: 100%;
   align-items: center;
   justify-content: center;
-  gap: 0.625rem;
+  gap: 0.25rem;
   margin-top: auto;
   padding-top: 1.375rem;
-  color: #ea580c;
-  font-size: 0.88rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
+  color: #14b8a6;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0;
   text-align: center;
+  text-decoration: underline;
+  text-decoration-color: currentColor;
+  text-underline-offset: 0.25rem;
+  transition: color 200ms ease;
 }
 
 .inlineArrow {
   width: 1rem;
   height: 1rem;
+  transition: transform 200ms ease;
+}
+
+.cardLink:hover .inlineCta,
+.cardLink:focus-visible .inlineCta {
+  color: #f59e0b;
+}
+
+.cardLink:hover .inlineArrow,
+.cardLink:focus-visible .inlineArrow {
+  transform: translateX(2px);
 }
 
 .footerBar {

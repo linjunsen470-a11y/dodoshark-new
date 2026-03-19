@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 const viewDetailsLinkClass =
-  'group inline-flex items-center gap-1 text-center text-sm font-semibold text-[#14b8a6] underline decoration-current underline-offset-4 transition-colors duration-200 hover:text-[#0d9488] focus-visible:outline-none focus-visible:text-[#0d9488]'
+  'group inline-flex items-center gap-1 text-center text-sm font-semibold text-[#14b8a6] underline decoration-current underline-offset-4 transition-colors duration-200 hover:text-[#f59e0b] focus-visible:outline-none focus-visible:text-[#f59e0b]'
 
 function ArrowRightIcon({ className }: { className?: string }) {
   return (

@@ -248,7 +248,7 @@ function GridCard({
   const hasContent = Boolean(data.title || data.description || data.image?.asset)
   if (!hasContent) return null
 
-  const imageHeightClass = size === 'large' ? 'aspect-[16/10]' : 'aspect-[4/3]'
+  const imageHeightClass = 'aspect-[4/3]'
   const titleClass =
     size === 'large'
       ? cardTitleClass
@@ -267,7 +267,7 @@ function GridCard({
   const contentClass = size === 'large' ? 'p-6' : 'p-5'
   const imageBgClass = theme.surfaceMuted
   const emptyImageClass = theme.subtitle
-  const imageSrc = resolveImageSrc(data.image, {width: 900, height: 700, fit: 'crop'})
+  const imageSrc = resolveImageSrc(data.image, {width: 900, height: 675, fit: 'crop'})
 
   return (
     <article className={articleClass}>
@@ -331,10 +331,10 @@ function MobileCarouselCard({
   const emptyImageClass = theme.subtitle
   const dotsBaseClass = theme.dotIdle
   const dotsActiveClass = theme.dotActive
-  const imageSrc = resolveImageSrc(data.image, {width: 900, height: 700, fit: 'crop'})
+  const imageSrc = resolveImageSrc(data.image, {width: 900, height: 675, fit: 'crop'})
   const imageFrameClass = disableCardFrameEffect
-    ? `relative aspect-[16/10] ${imageBgClass}`
-    : `relative aspect-[16/10] overflow-hidden rounded-t-lg ${imageBgClass}`
+    ? `relative aspect-[4/3] ${imageBgClass}`
+    : `relative aspect-[4/3] overflow-hidden rounded-t-lg ${imageBgClass}`
 
   return (
     <article className={articleClass}>
@@ -556,7 +556,7 @@ function GroupGrid({
       <div className="md:hidden">
         <div className="relative overflow-x-hidden">
           {mobileControls.hasOverflow && (
-            <div className="pointer-events-none absolute inset-x-0 top-0 z-10 aspect-[16/10]">
+            <div className="pointer-events-none absolute inset-x-0 top-0 z-10 aspect-[4/3]">
               <SliderNavButton
                 direction="prev"
                 disabled={!mobileControls.canPrev}

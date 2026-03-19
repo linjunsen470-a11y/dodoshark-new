@@ -114,7 +114,7 @@ export default function VlogVideoGrid({ items }: VlogVideoGridProps) {
                     {item.excerpt || 'Watch the full video for equipment demos and process highlights.'}
                   </p>
                   <div className="mt-auto flex items-center justify-center border-t border-slate-50 pt-6">
-                    <span className="inline-flex items-center gap-2 text-sm font-semibold text-[#14b8a6] underline decoration-current underline-offset-4 transition-colors duration-200 group-hover:text-[#0d9488] group-focus-visible:text-[#0d9488]">
+                    <span className="inline-flex items-center gap-2 text-sm font-semibold text-[#14b8a6] underline decoration-current underline-offset-4 transition-colors duration-200 group-hover:text-[#f59e0b] group-focus-visible:text-[#f59e0b]">
                       {canPlay ? 'Play Video' : 'Video Unavailable'}
                       <Icon icon="arrow-right" className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5 group-focus-visible:translate-x-0.5" />
                     </span>
