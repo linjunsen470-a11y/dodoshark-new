@@ -654,14 +654,14 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="overflow-hidden bg-[#e6eaee] py-10 sm:py-14">
+      <section className="overflow-hidden bg-slate-50 py-10 sm:py-14">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h2 className="font-display text-3xl font-extrabold tracking-[-0.02em] text-slate-800 sm:text-4xl md:text-5xl">
+            <h2 className="font-display text-3xl font-extrabold tracking-[-0.02em] text-slate-900 sm:text-4xl md:text-5xl">
               Project Cases
             </h2>
-            <div className="mx-auto mt-4 h-1.5 w-20 rounded-full bg-orange-500" />
-            <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg">
+            <div className="mx-auto mt-4 h-1.5 w-20 rounded-full bg-slate-300" />
+            <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-slate-500 sm:text-lg">
               Every case is a benchmark for industrial excellence.
             </p>
           </div>
