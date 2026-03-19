@@ -5,7 +5,9 @@ import {
   DocumentIcon,
   DocumentTextIcon,
   PlugIcon,
+  TagIcon,
   UserIcon,
+  VideoIcon,
   WrenchIcon,
 } from '@sanity/icons'
 
@@ -32,10 +34,12 @@ const schemaTypeIconMap = {
   accessory: PlugIcon,
   author: UserIcon,
   caseStudy: CaseIcon,
+  contentTag: TagIcon,
   post: DocumentTextIcon,
   product: WrenchIcon,
   productVariant: ControlsIcon,
   solution: BulbOutlineIcon,
+  vlogItem: VideoIcon,
 } as const
 
 export function iconForSchemaType(schemaType?: string) {

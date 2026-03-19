@@ -4,6 +4,7 @@ import Link from 'next/link'
 
 import { client, urlFor } from '@/app/lib/sanity'
 import Icon from '@/components/ui/Icon'
+import LandingCardPager, { type LandingCardItem } from '@/components/ui/LandingCardPager'
 
 type QueryParamValue = string | string[] | undefined
 
@@ -30,6 +31,12 @@ type CategoryItem = {
   slug?: { current?: string }
 }
 
+type ContentTagItem = {
+  _id?: string
+  title?: string
+  slug?: { current?: string }
+}
+
 type CaseStat = {
   label?: string
   value?: string
@@ -43,6 +50,7 @@ type CaseCard = {
   location?: string
   coverImage?: SanityImage
   industry?: CategoryItem
+  tags?: ContentTagItem[]
   impactStats?: CaseStat[]
 }
 
@@ -55,14 +63,12 @@ type CasesLandingData = {
     image?: SanityImage
     stats?: CaseStat[]
   }
-  industries?: CategoryItem[]
+  tagFilters?: ContentTagItem[]
 }
 
 type CasesPageProps = {
   searchParams: Promise<Record<string, QueryParamValue>>
 }
-
-const PAGE_SIZE = 6
 
 const casesLandingQuery = `*[_type == "casesPage"][0]{
   seo,
@@ -79,24 +85,18 @@ const casesLandingQuery = `*[_type == "casesPage"][0]{
       value
     }
   },
-  industries[]->{
+  tagFilters[]->{
     _id,
     title,
     slug{current}
   }
 }`
 
-const casesCountQuery = `count(*[
-  _type == "caseStudy"
-  && defined(slug.current)
-  && ($industry == "" || industry->slug.current == $industry)
-])`
-
 const casesListQuery = `*[
   _type == "caseStudy"
   && defined(slug.current)
-  && ($industry == "" || industry->slug.current == $industry)
-] | order(_createdAt desc)[$start...$end]{
+  && ($tag == "" || $tag in tags[]->slug.current)
+] | order(_createdAt desc){
   _id,
   title,
   slug{current},
@@ -111,13 +111,18 @@ const casesListQuery = `*[
     title,
     slug{current}
   },
+  tags[]->{
+    _id,
+    title,
+    slug{current}
+  },
   impactStats[]{
     label,
     value
   }
 }`
 
-const allCategoriesQuery = `*[_type == "category"] | order(title asc){
+const allTagsQuery = `*[_type == "contentTag"] | order(title asc){
   _id,
   title,
   slug{current}
@@ -150,9 +155,9 @@ function toImageSrc(image?: SanityImage, width = 1200) {
   }
 }
 
-function buildHref({ industry, page }: { industry?: string; page?: number }) {
+function buildHref({ tag, page }: { tag?: string; page?: number }) {
   const params = new URLSearchParams()
-  if (industry) params.set('industry', industry)
+  if (tag) params.set('tag', tag)
   if (page && page > 1) params.set('page', String(page))
   const query = params.toString()
   return query ? `/cases?${query}` : '/cases'
@@ -173,23 +178,18 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function CasesPage({ searchParams }: CasesPageProps) {
   const params = await searchParams
-  const industry = firstParam(params.industry)?.trim() || ''
-  const requestedPage = parsePositiveInt(firstParam(params.page), 1)
+  const tag = firstParam(params.tag)?.trim() || ''
+  const initialPage = parsePositiveInt(firstParam(params.page), 1)
 
   const landing = await client.fetch<CasesLandingData | null>(casesLandingQuery)
-  const total = await client.fetch<number>(casesCountQuery, { industry })
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
-  const currentPage = Math.min(requestedPage, totalPages)
-  const start = (currentPage - 1) * PAGE_SIZE
-  const end = start + PAGE_SIZE
 
-  const [cases, fallbackIndustries] = await Promise.all([
-    client.fetch<CaseCard[]>(casesListQuery, { industry, start, end }),
-    client.fetch<CategoryItem[]>(allCategoriesQuery),
+  const [cases, fallbackTags] = await Promise.all([
+    client.fetch<CaseCard[]>(casesListQuery, { tag }),
+    client.fetch<ContentTagItem[]>(allTagsQuery),
   ])
 
-  const configuredIndustries = landing?.industries?.filter((item) => item?.slug?.current) ?? []
-  const industries = configuredIndustries.length > 0 ? configuredIndustries : fallbackIndustries
+  const configuredTags = landing?.tagFilters?.filter((item) => item?.slug?.current) ?? []
+  const tags = configuredTags.length > 0 ? configuredTags : fallbackTags
   const heroImageSrc = toImageSrc(landing?.hero?.image, 1800)
   const heroBadge = landing?.hero?.badge?.trim()
   const heroTitle = landing?.hero?.title?.trim()
@@ -197,6 +197,21 @@ export default async function CasesPage({ searchParams }: CasesPageProps) {
     landing?.hero?.subtitle?.trim() ||
     'Discover how industrial partners improve throughput and efficiency with real deployments.'
   const heroStats = landing?.hero?.stats ?? []
+  const caseItems: LandingCardItem[] = cases.map((item) => {
+    const slug = item.slug?.current?.trim()
+
+    return {
+      id: item._id,
+      href: slug ? `/cases/${slug}` : '/cases',
+      title: item.title?.trim() || 'Case Study',
+      description:
+        item.excerpt?.trim() || 'Detailed case study content is available in the full project report.',
+      imageSrc: toImageSrc(item.coverImage, 900),
+      imageAlt: item.coverImage?.alt || item.title || 'Case cover',
+      tag: item.tags?.[0]?.title?.trim() || item.industry?.title?.trim() || 'Case Study',
+      metaText: item.location?.trim(),
+    }
+  })
 
   return (
     <main className="bg-[#fcfdfd] text-slate-900">
@@ -249,91 +264,17 @@ export default async function CasesPage({ searchParams }: CasesPageProps) {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {cases.length === 0 ? (
             <div className="rounded-lg border border-dashed border-slate-300 bg-white p-16 text-center text-slate-500">
-              No case studies found for current industry filter.
+              No case studies found for the current tag.
             </div>
           ) : (
-            <div className="mb-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-              {cases.map((item) => {
-                const cover = toImageSrc(item.coverImage, 900)
-                const caseHref = item.slug?.current ? `/cases/${item.slug.current}` : '#'
-                const caseTag = item.industry?.title || 'Case Study'
-                return (
-                  <article key={item._id} className="premium-card group overflow-hidden">
-                    <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
-                      {cover ? (
-                        <Image
-                          src={cover}
-                          alt={item.coverImage?.alt || item.title || 'Case cover'}
-                          fill
-                          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                          className="object-cover transition-transform duration-700 group-hover:scale-105"
-                        />
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-slate-300">
-                          <Icon icon="image" className="h-10 w-10" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-7">
-                      <div className="mb-4 flex justify-center">
-                        <div
-                          className="inline-flex max-w-full items-center gap-2 whitespace-nowrap rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-[13px] font-semibold leading-none text-orange-600 shadow-[0_8px_24px_rgba(249,115,22,0.08)]"
-                          title={caseTag}
-                        >
-                          <span className="h-2 w-2 shrink-0 rounded-full bg-orange-400" />
-                          <span className="block max-w-[180px] truncate">{caseTag}</span>
-                        </div>
-                      </div>
-                      {item.location ? (
-                        <div className="mb-4 flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">
-                          <Icon icon="location" className="h-4 w-4 shrink-0" />
-                          <span className="truncate">{item.location}</span>
-                        </div>
-                      ) : null}
-                      {!!item.impactStats?.length && (
-                        <div className="mb-4 flex flex-wrap items-center justify-center gap-2">
-                          {item.impactStats.slice(0, 2).map((stat, idx) => (
-                            <span
-                              key={`${stat.label}-${idx}`}
-                              className="rounded-lg bg-orange-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-orange-600"
-                            >
-                              {stat.value || stat.label}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                      <h3 className="mb-3 text-xl font-display font-black leading-tight text-slate-900 transition-colors group-hover:text-orange-600">
-                        {item.title}
-                      </h3>
-                      <p className="mb-6 line-clamp-3 text-sm font-light leading-relaxed text-slate-500">
-                        {item.excerpt || 'Detailed case study content is available in the full project report.'}
-                      </p>
-                      <Link
-                        href={caseHref}
-                        className="flex w-full items-center justify-center rounded-lg bg-slate-50 py-3 text-[11px] font-black tracking-widest transition-all hover:bg-slate-800 hover:text-white"
-                      >
-                        View&nbsp; Details
-                      </Link>
-                    </div>
-                  </article>
-                )
-              })}
-            </div>
-          )}
-
-          {totalPages > 1 && (
-            <div className="mt-16 flex items-center justify-center gap-3">
-              {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
-                <Link
-                  key={pageNumber}
-                  href={buildHref({ industry, page: pageNumber })}
-                  className={`h-3 rounded-full transition-all ${
-                    pageNumber === currentPage ? 'w-8 bg-orange-500' : 'w-3 bg-slate-200 hover:bg-slate-300'
-                  }`}
-                  aria-label={`Go to page ${pageNumber}`}
-                />
-              ))}
-            </div>
+            <LandingCardPager
+              items={caseItems}
+              initialPage={initialPage}
+              pathname="/cases"
+              filterParamName="tag"
+              filterParamValue={tag}
+              emptyMessage="No case studies found for the current tag."
+            />
           )}
 
           <div className="mt-20 -mx-4 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:overflow-visible md:px-0">
@@ -341,21 +282,21 @@ export default async function CasesPage({ searchParams }: CasesPageProps) {
               <Link
                 href={buildHref({})}
                 className={`shrink-0 whitespace-nowrap rounded-md border-2 px-5 py-2.5 text-[11px] font-black tracking-widest transition-all md:px-6 ${
-                  industry
+                  tag
                     ? 'border-slate-200 text-slate-700 hover:border-slate-300'
                     : 'border-orange-500 bg-orange-500 text-white shadow-lg shadow-orange-500/25'
                 }`}
               >
-                All Industries
+                All Tags
               </Link>
-              {industries.map((item) => {
+              {tags.map((item) => {
                 const slug = item.slug?.current
                 if (!slug) return null
-                const active = slug === industry
+                const active = slug === tag
                 return (
                   <Link
                     key={item._id ?? slug}
-                    href={buildHref({ industry: slug })}
+                    href={buildHref({ tag: slug })}
                     className={`shrink-0 whitespace-nowrap rounded-md border-2 px-5 py-2.5 text-[11px] font-black tracking-widest transition-all md:px-6 ${
                       active
                         ? 'border-orange-500 bg-orange-500 text-white shadow-lg shadow-orange-500/25'

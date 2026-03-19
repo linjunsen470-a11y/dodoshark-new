@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { client, urlFor } from '@/app/lib/sanity'
+import LandingCardPager, { type LandingCardItem } from '@/components/ui/LandingCardPager'
 
 type QueryParamValue = string | string[] | undefined
 
@@ -53,8 +54,6 @@ type SolutionsPageProps = {
   searchParams: Promise<Record<string, QueryParamValue>>
 }
 
-const PAGE_SIZE = 8
-
 const solutionsLandingQuery = `*[_type == "solutionsPage"][0]{
   seo,
   hero{
@@ -73,17 +72,11 @@ const solutionsLandingQuery = `*[_type == "solutionsPage"][0]{
   }
 }`
 
-const solutionsCountQuery = `count(*[
-  _type == "solution"
-  && defined(slug.current)
-  && ($category == "" || category->slug.current == $category)
-])`
-
 const solutionsListQuery = `*[
   _type == "solution"
   && defined(slug.current)
   && ($category == "" || category->slug.current == $category)
-] | order(_createdAt desc)[$start...$end]{
+] | order(_createdAt desc){
   _id,
   title,
   slug{current},
@@ -162,17 +155,12 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function SolutionsPage({ searchParams }: SolutionsPageProps) {
   const params = await searchParams
   const category = firstParam(params.category)?.trim() || ''
-  const requestedPage = parsePositiveInt(firstParam(params.page), 1)
+  const initialPage = parsePositiveInt(firstParam(params.page), 1)
 
   const landing = await client.fetch<SolutionsLandingData | null>(solutionsLandingQuery)
-  const total = await client.fetch<number>(solutionsCountQuery, { category })
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
-  const currentPage = Math.min(requestedPage, totalPages)
-  const start = (currentPage - 1) * PAGE_SIZE
-  const end = start + PAGE_SIZE
 
   const [solutions, fallbackCategories] = await Promise.all([
-    client.fetch<SolutionCard[]>(solutionsListQuery, { category, start, end }),
+    client.fetch<SolutionCard[]>(solutionsListQuery, { category }),
     client.fetch<CategoryItem[]>(allCategoriesQuery),
   ])
 
@@ -183,6 +171,19 @@ export default async function SolutionsPage({ searchParams }: SolutionsPageProps
   const heroTitle = landing?.hero?.title?.trim()
   const heroSubtitle =
     landing?.hero?.subtitle?.trim() || 'Discover proven process flows for different materials and industries.'
+  const solutionItems: LandingCardItem[] = solutions.map((item) => {
+    const slug = item.slug?.current?.trim()
+
+    return {
+      id: item._id,
+      href: slug ? `/solutions/${slug}` : '/solutions',
+      title: item.title?.trim() || 'Solution',
+      description: item.summary?.trim() || 'High-efficiency and stable industrial process design.',
+      imageSrc: toImageSrc(item.heroImage, 900),
+      imageAlt: item.heroImage?.alt || item.title || 'Solution image',
+      tag: item.category?.title?.trim() || 'Solution',
+    }
+  })
 
   return (
     <main className="bg-[#fcfdfd] text-slate-900">
@@ -256,69 +257,14 @@ export default async function SolutionsPage({ searchParams }: SolutionsPageProps
               No solutions found for the current filter.
             </div>
           ) : (
-            <div className="mb-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-              {solutions.map((item) => {
-                const imageSrc = toImageSrc(item.heroImage, 900)
-                const href = item.slug?.current ? `/solutions/${item.slug.current}` : '#'
-                const solutionTag = item.category?.title || 'Solution'
-                return (
-                  <article key={item._id} className="premium-card overflow-hidden group">
-                    <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
-                      {imageSrc ? (
-                        <Image
-                          src={imageSrc}
-                          alt={item.heroImage?.alt || item.title || 'Solution image'}
-                          fill
-                          className="object-cover transition-transform duration-700 group-hover:scale-105"
-                        />
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-slate-300">
-                          <i className="fas fa-image text-3xl" aria-hidden />
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-7">
-                      <div className="mb-4 flex justify-center">
-                        <div
-                          className="inline-flex max-w-full items-center gap-2 whitespace-nowrap rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-[13px] font-semibold leading-none text-orange-600 shadow-[0_8px_24px_rgba(249,115,22,0.08)]"
-                          title={solutionTag}
-                        >
-                          <span className="h-2 w-2 shrink-0 rounded-full bg-orange-400" />
-                          <span className="block max-w-[180px] truncate">{solutionTag}</span>
-                        </div>
-                      </div>
-                      <h3 className="mb-3 text-xl font-display font-black leading-tight text-slate-900 transition-colors group-hover:text-orange-600">
-                        {item.title}
-                      </h3>
-                      <p className="mb-6 line-clamp-3 text-sm font-light leading-relaxed text-slate-500">
-                        {item.summary || 'High-efficiency and stable industrial process design.'}
-                      </p>
-                      <Link
-                        href={href}
-                        className="flex w-full items-center justify-center rounded-lg bg-slate-50 py-3 text-[11px] font-black tracking-widest transition-all hover:bg-slate-800 hover:text-white"
-                      >
-                        View&nbsp; Details
-                      </Link>
-                    </div>
-                  </article>
-                )
-              })}
-            </div>
-          )}
-
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-3">
-              {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
-                <Link
-                  key={pageNumber}
-                  href={buildHref({ category, page: pageNumber })}
-                  className={`h-3 rounded-full transition-all ${
-                    pageNumber === currentPage ? 'w-8 bg-orange-500' : 'w-3 bg-slate-200 hover:bg-slate-300'
-                  }`}
-                  aria-label={`Go to page ${pageNumber}`}
-                />
-              ))}
-            </div>
+            <LandingCardPager
+              items={solutionItems}
+              initialPage={initialPage}
+              pathname="/solutions"
+              filterParamName="category"
+              filterParamValue={category}
+              emptyMessage="No solutions found for the current filter."
+            />
           )}
         </div>
       </section>

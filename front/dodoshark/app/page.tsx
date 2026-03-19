@@ -8,6 +8,7 @@ import DeferredLiteYouTube from '@/components/home/DeferredLiteYouTube'
 import DeferredHomeBlogCarousel from '@/components/home/DeferredHomeBlogCarousel'
 import DeferredProjectCasesCarousel from '@/components/home/DeferredProjectCasesCarousel'
 import { type HeroCarouselImage } from '@/components/home/HeroCarousel'
+import ViewDetailsLink from '@/components/ui/ViewDetailsLink'
 
 type SanityImage = {
   asset?: {
@@ -311,18 +312,6 @@ function ArrowRightIcon({ className }: { className?: string }) {
   )
 }
 
-const cardInlineCtaClass =
-  'group inline-flex items-center gap-1 text-sm font-semibold text-center text-[#14b8a6] underline decoration-current underline-offset-4 transition-colors duration-200 hover:text-[#0d9488] focus-visible:outline-none focus-visible:text-[#0d9488]'
-
-function CardInlineCta({ href }: { href: string }) {
-  return (
-    <Link href={href} className={cardInlineCtaClass}>
-      View Details
-      <ArrowRightIcon className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5 group-focus-visible:translate-x-0.5" />
-    </Link>
-  )
-}
-
 function PlayIcon({ className }: { className?: string }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
@@ -352,7 +341,7 @@ function ProductCard({
         <h4 className="text-lg font-bold text-slate-900">{title}</h4>
         <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-500">{description}</p>
         <div className="mt-5 flex items-center justify-center">
-          <CardInlineCta href="/products" />
+          <ViewDetailsLink href="/products" />
         </div>
       </div>
     </article>
@@ -371,7 +360,7 @@ function SolutionCard({ title, description, image }: { title: string; descriptio
         </h4>
         <p className="mt-4 text-sm leading-6 text-slate-500">{description}</p>
         <div className="mt-5 flex items-center justify-center">
-          <CardInlineCta href="/solutions" />
+          <ViewDetailsLink href="/solutions" />
         </div>
       </div>
     </article>

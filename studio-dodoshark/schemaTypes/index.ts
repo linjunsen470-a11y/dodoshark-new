@@ -23,6 +23,7 @@ import showcaseBlock from './objects/pageBuilder/showcaseBlock'
 
 // Documents - Reference Libraries
 import category from './documents/category'
+import contentTag from './documents/contentTag'
 import productVariant from './documents/productVariant'
 import accessory from './documents/accessory'
 import author from './documents/author'
@@ -32,6 +33,7 @@ import product from './documents/product'
 import solution from './documents/solution'
 import caseStudy from './documents/caseStudy'
 import post from './documents/post'
+import vlogItem from './documents/vlogItem'
 
 // Singletons
 import homePage from './singletons/homePage'
@@ -69,6 +71,7 @@ export const schemaTypes = [
 
     // Reference Libraries
     category,
+    contentTag,
     productVariant,
     accessory,
     author,
@@ -78,6 +81,7 @@ export const schemaTypes = [
     solution,
     caseStudy,
     post,
+    vlogItem,
 
     // Singletons
     homePage,
