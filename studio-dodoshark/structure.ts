@@ -10,6 +10,7 @@ import {
   PlugIcon,
   TagIcon,
   UserIcon,
+  VideoIcon,
   WrenchIcon,
 } from '@sanity/icons'
 import {StructureResolver} from 'sanity/structure'
@@ -31,7 +32,7 @@ export const structure: StructureResolver = (S) =>
               S.documentTypeListItem('homePage').title('Home Page').icon(HomeIcon),
               S.documentTypeListItem('aboutPage').title('About Page').icon(UserIcon),
               S.documentTypeListItem('contactPage').title('Contact Page').icon(EnvelopeIcon),
-              S.documentTypeListItem('blogPage').title('Blog Listing Page').icon(DocumentTextIcon),
+              S.documentTypeListItem('blogPage').title('Vlog Listing Page').icon(VideoIcon),
               S.documentTypeListItem('solutionsPage').title('Solutions Listing Page').icon(BulbOutlineIcon),
               S.documentTypeListItem('casesPage').title('Case Studies Listing Page').icon(CaseIcon),
               S.documentTypeListItem('productPage').title('Products Listing Page').icon(PackageIcon),
@@ -46,7 +47,8 @@ export const structure: StructureResolver = (S) =>
             .id('dynamicContentList')
             .title('Collections')
             .items([
-              S.documentTypeListItem('post').title('Blog Posts').icon(DocumentTextIcon),
+              S.documentTypeListItem('vlogItem').title('Vlog Videos').icon(VideoIcon),
+              S.documentTypeListItem('post').title('Legacy Blog Posts').icon(DocumentTextIcon),
               S.documentTypeListItem('solution').title('Solutions').icon(BulbOutlineIcon),
               S.documentTypeListItem('caseStudy').title('Case Studies').icon(CaseIcon),
               S.documentTypeListItem('product').title('Products').icon(WrenchIcon),
@@ -62,6 +64,7 @@ export const structure: StructureResolver = (S) =>
             .title('Reference Library')
             .items([
               S.documentTypeListItem('category').title('Categories').icon(TagIcon),
+              S.documentTypeListItem('contentTag').title('Shared Tags').icon(TagIcon),
               S.documentTypeListItem('productVariant').title('Product Variants').icon(ControlsIcon),
               S.documentTypeListItem('accessory').title('Accessories').icon(PlugIcon),
               S.documentTypeListItem('author').title('Authors').icon(UserIcon),
