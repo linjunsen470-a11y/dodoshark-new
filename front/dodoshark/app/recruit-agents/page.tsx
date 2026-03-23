@@ -4,30 +4,63 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Recruit Agents | DoDoShark Machinery',
-  description: 'Join the DoDoShark global network. We are looking for passionate agents to help us empower agricultural and food processing productivity worldwide.',
+  description: 'Join the DoDoShark global network. We are looking for high-quality partners to share global industrial dividends and set new brand benchmarks.',
 }
 
-const BENEFITS = [
+const WHY_CHOOSE_US = [
   {
-    title: 'Brand Heritage',
-    description: 'Backed by 50 years of engineering excellence and a strong state-owned factory foundation transformed into a modern global brand.',
+    title: 'Continuous Innovation',
+    description: 'Our professional R&D team focuses on "differentiated product value," establishing unique competitive advantages in regional markets beyond low-price competition.',
     icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18" /></svg>
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0012 18.75c-1.03 0-1.9-.4-2.593-1.02l-.547-.548z" /></svg>
     )
   },
   {
-    title: 'Technical Edge',
-    description: 'Industry-leading machinery with high efficiency, 10-year core component warranties, and continuous R&D innovation.',
+    title: 'Superior Quality',
+    description: 'Combined cutting-edge technology with precision manufacturing. High satisfaction, low failure rates, and long service life across all processing scenarios.',
     icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12a7.5 7.5 0 0015 0m-15 0a7.5 7.5 0 1115 0m-15 0H3m16.5 0H21m-1.5 0H12m-8.457 3.077l1.41-.513m14.095-5.13l1.41-.513M5.106 17.785l1.15-.964m11.49-9.642l1.149-.964M7.501 19.795l.75-1.3m7.5-12.99l.75-1.3m-6.06 15.633l.126-1.495m1.448-11.83l.126-1.495m-5.31 12.975l-1.15-.964m11.49-9.642l-1.15-.964m-4.004 9.177l-1.41-.513M5.554 6.423l-1.41-.513" /></svg>
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
     )
   },
   {
-    title: 'Global Support',
-    description: 'Comprehensive marketing, technical training, and after-sales support to help you scale your business locally.',
+    title: 'Diverse Portfolio',
+    description: 'Full-category matrix from small crushers to large-scale equipment, covering agriculture, food, and chemicals with precise configuration coverage.',
     icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9s2.015-9 4.5-9m0 0a9.015 9.015 0 010 18" /></svg>
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
     )
+  },
+  {
+    title: 'Stable Supply',
+    description: 'Independent control from R&D to assembly. No chain-break risks, fast order response, and timely global delivery guaranteed.',
+    icon: (
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+    )
+  }
+]
+
+const SCOPE = [
+  { region: 'Africa', countries: ['Nigeria', 'Ghana', 'Benin', 'Kenya', 'Ethiopia', 'Senegal'], color: 'from-orange-500/10 to-transparent' },
+  { region: 'Southeast Asia', countries: ['Philippines', 'Indonesia', 'Thailand', 'Vietnam', 'Laos', 'Cambodia'], color: 'from-blue-500/10 to-transparent' },
+  { region: 'South America', countries: ['Brazil', 'Mexico', 'Argentina'], color: 'from-green-500/10 to-transparent' },
+  { region: 'Central Asia', countries: ['Kazakhstan', 'Pakistan', 'Uzbekistan'], color: 'from-purple-500/10 to-transparent' },
+]
+
+const SUPPORT = [
+  {
+    title: 'Product & Supply Chain',
+    items: ['Competitive pricing & flex ordering', 'Intelligent inventory management', 'Customized SKU for regional needs']
+  },
+  {
+    title: 'Brand & Marketing',
+    items: ['Unified VI & multi-lang materials', 'Global promotion resources', 'Localized marketing guidance']
+  },
+  {
+    title: 'Training & After-Sales',
+    items: ['24/7 dedicated technical support', 'Remote troubleshooting & spare parts', 'Master product selling points & setup']
+  },
+  {
+    title: 'Cooperation Model',
+    items: ['Exclusive & regional agency options', 'Transparent commission & incentives', 'Standardized sustainable agreements']
   }
 ]
 
@@ -50,94 +83,166 @@ export default function RecruitAgentsPage() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-          <h1 className="text-5xl md:text-7xl font-black text-white mb-6 leading-tight tracking-tight">
-            Grow with <br /> <span className="bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent">DoDoShark Machinery</span>
+          <h1 className="text-4xl md:text-6xl font-black text-white mb-6 leading-tight tracking-tight">
+            Partner with DoDoShark <br /> <span className="bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent">Explore Global Blue Oceans</span>
           </h1>
-          <p className="text-xl font-bold italic text-orange-300 mb-6 font-serif">
-            "Join the Global Network of Excellence"
+          <p className="text-xl font-bold italic text-orange-300 mb-8 font-serif">
+            —— Overseas Partner (Agent) Recruitment Plan
           </p>
-          <p className="text-lg text-slate-300 max-w-3xl mx-auto font-light leading-relaxed">
-            We are looking for strategic partners and agents worldwide. Leverage our 50 years of technical expertise and premium machinery to build a successful business in your region.
+          <p className="text-lg text-slate-300 max-w-4xl mx-auto font-light leading-relaxed">
+            In the wave of global manufacturing upgrades, premium mechanical equipment is the core competitiveness. DoDoShark invites you to seize regional market dividends and embark on a new journey of growth together.
           </p>
-          <div className="mt-10 flex flex-wrap justify-center gap-4">
-            <Link href="/contact" className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-full font-bold uppercase tracking-wider text-sm transition-colors shadow-lg shadow-orange-500/30">
-              Apply to be an Agent
+          <div className="mt-12">
+            <Link href="/contact" className="inline-block bg-orange-500 hover:bg-orange-600 text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest text-sm transition-all shadow-xl shadow-orange-500/30">
+              Apply Now
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Why Partner With Us */}
-      <section className="py-24 bg-white relative z-20 -mt-16 rounded-t-[3rem]">
+      {/* Why Choose Us */}
+      <section className="py-24 bg-white relative z-20 -mt-16 rounded-none md:rounded-t-[1rem]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tight">Why Partner <br /><span className="text-orange-500">With Us?</span></h2>
+          <div className="text-center mb-20">
+            <h2 className="text-3xl md:text-4xl font-black text-slate-900 uppercase tracking-tight">Choice is Greater Than <span className="text-orange-500">Effort</span></h2>
+            <div className="mt-4 h-1.5 w-24 bg-orange-500 mx-auto rounded-full" />
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {BENEFITS.map((benefit) => (
-              <div key={benefit.title} className="bg-slate-50 border border-slate-200 rounded-[2.5rem] p-10 hover:border-orange-500 transition-colors shadow-xl group">
-                <div className="w-14 h-14 bg-orange-500 text-white rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-orange-500/30 group-hover:scale-110 transition-transform">
-                  {benefit.icon}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {WHY_CHOOSE_US.map((item) => (
+              <div key={item.title} className="bg-slate-50 border border-slate-200 rounded-xl p-8 hover:border-orange-500 transition-all duration-300 shadow-xl group">
+                <div className="w-12 h-12 bg-slate-900 text-white rounded-xl flex items-center justify-center mb-6 shadow-lg group-hover:bg-orange-500 transition-colors">
+                  {item.icon}
                 </div>
-                <h3 className="text-2xl font-black uppercase tracking-tight mb-4 text-slate-900">{benefit.title}</h3>
-                <p className="text-slate-600 leading-relaxed font-light">{benefit.description}</p>
+                <h3 className="text-xl font-black uppercase tracking-tight mb-4 text-slate-900 leading-tight">{item.title}</h3>
+                <p className="text-slate-600 leading-relaxed font-light text-sm">{item.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Recruitment Details */}
-      <section className="py-24 bg-slate-900 text-white">
+      {/* Recruitment Scope */}
+      <section className="py-24 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-black uppercase tracking-tight mb-6">Our Recruitment <span className="text-orange-500">Criteria</span></h2>
-              <ul className="space-y-4">
-                {[
-                  'In-depth knowledge of local agricultural/food processing markets.',
-                  'Established network or capability to build one in your region.',
-                  'Commitment to high-quality service and customer satisfaction.',
-                  'Willingness to grow alongside a premium engineering brand.'
-                ].map((item, idx) => (
-                  <li key={idx} className="flex items-start gap-3">
-                    <svg className="w-6 h-6 text-orange-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    <span className="text-slate-300 font-light">{item}</span>
-                  </li>
+          <div className="flex flex-col lg:flex-row items-center gap-16">
+            <div className="w-full lg:w-1/2">
+              <h2 className="text-3xl font-black uppercase tracking-tight mb-6">Strategic Layout, <br /><span className="text-orange-500">Precise Recruitment</span></h2>
+              <p className="text-slate-600 font-light leading-relaxed mb-10 text-lg">
+                We are actively expanding our global presence, focusing on regions with high agricultural and industrial potential.
+              </p>
+              <div className="grid sm:grid-cols-2 gap-4">
+                {SCOPE.map((item) => (
+                  <div key={item.region} className={`p-6 rounded-xl border border-slate-200 bg-gradient-to-br ${item.color}`}>
+                    <h4 className="font-black uppercase tracking-tight text-slate-900 mb-3">{item.region}</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {item.countries.map(c => (
+                        <span key={c} className="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-white/50 px-2 py-0.5 rounded-full border border-slate-200">{c}</span>
+                      ))}
+                    </div>
+                  </div>
                 ))}
-              </ul>
-            </div>
-            <div className="relative aspect-video rounded-[2.5rem] overflow-hidden border border-slate-800">
-               <Image 
-                src="https://images.unsplash.com/photo-1454165833767-027ffea9e67a?w=800&q=80" 
-                alt="Business Meeting" 
-                fill 
-                className="object-cover opacity-60"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 flex items-center justify-center">
-                <div className="text-center p-8">
-                  <p className="text-2xl font-black uppercase mb-2">Build a Future</p>
-                  <p className="text-orange-400 font-bold italic">"Empowering Productivity, Together"</p>
-                </div>
               </div>
+            </div>
+            <div className="w-full lg:w-1/2 relative aspect-square md:aspect-video lg:aspect-square rounded-xl overflow-hidden shadow-2xl">
+              <Image 
+                src="https://images.unsplash.com/photo-1526772662000-3f88f10405ff?w=800&q=80" 
+                alt="Global Connection" 
+                fill 
+                className="object-cover"
+              />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Final CTA */}
+      {/* Requirements */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-black uppercase tracking-tight mb-4">One Mind, <span className="text-orange-500">One Journey</span></h2>
+          <p className="text-slate-500 font-light max-w-2xl mx-auto mb-16">Successful cooperation stems from shared philosophy and strength.</p>
+
+          <div className="grid md:grid-cols-3 gap-8 text-left">
+            <div className="bg-white border-t-4 border-orange-500 p-8 shadow-xl rounded-b-xl">
+              <h3 className="text-xl font-black mb-6 uppercase tracking-tight">Qualifications</h3>
+              <ul className="space-y-4 text-slate-600 font-light">
+                <li className="flex gap-3"><span className="text-orange-500 font-bold shrink-0">✓</span> Legal operating status & qualifications</li>
+                <li className="flex gap-3"><span className="text-orange-500 font-bold shrink-0">✓</span> Familiarity with local market & laws</li>
+                <li className="flex gap-3"><span className="text-orange-500 font-bold shrink-0">✓</span> Strong local customer resources</li>
+              </ul>
+            </div>
+            <div className="bg-white border-t-4 border-slate-900 p-8 shadow-xl rounded-b-xl">
+              <h3 className="text-xl font-black mb-6 uppercase tracking-tight">Capabilities</h3>
+              <ul className="space-y-4 text-slate-600 font-light">
+                <li className="flex gap-3"><span className="text-orange-500 font-bold shrink-0">✓</span> 3+ years mechanical sales experience</li>
+                <li className="flex gap-3"><span className="text-orange-500 font-bold shrink-0">✓</span> Professional tech & sales team</li>
+                <li className="flex gap-3"><span className="text-orange-500 font-bold shrink-0">✓</span> Full lifecycle service capability</li>
+              </ul>
+            </div>
+            <div className="bg-white border-t-4 border-orange-500 p-8 shadow-xl rounded-b-xl">
+              <h3 className="text-xl font-black mb-6 uppercase tracking-tight">Compliance</h3>
+              <ul className="space-y-4 text-slate-600 font-light">
+                <li className="flex gap-3"><span className="text-orange-500 font-bold shrink-0">✓</span> Adherence to market rules & integrity</li>
+                <li className="flex gap-3"><span className="text-orange-500 font-bold shrink-0">✓</span> Solid financial & credit standing</li>
+                <li className="flex gap-3"><span className="text-orange-500 font-bold shrink-0">✓</span> Adequate capital for operations</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Support System */}
+      <section className="py-24 bg-slate-900 text-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <svg className="w-full h-full" fill="currentColor" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points="0,100 100,0 100,100" /></svg>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-20">
+            <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tight">Your Success, <span className="text-orange-500">Our Promise</span></h2>
+            <p className="mt-4 text-slate-400 font-light">Empowering Partners, Achieving Shared Value.</p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {SUPPORT.map((s) => (
+              <div key={s.title} className="bg-white/5 border border-white/10 p-8 rounded-xl hover:bg-white/10 transition-colors">
+                <h3 className="text-lg font-black uppercase tracking-tight text-orange-500 mb-6">{s.title}</h3>
+                <ul className="space-y-4">
+                  {s.items.map((item, i) => (
+                    <li key={i} className="text-sm text-slate-300 font-light flex gap-3">
+                      <span className="w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-slate-900 rounded-[3rem] p-12 lg:p-16 text-white text-center shadow-2xl relative overflow-hidden border border-slate-800">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500 rounded-full blur-[100px] opacity-20 pointer-events-none" />
-            
-            <h2 className="text-3xl font-black text-orange-500 mb-4 uppercase tracking-widest text-xs">Ready to Start?</h2>
-            <h3 className="text-4xl md:text-5xl font-black mb-8 uppercase tracking-tight">Become a DoDoShark Agent</h3>
-            <p className="text-slate-300 mb-10 text-lg max-w-3xl mx-auto font-light leading-relaxed">
-              If you share our passion for excellence and engineering depth, we want to hear from you. Contact our global partnership team today.
+          <div className="bg-slate-50 border border-slate-200 rounded-[1rem] p-12 lg:p-16 text-center shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-80 h-80 bg-orange-500/10 rounded-full blur-[100px] pointer-events-none" />
+            <h2 className="text-3xl font-black mb-8 uppercase tracking-tight text-slate-900">Act Now and Share the Dividends</h2>
+            <p className="text-slate-600 mb-10 text-lg max-w-3xl mx-auto font-light leading-relaxed">
+              We believe that combining DoDoShark's excellent products with your localized advantages will create miracles. If you are ready to start a new chapter, contact us today.
             </p>
-            <Link href="/contact" className="inline-block bg-orange-500 text-white px-10 py-4 rounded-full font-black text-sm uppercase tracking-widest hover:bg-orange-600 transition-all shadow-xl shadow-orange-500/20">
-              Submit Inquiry
+            <div className="grid sm:grid-cols-3 gap-6 mb-12 max-w-3xl mx-auto">
+              <div>
+                <p className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-1">Company Name</p>
+                <div className="h-0.5 bg-slate-200 mb-4" />
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-1">Email</p>
+                <div className="h-0.5 bg-slate-200 mb-4" />
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-1">Phone</p>
+                <div className="h-0.5 bg-slate-200 mb-4" />
+              </div>
+            </div>
+            <Link href="/contact" className="inline-block bg-slate-900 hover:bg-orange-500 text-white px-10 py-4 rounded-full font-black text-sm uppercase tracking-widest transition-all shadow-xl shadow-slate-900/20">
+              Contact Us To Apply
             </Link>
           </div>
         </div>
