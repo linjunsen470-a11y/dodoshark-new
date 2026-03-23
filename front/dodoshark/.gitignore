@@ -55,3 +55,9 @@ next-env.d.ts
 
 #svg files
 !*.svg
+
+#build log
+*.log
+
+#text file
+*.txt
