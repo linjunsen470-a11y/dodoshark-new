@@ -18,16 +18,6 @@ function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }
   )
 }
 
-function PlaceholderImage({ text, className = "" }: { text?: string; className?: string }) {
-  return (
-    <div className={`flex items-center justify-center bg-slate-100 text-slate-400 ${className}`}>
-      <div className="text-center">
-        <i className="fas fa-image text-4xl mb-2 opacity-50" aria-hidden />
-        {text && <p className="text-sm font-medium">{text}</p>}
-      </div>
-    </div>
-  )
-}
 
 export default function CornMillingSolutionPage() {
   return (
@@ -58,7 +48,13 @@ export default function CornMillingSolutionPage() {
           </div>
           <div className="lg:w-1/2 w-full">
             <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-2xl border border-slate-700/50">
-              <PlaceholderImage text="Corn Production Line Banner" className="w-full h-full bg-slate-900" />
+              <Image
+                src="/assets/images/solutions/corn-milling/hero-banner.png"
+                alt="Dodoshark Corn Production Line"
+                fill
+                className="object-cover"
+                priority
+              />
             </div>
           </div>
         </div>
@@ -67,15 +63,15 @@ export default function CornMillingSolutionPage() {
       {/* 2. Core Advantages */}
       <section className="py-24 bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <SectionHeader 
-            title="Core Advantages" 
+          <SectionHeader
+            title="Core Advantages"
             subtitle="Six reasons why Dodoshark is the preferred choice for modern corn milling solutions."
           />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Low Cost */}
             <div className="premium-card p-8 rounded-2xl group border border-slate-100 hover:border-orange-100 transition-all bg-slate-50 hover:bg-white shadow-sm hover:shadow-xl hover:shadow-orange-500/5">
-              <div className="h-14 w-14 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center mb-6 text-2xl shadow-inner">
-                <i className="fas fa-piggy-bank" />
+              <div className="h-16 w-16 mb-6 relative">
+                <Image src="/assets/images/solutions/corn-milling/advantages/low-cost.png" alt="Low Cost" fill className="object-contain" />
               </div>
               <h3 className="text-xl font-display font-bold mb-3">Low Cost & High ROI</h3>
               <p className="text-slate-500 font-light leading-relaxed">
@@ -84,8 +80,8 @@ export default function CornMillingSolutionPage() {
             </div>
             {/* Clean Workshop */}
             <div className="premium-card p-8 rounded-2xl group border border-slate-100 hover:border-orange-100 transition-all bg-slate-50 hover:bg-white shadow-sm hover:shadow-xl hover:shadow-orange-500/5">
-              <div className="h-14 w-14 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center mb-6 text-2xl shadow-inner">
-                <i className="fas fa-leaf" />
+              <div className="h-16 w-16 mb-6 relative">
+                <Image src="/assets/images/solutions/corn-milling/advantages/clean.png" alt="Clean Workshop" fill className="object-contain" />
               </div>
               <h3 className="text-xl font-display font-bold mb-3">Clean Workshop</h3>
               <p className="text-slate-500 font-light leading-relaxed">
@@ -94,8 +90,8 @@ export default function CornMillingSolutionPage() {
             </div>
             {/* Quality */}
             <div className="premium-card p-8 rounded-2xl group border border-slate-100 hover:border-orange-100 transition-all bg-slate-50 hover:bg-white shadow-sm hover:shadow-xl hover:shadow-orange-500/5">
-              <div className="h-14 w-14 rounded-xl bg-yellow-100 text-yellow-600 flex items-center justify-center mb-6 text-2xl shadow-inner">
-                <i className="fas fa-award" />
+              <div className="h-16 w-16 mb-6 relative">
+                <Image src="/assets/images/solutions/corn-milling/advantages/quality.png" alt="Excellent Quality" fill className="object-contain" />
               </div>
               <h3 className="text-xl font-display font-bold mb-3">Excellent Flour Quality</h3>
               <p className="text-slate-500 font-light leading-relaxed">
@@ -104,8 +100,8 @@ export default function CornMillingSolutionPage() {
             </div>
             {/* Efficiency */}
             <div className="premium-card p-8 rounded-2xl group border border-slate-100 hover:border-orange-100 transition-all bg-slate-50 hover:bg-white shadow-sm hover:shadow-xl hover:shadow-orange-500/5">
-              <div className="h-14 w-14 rounded-xl bg-green-100 text-green-600 flex items-center justify-center mb-6 text-2xl shadow-inner">
-                <i className="fas fa-tachometer-alt" />
+              <div className="h-16 w-16 mb-6 relative">
+                <Image src="/assets/images/solutions/corn-milling/advantages/efficiency.png" alt="Efficiency" fill className="object-contain" />
               </div>
               <h3 className="text-xl font-display font-bold mb-3">Efficiency Improvement</h3>
               <p className="text-slate-500 font-light leading-relaxed">
@@ -114,8 +110,8 @@ export default function CornMillingSolutionPage() {
             </div>
             {/* Intelligent */}
             <div className="premium-card p-8 rounded-2xl group border border-slate-100 hover:border-orange-100 transition-all bg-slate-50 hover:bg-white shadow-sm hover:shadow-xl hover:shadow-orange-500/5">
-              <div className="h-14 w-14 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center mb-6 text-2xl shadow-inner">
-                <i className="fas fa-microchip" />
+              <div className="h-16 w-16 mb-6 relative">
+                <Image src="/assets/images/solutions/corn-milling/advantages/smart.png" alt="Intelligent" fill className="object-contain" />
               </div>
               <h3 className="text-xl font-display font-bold mb-3">Intelligent & Worry-Free</h3>
               <p className="text-slate-500 font-light leading-relaxed">
@@ -124,8 +120,8 @@ export default function CornMillingSolutionPage() {
             </div>
             {/* Guarantee */}
             <div className="premium-card p-8 rounded-2xl group border border-slate-100 hover:border-orange-100 transition-all bg-slate-50 hover:bg-white shadow-sm hover:shadow-xl hover:shadow-orange-500/5">
-              <div className="h-14 w-14 rounded-xl bg-red-100 text-red-600 flex items-center justify-center mb-6 text-2xl shadow-inner">
-                <i className="fas fa-shield-alt" />
+              <div className="h-16 w-16 mb-6 relative">
+                <Image src="/assets/images/solutions/corn-milling/advantages/guarantee.png" alt="Guarantee" fill className="object-contain" />
               </div>
               <h3 className="text-xl font-display font-bold mb-3">Long-Term Guarantee</h3>
               <p className="text-slate-500 font-light leading-relaxed">
@@ -142,7 +138,13 @@ export default function CornMillingSolutionPage() {
           <div className="flex flex-col lg:flex-row gap-16">
             <div className="lg:w-1/3">
               <h2 className="text-3xl font-display font-black leading-tight mb-6">Wide Applications of Raw Corn</h2>
-              <PlaceholderImage text="Corn Raw Material Image" className="w-full aspect-square rounded-2xl mb-6 shadow-md" />
+              <Image
+                src="/assets/images/solutions/corn-milling/corn-raw.jpg"
+                alt="Corn Raw Material"
+                width={800}
+                height={800}
+                className="w-full aspect-square rounded-2xl mb-6 shadow-md object-cover"
+              />
               <p className="text-slate-600 mb-6 font-light">
                 Corn is widely planted around the world. As an important grain raw material, it is widely used in:
               </p>
@@ -218,8 +220,10 @@ export default function CornMillingSolutionPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeader title="Industry Pain Points vs Dodoshark Solutions" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="rounded-xl border border-red-100 bg-red-50 p-6">
-              <div className="text-red-500 mb-4"><i className="fas fa-times-circle text-3xl" /></div>
+            <div className="rounded-xl border border-red-100 bg-red-50 p-6 flex flex-col">
+              <div className="relative w-full aspect-video rounded-lg overflow-hidden mb-4 shadow-sm">
+                <Image src="/assets/images/solutions/corn-milling/pain-points/dust-pollution.jpg" alt="Dust Pollution" fill className="object-cover" />
+              </div>
               <h4 className="font-bold text-slate-900 mb-2">Serious Dust Pollution</h4>
               <p className="text-sm text-slate-600 mb-3">Open design causing safety hazards and raw material waste (0.5%-2%).</p>
               <div className="pt-3 border-t border-red-200 mt-auto">
@@ -227,8 +231,10 @@ export default function CornMillingSolutionPage() {
                 <p className="text-sm mt-1">99.9% dust collection system</p>
               </div>
             </div>
-            <div className="rounded-xl border border-red-100 bg-red-50 p-6">
-              <div className="text-red-500 mb-4"><i className="fas fa-exclamation-triangle text-3xl" /></div>
+            <div className="rounded-xl border border-red-100 bg-red-50 p-6 flex flex-col">
+              <div className="relative w-full aspect-video rounded-lg overflow-hidden mb-4 shadow-sm">
+                <Image src="/assets/images/solutions/corn-milling/pain-points/unstable-performance.jpg" alt="Unstable Performance" fill className="object-cover" />
+              </div>
               <h4 className="font-bold text-slate-900 mb-2">Unstable Performance</h4>
               <p className="text-sm text-slate-600 mb-3">Low efficiency, uncontrollable fineness, high temperature causing nutrient loss.</p>
               <div className="pt-3 border-t border-red-200 mt-auto">
@@ -236,8 +242,10 @@ export default function CornMillingSolutionPage() {
                 <p className="text-sm mt-1">Precise mesh control & cooling</p>
               </div>
             </div>
-            <div className="rounded-xl border border-red-100 bg-red-50 p-6">
-              <div className="text-red-500 mb-4"><i className="fas fa-cogs text-3xl" /></div>
+            <div className="rounded-xl border border-red-100 bg-red-50 p-6 flex flex-col">
+              <div className="relative w-full aspect-video rounded-lg overflow-hidden mb-4 shadow-sm">
+                <Image src="/assets/images/solutions/corn-milling/pain-points/mismatched-systems.jpg" alt="Mismatched Systems" fill className="object-cover" />
+              </div>
               <h4 className="font-bold text-slate-900 mb-2">Mismatched Systems</h4>
               <p className="text-sm text-slate-600 mb-3">Piecing together different brands leads to bottlenecks and high maintenance.</p>
               <div className="pt-3 border-t border-red-200 mt-auto">
@@ -245,8 +253,10 @@ export default function CornMillingSolutionPage() {
                 <p className="text-sm mt-1">Integrated full-link design</p>
               </div>
             </div>
-            <div className="rounded-xl border border-red-100 bg-red-50 p-6">
-              <div className="text-red-500 mb-4"><i className="fas fa-user-times text-3xl" /></div>
+            <div className="rounded-xl border border-red-100 bg-red-50 p-6 flex flex-col">
+              <div className="relative w-full aspect-video rounded-lg overflow-hidden mb-4 shadow-sm">
+                <Image src="/assets/images/solutions/corn-milling/pain-points/low-intelligence.jpg" alt="Low Intelligence" fill className="object-cover" />
+              </div>
               <h4 className="font-bold text-slate-900 mb-2">Low Intelligence Level</h4>
               <p className="text-sm text-slate-600 mb-3">Relies purely on manual experience causing quality fluctuations.</p>
               <div className="pt-3 border-t border-red-200 mt-auto">
@@ -262,12 +272,12 @@ export default function CornMillingSolutionPage() {
       <section id="products" className="py-24 bg-slate-50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeader title="Recommended Product Selection" subtitle="A variety of milling principles to perfectly match your target fineness and output." />
-          
+
           <div className="space-y-16">
             {/* Product 1 */}
             <div className="bg-white rounded-3xl p-8 lg:p-12 shadow-sm border border-slate-100 flex flex-col lg:flex-row gap-12 items-center">
               <div className="lg:w-2/5">
-                <PlaceholderImage text="Roller Crusher Image" className="w-full aspect-square rounded-2xl" />
+                <Image src="/assets/images/solutions/corn-milling/products/roller-crusher.png" alt="Roller Crusher" width={600} height={600} className="w-full aspect-square rounded-2xl object-contain bg-slate-50 shadow-inner" />
               </div>
               <div className="lg:w-3/5">
                 <div className="text-sm font-bold text-orange-500 mb-2 tracking-widest uppercase">01 / Coarse Crushing</div>
@@ -279,7 +289,7 @@ export default function CornMillingSolutionPage() {
                   <div><strong className="text-slate-900 block">Material</strong> Iron Material</div>
                 </div>
                 <p className="text-slate-500 font-light leading-relaxed mb-6">
-                  <strong>Principle:</strong> Two pressure rollers with toothed surfaces rotate relative to each other, using shear, extrusion, and tearing force.<br/><br/>
+                  <strong>Principle:</strong> Two pressure rollers with toothed surfaces rotate relative to each other, using shear, extrusion, and tearing force.<br /><br />
                   <strong>Application:</strong> Mainly used for coarse crushing of corn as feed for livestock, improving starch digestion efficiency.
                 </p>
                 <Link href="/products/roller-crusher" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
@@ -291,7 +301,7 @@ export default function CornMillingSolutionPage() {
             {/* Product 2 */}
             <div className="bg-white rounded-3xl p-8 lg:p-12 shadow-sm border border-slate-100 flex flex-col lg:flex-row-reverse gap-12 items-center">
               <div className="lg:w-2/5">
-                <PlaceholderImage text="Hammer Mill Image" className="w-full aspect-square rounded-2xl" />
+                <Image src="/assets/images/solutions/corn-milling/products/hammer-mill.png" alt="Hammer Mill" width={600} height={600} className="w-full aspect-square rounded-2xl object-contain bg-slate-50 shadow-inner" />
               </div>
               <div className="lg:w-3/5">
                 <div className="text-sm font-bold text-orange-500 mb-2 tracking-widest uppercase">02 / Standard Milling</div>
@@ -303,7 +313,7 @@ export default function CornMillingSolutionPage() {
                   <div><strong className="text-slate-900 block">Material</strong> Iron / 304 Stainless Steel</div>
                 </div>
                 <p className="text-slate-500 font-light leading-relaxed mb-6">
-                  <strong>Principle:</strong> Uses kinetic energy from high-speed rotating hammer pieces to impact, shear, and friction the material.<br/><br/>
+                  <strong>Principle:</strong> Uses kinetic energy from high-speed rotating hammer pieces to impact, shear, and friction the material.<br /><br />
                   <strong>Application:</strong> Most widely used high-efficiency impact equipment in feed and grain processing.
                 </p>
                 <Link href="/products/hammer-mill" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
@@ -315,7 +325,7 @@ export default function CornMillingSolutionPage() {
             {/* Product 3 */}
             <div className="bg-white rounded-3xl p-8 lg:p-12 shadow-sm border border-slate-100 flex flex-col lg:flex-row gap-12 items-center">
               <div className="lg:w-2/5">
-                <PlaceholderImage text="Claw Mill Image" className="w-full aspect-square rounded-2xl" />
+                <Image src="/assets/images/solutions/corn-milling/products/claw-mill.png" alt="Claw Mill" width={600} height={600} className="w-full aspect-square rounded-2xl object-contain bg-slate-50 shadow-inner" />
               </div>
               <div className="lg:w-3/5">
                 <div className="text-sm font-bold text-orange-500 mb-2 tracking-widest uppercase">03 / Fine Milling</div>
@@ -327,7 +337,7 @@ export default function CornMillingSolutionPage() {
                   <div><strong className="text-slate-900 block">Material</strong> Cast Iron / 304 Stainless Steel</div>
                 </div>
                 <p className="text-slate-500 font-light leading-relaxed mb-6">
-                  <strong>Principle:</strong> Strong impact, shear, and grinding between rotating moving teeth and fixed teeth, discharged via screen mesh.<br/><br/>
+                  <strong>Principle:</strong> Strong impact, shear, and grinding between rotating moving teeth and fixed teeth, discharged via screen mesh.<br /><br />
                   <strong>Application:</strong> Wider application range and higher efficiency for processing fine powder than hammer mills.
                 </p>
                 <Link href="/products/claw-mill" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
@@ -339,7 +349,7 @@ export default function CornMillingSolutionPage() {
             {/* Product 4 */}
             <div className="bg-white rounded-3xl p-8 lg:p-12 shadow-sm border border-slate-100 flex flex-col lg:flex-row-reverse gap-12 items-center">
               <div className="lg:w-2/5">
-                <PlaceholderImage text="Ultrafine Mill Image" className="w-full aspect-square rounded-2xl" />
+                <Image src="/assets/images/solutions/corn-milling/products/ultrafine-mill.png" alt="Ultrafine Mill" width={600} height={600} className="w-full aspect-square rounded-2xl object-contain bg-slate-50 shadow-inner" />
               </div>
               <div className="lg:w-3/5">
                 <div className="text-sm font-bold text-orange-500 mb-2 tracking-widest uppercase">04 / Ultrafine Milling</div>
@@ -351,7 +361,7 @@ export default function CornMillingSolutionPage() {
                   <div><strong className="text-slate-900 block">Material</strong> Cast Iron / 304 Stainless Steel</div>
                 </div>
                 <p className="text-slate-500 font-light leading-relaxed mb-6">
-                  <strong>Principle:</strong> Built-in air classification system. Unqualified fine powder returns to the milling chamber for re-milling.<br/><br/>
+                  <strong>Principle:</strong> Built-in air classification system. Unqualified fine powder returns to the milling chamber for re-milling.<br /><br />
                   <strong>Application:</strong> High added-value ultrafine milling for chemical, pharmaceutical, food, and non-metallic minerals.
                 </p>
                 <Link href="/products/ultrafine-mill" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
@@ -371,9 +381,15 @@ export default function CornMillingSolutionPage() {
           <div className="mb-16 text-center">
             <h2 className="text-3xl font-display font-black leading-tight md:text-5xl mb-4">Technical System Overview</h2>
           </div>
-          
+
           <div className="mb-16">
-            <PlaceholderImage text="Corn Dust-Free Milling Process Flow Diagram" className="w-full h-96 rounded-2xl bg-slate-800" />
+            <Image
+              src="/assets/images/solutions/corn-milling/process-flow.png"
+              alt="Corn Dust-Free Milling Process Flow Diagram"
+              width={1400}
+              height={800}
+              className="w-full h-auto rounded-3xl shadow-2xl border border-white/10"
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -405,25 +421,33 @@ export default function CornMillingSolutionPage() {
       {/* 8 & 9. Choose Us & Cases */}
       <section className="py-24 bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          
+
           <div className="mb-24 grid grid-cols-1 md:grid-cols-4 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-slate-100">
-            <div className="p-4">
-              <i className="fas fa-boxes text-4xl text-orange-500 mb-4" />
+            <div className="p-4 flex flex-col items-center">
+              <div className="relative h-16 w-16 mb-4">
+                <Image src="/assets/images/solutions/corn-milling/cases/complete-products.png" alt="Complete Products" fill className="object-contain" />
+              </div>
               <h4 className="font-bold text-lg mb-2 text-slate-900">Complete Products</h4>
               <p className="text-sm text-slate-500">Match suitable models for optimal efficiency.</p>
             </div>
-            <div className="p-4">
-              <i className="fas fa-hand-holding-usd text-4xl text-orange-500 mb-4" />
+            <div className="p-4 flex flex-col items-center">
+              <div className="relative h-16 w-16 mb-4">
+                <Image src="/assets/images/solutions/corn-milling/cases/high-return.png" alt="High Return" fill className="object-contain" />
+              </div>
               <h4 className="font-bold text-lg mb-2 text-slate-900">High Return</h4>
               <p className="text-sm text-slate-500">Self-production ensures low costs and better price.</p>
             </div>
-            <div className="p-4">
-              <i className="fas fa-truck-loading text-4xl text-orange-500 mb-4" />
+            <div className="p-4 flex flex-col items-center">
+              <div className="relative h-16 w-16 mb-4">
+                <Image src="/assets/images/solutions/corn-milling/cases/full-link-delivery.png" alt="Full-Link Delivery" fill className="object-contain" />
+              </div>
               <h4 className="font-bold text-lg mb-2 text-slate-900">Full-Link Delivery</h4>
               <p className="text-sm text-slate-500">Design to installation handled seamlessly.</p>
             </div>
-            <div className="p-4">
-              <i className="fas fa-layer-group text-4xl text-orange-500 mb-4" />
+            <div className="p-4 flex flex-col items-center">
+              <div className="relative h-16 w-16 mb-4">
+                <Image src="/assets/images/solutions/corn-milling/cases/sustainable-upgrade.png" alt="Sustainable Upgrade" fill className="object-contain" />
+              </div>
               <h4 className="font-bold text-lg mb-2 text-slate-900">Sustainable Upgrade</h4>
               <p className="text-sm text-slate-500">Modular design expands with your business.</p>
             </div>
