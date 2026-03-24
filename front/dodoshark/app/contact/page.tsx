@@ -119,14 +119,22 @@ export default async function ContactPage() {
 
             <div className="grid lg:grid-cols-5 gap-16 relative z-10">
 
-              {/* Left Column: Socials & Intro */}
-              <div className="lg:col-span-2 space-y-10">
-                <div>
-                  <h2 className="text-3xl lg:text-4xl font-black mb-6 uppercase tracking-tight text-white">
-                    Let's Build <br /><span className="text-orange-500">Together</span>
+              {/* Left Column: Image */}
+              <div className="lg:col-span-2 relative h-full min-h-[450px] md:min-h-[600px] rounded-2xl overflow-hidden shadow-2xl border border-slate-800 group">
+                <Image
+                  src="/assets/images/showroom-1.jpg"
+                  alt="DoDoShark Showroom"
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  sizes="(max-width: 1024px) 100vw, 40vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent opacity-80" />
+                <div className="absolute bottom-8 left-8 right-8">
+                  <h2 className="text-2xl lg:text-3xl font-black text-white uppercase tracking-tight mb-3">
+                    Our <span className="text-orange-500">Showroom</span>
                   </h2>
-                  <p className="text-slate-300 font-light leading-relaxed text-lg">
-                    Whether you need a custom quotation, technical support, or want to schedule a factory video test across time zones, our engineering team is ready to assist you. Responses guaranteed within 24 hours.
+                  <p className="text-slate-200 text-sm font-light leading-relaxed">
+                    Visit our facility in Nanjing to see our high-precision machinery in action and discuss your production needs with our experts.
                   </p>
                 </div>
               </div>
