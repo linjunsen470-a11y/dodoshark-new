@@ -16,7 +16,7 @@ const PRODUCT_SYSTEMS = [
       <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>
     ),
     tags: ['Cast Iron Crushers', 'Roller Crushers', 'Rice Millers', 'Wheat Mills'],
-    image: 'https://images.unsplash.com/photo-1595914041725-b1e6cbcc29a5?w=800&q=80',
+    image: '/assets/images/about/dual-track-agri.jpg',
   },
   {
     title: 'Food Processing Machinery',
@@ -25,7 +25,7 @@ const PRODUCT_SYSTEMS = [
       <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M14.25 10.5V2.25M14.25 10.5c0 1.243-1.007 2.25-2.25 2.25s-2.25-1.007-2.25-2.25V2.25M14.25 10.5c1.243 0 2.25 1.007 2.25 2.25A2.25 2.25 0 0112 15a2.25 2.25 0 01-2.25-2.25A2.25 2.25 0 0112 12.75" /><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5v-15m15 15v-15" /></svg>
     ),
     tags: ['Stainless Crushers', 'Industrial Mixers', 'Dough Mixers', 'Juicers'],
-    image: 'https://images.unsplash.com/photo-1574347576572-c51ae7afadad?w=800&q=80',
+    image: '/assets/images/about/dual-track-food.jpg',
   }
 ]
 
@@ -35,42 +35,42 @@ const TIMELINE = [
     phase: 'State-Owned Heritage',
     title: 'A Foundation of Engineering',
     desc: 'Our predecessor was founded in 1970. Half a century of deep technical accumulation established a solid engineering foundation and robust manufacturing capabilities.',
-    img: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=600&q=80',
+    img: '/assets/images/about/history-1.jpg',
   },
   {
     year: '2019',
     phase: 'Brand Foundation',
     title: 'The DoDoShark Era Begins',
     desc: 'DoDoShark Machinery was officially established in the historical capital of Nanjing, locking its focus on empowering agricultural and food processing productivity.',
-    img: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80',
+    img: '/assets/images/about/history-2.jpg',
   },
   {
     year: '2020 - 2021',
     phase: 'Market Roots & Reputation',
     title: 'Iterative Excellence',
     desc: 'Leveraged deep technical strength to resolve dozens of common industry crusher issues. Gained a firm market foothold with new models featuring high crushing rates and extreme durability.',
-    img: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=600&q=80',
+    img: '/assets/images/about/history-3.jpg',
   },
   {
     year: '2022 - 2023',
     phase: 'Track Expansion',
     title: 'Dual-Track Business Model',
     desc: 'Extended beyond agricultural machinery into stainless steel food crushers and mixers, successfully forming the "Agriculture + Food" dual-track processing layout.',
-    img: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&q=80',
+    img: '/assets/images/about/history-4.jpg',
   },
   {
     year: '2024 - 2025',
     phase: 'Innovation & Lean Manufacturing',
     title: 'Smart Automation Upgrades',
     desc: 'Core products received hardcore upgrades: Intelligent Control + Energy Saving designs. Introduced lean production systems for dual upgrades in quality and efficiency.',
-    img: 'https://images.unsplash.com/photo-1581092335397-9583eb92d232?w=600&q=80',
+    img: '/assets/images/about/history-5.jpg',
   },
   {
     year: '2026+',
     phase: 'Brand Elevation & Future Outlook',
     title: 'Industry Solution Provider',
     desc: 'Evolving from an equipment supplier to a comprehensive industry solutions provider. Opening a new global chapter driven by technological depth and effect-based sales.',
-    img: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=80',
+    img: '/assets/images/about/history-6.jpg',
   },
 ]
 
@@ -79,17 +79,17 @@ export default function AboutPage() {
     <main className="bg-[#fcfdfd] text-slate-900 font-sans selection:bg-orange-100 selection:text-orange-900">
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-48 overflow-hidden bg-slate-900">
-        <div className="absolute inset-0 opacity-20">
+      <section className="relative pt-32 pb-48 overflow-hidden bg-slate-800">
+        <div className="absolute inset-0 opacity-30">
           <Image
             src="/assets/images/factory.jpg"
-            alt="DoDoShark Factory Assembly"
+            alt="DoDoShark Production Facility"
             fill
             sizes="100vw"
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-900 via-slate-900/80 to-slate-900" />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-800/90 via-slate-800/40 to-slate-800" />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
@@ -198,13 +198,28 @@ export default function AboutPage() {
 
       {/* Global Assets & Team (Stats) */}
       <section className="py-24 bg-orange-600 text-white relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <svg className="w-full h-full" fill="currentColor" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points="0,100 100,0 100,100" /></svg>
+        <div className="absolute inset-0 opacity-20">
+          <Image
+            src="/assets/images/about/global-layout.jpg"
+            alt="DoDoShark Global Layout"
+            fill
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-orange-600/60" />
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl font-black uppercase tracking-tight mb-6">High-End Talent & <br /> Global Layout</h2>
+              <p className="text-orange-500 bg-white/90 inline-block px-3 py-1 text-sm font-bold mb-4 rounded">Our Elite Engineering Team</p>
+              <div className="relative aspect-video rounded-xl overflow-hidden mb-6 border-4 border-white/20 shadow-2xl">
+                <Image
+                  src="/assets/images/about/team.jpg"
+                  alt="DoDoShark Elite Team"
+                  fill
+                  className="object-cover"
+                />
+              </div>
               <p className="text-orange-100 font-light leading-relaxed mb-6">
                 Integrating foundational physics, mechanical automation, and IT technology to produce intellectual property. We operate 3 major production bases in Shandong (Jinan, Liaocheng, Weifang) with advanced laser cutting and static pressure casting technologies.
               </p>
@@ -214,19 +229,19 @@ export default function AboutPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white/10 backdrop-blur border border-white/20 p-6 rounded-xl text-center">
+              <div className="bg-white/10 backdrop-blur border border-white/20 p-6 rounded-xl text-center hover:bg-white/20 transition-colors">
                 <div className="text-4xl font-black mb-2">10+</div>
                 <div className="text-xs uppercase tracking-widest text-orange-200">Senior Engineers</div>
               </div>
-              <div className="bg-white/10 backdrop-blur border border-white/20 p-6 rounded-xl text-center">
+              <div className="bg-white/10 backdrop-blur border border-white/20 p-6 rounded-xl text-center hover:bg-white/20 transition-colors">
                 <div className="text-4xl font-black mb-2">3</div>
                 <div className="text-xs uppercase tracking-widest text-orange-200">Production Bases</div>
               </div>
-              <div className="bg-white/10 backdrop-blur border border-white/20 p-6 rounded-xl text-center">
+              <div className="bg-white/10 backdrop-blur border border-white/20 p-6 rounded-xl text-center hover:bg-white/20 transition-colors">
                 <div className="text-4xl font-black mb-2">60+</div>
                 <div className="text-xs uppercase tracking-widest text-orange-200">Skilled Technicians</div>
               </div>
-              <div className="bg-white/10 backdrop-blur border border-white/20 p-6 rounded-xl text-center">
+              <div className="bg-white/10 backdrop-blur border border-white/20 p-6 rounded-xl text-center hover:bg-white/20 transition-colors">
                 <div className="text-4xl font-black mb-2">10+</div>
                 <div className="text-xs uppercase tracking-widest text-orange-200">Countries Served</div>
               </div>
@@ -302,19 +317,46 @@ export default function AboutPage() {
       {/* Value Proposition / CTA */}
       <section className="py-24 bg-white relative z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-slate-900 rounded-[1rem] p-12 lg:p-16 text-white text-center shadow-2xl relative overflow-hidden border border-slate-800">
+          <div className="bg-slate-900 rounded-[1rem] p-12 lg:p-16 text-white shadow-2xl relative overflow-hidden border border-slate-800">
+            <div className="absolute inset-0 opacity-30">
+              <Image
+                src="/assets/images/about/value-proposition.jpg"
+                alt="Value Proposition Background"
+                fill
+                className="object-cover"
+              />
+            </div>
             <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500 rounded-full blur-[100px] opacity-20 pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-slate-500 rounded-full blur-[100px] opacity-20 pointer-events-none" />
 
-            <h2 className="text-3xl font-black text-orange-500 mb-4 uppercase tracking-tight tracking-widest text-xs">Value Proposition</h2>
-            <h3 className="text-4xl md:text-5xl font-black mb-8 uppercase tracking-tight relative z-10 text-white">Partnerships Beyond Equipment</h3>
-            <p className="text-slate-300 mb-10 relative z-10 text-lg max-w-3xl mx-auto font-light leading-relaxed">
-              We have moved beyond simple equipment sales to an "Effect-based Sales" model, providing full life-cycle solutions from process planning to technical implementation. With an industry-leading <strong>10-year warranty on core components</strong>, we upgrade short-term cooperation into long-term strategic partnerships.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4 relative z-10">
-              <Link href="/contact" className="inline-block bg-orange-500 text-white px-10 py-4 rounded-full font-black text-sm uppercase tracking-widest hover:bg-orange-600 transition-all shadow-xl shadow-orange-500/20">
-                Connect With Us Today
-              </Link>
+            <div className="relative z-10 flex flex-col lg:flex-row items-center gap-12">
+              <div className="lg:w-7/12 text-center lg:text-left">
+                <h2 className="text-3xl font-black text-orange-500 mb-4 uppercase tracking-tight tracking-widest text-xs">Value Proposition</h2>
+                <h3 className="text-4xl md:text-5xl font-black mb-8 uppercase tracking-tight text-white">Partnerships Beyond Equipment</h3>
+                <p className="text-slate-300 mb-10 text-lg font-light leading-relaxed">
+                  We have moved beyond simple equipment sales to an "Effect-based Sales" model, providing full life-cycle solutions from process planning to technical implementation. With an industry-leading <strong>10-year warranty on core components</strong>, we upgrade short-term cooperation into long-term strategic partnerships.
+                </p>
+                <div className="flex flex-wrap justify-center lg:justify-start gap-4">
+                  <Link href="/contact" className="inline-block bg-orange-500 text-white px-10 py-4 rounded-full font-black text-sm uppercase tracking-widest hover:bg-orange-600 transition-all shadow-xl shadow-orange-500/20">
+                    Connect With Us Today
+                  </Link>
+                </div>
+              </div>
+              <div className="lg:w-5/12">
+                <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border-8 border-white/10 shadow-2xl group">
+                  <Image
+                    src="/assets/images/about/join-us.jpg"
+                    alt="Join DoDoShark Team"
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent" />
+                  <div className="absolute bottom-6 left-6 right-6">
+                    <p className="text-white font-black uppercase tracking-widest text-sm mb-2">Join Our Journey</p>
+                    <p className="text-slate-300 text-xs font-light">Become part of the global DoDoShark ecosystem.</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

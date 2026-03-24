@@ -193,9 +193,10 @@ export default async function SolutionsPage({ searchParams }: SolutionsPageProps
             src={heroImageSrc}
             alt={landing?.hero?.image?.alt || 'Solutions hero'}
             fill
-            className="object-cover opacity-20"
+            className="object-cover opacity-30"
           />
         )}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-800/90 via-slate-800/40 to-slate-800" />
         <div className="absolute inset-0 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:40px_40px] opacity-20" />
         <div className="relative z-10 mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
           {heroBadge && (

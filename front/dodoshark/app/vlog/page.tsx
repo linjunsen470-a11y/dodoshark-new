@@ -221,22 +221,23 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
 
   return (
     <main className="bg-[#fcfdfd] text-slate-900">
-      <section className="relative overflow-hidden border-b border-slate-100 bg-slate-50 pb-20 pt-32">
+      <section className="relative overflow-hidden bg-slate-800 pb-20 pt-32">
         {heroImageSrc && (
           <Image
             src={heroImageSrc}
             alt={landing?.hero?.image?.alt || 'Blog hero'}
             fill
             sizes="100vw"
-            className="object-cover opacity-10"
+            className="object-cover opacity-30"
           />
         )}
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-800/90 via-slate-800/40 to-slate-800" />
+        <div className="absolute inset-0 opacity-[0.05] pointer-events-none">
           <svg className="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
             <path
               d="M0,0 L100,0 L100,100 L0,100 Z"
               fill="none"
-              stroke="currentColor"
+              stroke="white"
               strokeWidth="0.1"
               strokeDasharray="1 2"
             />
@@ -249,7 +250,7 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
               <span>{heroBadge}</span>
             </div>
           )}
-          <h1 className="mb-8 text-5xl font-display font-black leading-tight tracking-tight text-slate-900 md:text-7xl">
+          <h1 className="mb-8 text-5xl font-display font-black leading-tight tracking-tight text-white md:text-7xl">
             {heroTitle ? (
               heroTitle
             ) : (
@@ -258,7 +259,7 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
               </>
             )}
           </h1>
-          <p className="mx-auto max-w-2xl text-xl font-light leading-relaxed text-slate-500">{heroSubtitle}</p>
+          <p className="mx-auto max-w-2xl text-xl font-light leading-relaxed text-slate-400">{heroSubtitle}</p>
         </div>
       </section>
 
