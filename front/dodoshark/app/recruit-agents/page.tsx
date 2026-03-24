@@ -67,27 +67,28 @@ const SUPPORT = [
 export default function RecruitAgentsPage() {
   return (
     <main className="bg-[#fcfdfd] text-slate-900 font-sans selection:bg-orange-100 selection:text-orange-900">
-      
+
       {/* Hero Section */}
-      <section className="relative pt-32 pb-48 overflow-hidden bg-slate-900">
-        <div className="absolute inset-0 opacity-20">
+      <section className="relative pt-32 pb-48 overflow-hidden bg-slate-800">
+        <div className="absolute inset-0 opacity-30">
           <Image
-            src="https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1600&q=80"
+            src="/assets/images/about/join-us.jpg"
             alt="DoDoShark Global Partnership"
             fill
             sizes="100vw"
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-900 via-slate-900/80 to-slate-900" />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-800/90 via-slate-800/40 to-slate-800" />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/80 via-slate-900/30 to-slate-900" />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           <h1 className="text-4xl md:text-6xl font-black text-white mb-6 leading-tight tracking-tight">
             Partner with DoDoShark <br /> <span className="bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent">Explore Global Blue Oceans</span>
           </h1>
-          <p className="text-xl font-bold italic text-orange-300 mb-8 font-serif">
-            —— Overseas Partner (Agent) Recruitment Plan
+          <p className="text-xl font-bold italic text-orange-400 mb-8 font-serif">
+            Overseas Partner (Agent) Recruitment Plan
           </p>
           <p className="text-lg text-slate-300 max-w-4xl mx-auto font-light leading-relaxed">
             In the wave of global manufacturing upgrades, premium mechanical equipment is the core competitiveness. DoDoShark invites you to seize regional market dividends and embark on a new journey of growth together.
@@ -144,10 +145,10 @@ export default function RecruitAgentsPage() {
               </div>
             </div>
             <div className="w-full lg:w-1/2 relative aspect-square md:aspect-video lg:aspect-square rounded-xl overflow-hidden shadow-2xl">
-              <Image 
-                src="https://images.unsplash.com/photo-1526772662000-3f88f10405ff?w=800&q=80" 
-                alt="Global Connection" 
-                fill 
+              <Image
+                src="/assets/images/about/global-layout.jpg"
+                alt="DoDoShark Global Layout"
+                fill
                 className="object-cover"
               />
             </div>
@@ -227,20 +228,7 @@ export default function RecruitAgentsPage() {
             <p className="text-slate-600 mb-10 text-lg max-w-3xl mx-auto font-light leading-relaxed">
               We believe that combining DoDoShark's excellent products with your localized advantages will create miracles. If you are ready to start a new chapter, contact us today.
             </p>
-            <div className="grid sm:grid-cols-3 gap-6 mb-12 max-w-3xl mx-auto">
-              <div>
-                <p className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-1">Company Name</p>
-                <div className="h-0.5 bg-slate-200 mb-4" />
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-1">Email</p>
-                <div className="h-0.5 bg-slate-200 mb-4" />
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-1">Phone</p>
-                <div className="h-0.5 bg-slate-200 mb-4" />
-              </div>
-            </div>
+
             <Link href="/contact" className="inline-block bg-slate-900 hover:bg-orange-500 text-white px-10 py-4 rounded-full font-black text-sm uppercase tracking-widest transition-all shadow-xl shadow-slate-900/20">
               Contact Us To Apply
             </Link>

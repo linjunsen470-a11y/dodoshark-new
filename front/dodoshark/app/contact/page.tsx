@@ -18,17 +18,17 @@ export default async function ContactPage() {
     <main className="bg-[#fcfdfd] text-slate-900 font-sans selection:bg-orange-100 selection:text-orange-900">
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-48 overflow-hidden bg-slate-900">
-        <div className="absolute inset-0 opacity-20">
+      <section className="relative pt-32 pb-48 overflow-hidden bg-slate-800">
+        <div className="absolute inset-0 opacity-30">
           <Image
-            src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1600&q=80"
-            alt="DoDoShark Factory"
+            src="/assets/images/about/contact-hero.jpg"
+            alt="DoDoShark Contact Center"
             fill
             sizes="100vw"
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-900 via-slate-900/80 to-slate-900" />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-800/90 via-slate-800/40 to-slate-800" />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
