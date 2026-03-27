@@ -15,6 +15,7 @@ type MetricItem = {
   unit?: string
   label?: string
   image?: {
+    alt?: string
     asset?: {
       _ref?: string
       _id?: string
@@ -65,7 +66,7 @@ export default function MetricsBlock({ block }: { block: MetricsBlockData }) {
                     {item.image?.asset ? (
                       <Image
                         src={urlFor(item.image).width(600).height(600).url()}
-                        alt={item.label || ''}
+                        alt={item.image.alt || item.label || ''}
                         width={144}
                         height={144}
                         className="w-full h-full object-cover"
