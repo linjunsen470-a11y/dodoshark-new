@@ -25,6 +25,7 @@ type LandingCardPagerProps = {
   filterParamName?: 'category' | 'industry' | 'tag'
   filterParamValue?: string
   emptyMessage: string
+  imageAspectClassName?: string
 }
 
 type ViewportMode = 'mobile' | 'tablet' | 'desktop'
@@ -104,6 +105,7 @@ export default function LandingCardPager({
   filterParamName,
   filterParamValue,
   emptyMessage,
+  imageAspectClassName = 'aspect-[4/3]',
 }: LandingCardPagerProps) {
   const router = useRouter()
   const [viewportMode, setViewportMode] = useState<ViewportMode>('desktop')
@@ -169,7 +171,7 @@ export default function LandingCardPager({
               <span className="sr-only">View details for {item.title}</span>
             </Link>
 
-            <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+            <div className={`relative overflow-hidden bg-slate-100 ${imageAspectClassName}`}>
               {item.imageSrc ? (
                 <Image
                   src={item.imageSrc}

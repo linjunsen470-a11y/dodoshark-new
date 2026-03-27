@@ -230,6 +230,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
               filterParamName="category"
               filterParamValue={category}
               emptyMessage="No products found for the current filter."
+              imageAspectClassName="aspect-square"
             />
           )}
         </div>
