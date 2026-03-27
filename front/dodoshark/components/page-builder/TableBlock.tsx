@@ -16,6 +16,31 @@ type TableValue = {
   rows?: TableRow[]
 }
 
+type MergeCellTag = 'th' | 'td'
+
+type ParsedMergeDirective =
+  | { kind: 'skip' }
+  | {
+      kind: 'cell'
+      tag: MergeCellTag
+      colSpan: number
+      rowSpan: number
+      content: string
+    }
+
+type MergeRenderCell = {
+  key: string
+  tag: MergeCellTag
+  colSpan: number
+  rowSpan: number
+  content: string
+}
+
+type MergeRenderRow = {
+  key: string
+  cells: MergeRenderCell[]
+}
+
 export type TableBlockData = {
   _type: 'tableBlock'
   _key?: string
@@ -49,6 +74,64 @@ function normalizeRows(rows: TableRow[]) {
 function extractRows(table?: TableValue | TableRow[]) {
   if (Array.isArray(table)) return table
   return table?.rows ?? []
+}
+
+function isMergeSyntaxCell(value: string | undefined) {
+  const trimmed = value?.trim() ?? ''
+  return /^\\(?:th|td)(?:\[[^\]]*\])?/i.test(trimmed) || /^\\skip$/i.test(trimmed)
+}
+
+function parsePositiveInteger(value: string | undefined) {
+  const parsed = Number.parseInt(value ?? '', 10)
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 1
+}
+
+function parseMergeDirective(value: string | undefined): ParsedMergeDirective {
+  const rawValue = value ?? ''
+  const trimmed = rawValue.trim()
+
+  if (/^\\skip$/i.test(trimmed)) {
+    return { kind: 'skip' }
+  }
+
+  const directiveMatch = trimmed.match(/^\\(th|td)(?:\[([^\]]*)\])?\s*/i)
+
+  if (!directiveMatch) {
+    return {
+      kind: 'cell',
+      tag: 'td',
+      colSpan: 1,
+      rowSpan: 1,
+      content: rawValue,
+    }
+  }
+
+  const [, rawTag, rawParams = ''] = directiveMatch
+  const params = rawParams
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+  const parsedParams = new Map<string, string>()
+
+  for (const param of params) {
+    const [key, paramValue] = param.split('=').map((entry) => entry.trim())
+    if (!key || !paramValue) continue
+    parsedParams.set(key.toLowerCase(), paramValue)
+  }
+
+  return {
+    kind: 'cell',
+    tag: rawTag.toLowerCase() === 'th' ? 'th' : 'td',
+    colSpan: parsePositiveInteger(parsedParams.get('c')),
+    rowSpan: parsePositiveInteger(parsedParams.get('r')),
+    content: trimmed.slice(directiveMatch[0].length),
+  }
+}
+
+function warnInvalidMergeTable(message: string) {
+  if (process.env.NODE_ENV !== 'production') {
+    console.warn(`[TableBlock] ${message}`)
+  }
 }
 
 function decodeEscapedText(value: string) {
@@ -198,11 +281,73 @@ function renderCellContent(value: string | undefined, context: 'header' | 'body'
   )
 }
 
+function buildMergedRows(rows: TableRow[]) {
+  const occupied = new Set<string>()
+  const mergedRows: MergeRenderRow[] = []
+
+  for (let rowIndex = 0; rowIndex < rows.length; rowIndex += 1) {
+    const row = rows[rowIndex]
+    const sourceCells = row.cells ?? []
+    const mergedCells: MergeRenderCell[] = []
+
+    for (let cellIndex = 0; cellIndex < sourceCells.length; cellIndex += 1) {
+      const rawValue = sourceCells[cellIndex]
+      const positionKey = `${rowIndex}:${cellIndex}`
+      const parsed = parseMergeDirective(rawValue)
+
+      if (parsed.kind === 'skip') {
+        if (!occupied.has(positionKey)) {
+          warnInvalidMergeTable(
+            `Found \\skip at row ${rowIndex + 1}, column ${cellIndex + 1} without a covering span.`
+          )
+        }
+        continue
+      }
+
+      const isCoveredByPreviousSpan = occupied.has(positionKey)
+      const resolvedColSpan = isCoveredByPreviousSpan ? 1 : parsed.colSpan
+      const resolvedRowSpan = isCoveredByPreviousSpan ? 1 : parsed.rowSpan
+
+      if (isCoveredByPreviousSpan) {
+        warnInvalidMergeTable(
+          `Cell at row ${rowIndex + 1}, column ${cellIndex + 1} overlaps a previous merged span. Rendering it as a normal cell.`
+        )
+      }
+
+      for (let rowOffset = 0; rowOffset < resolvedRowSpan; rowOffset += 1) {
+        for (let colOffset = 0; colOffset < resolvedColSpan; colOffset += 1) {
+          if (rowOffset === 0 && colOffset === 0) continue
+          occupied.add(`${rowIndex + rowOffset}:${cellIndex + colOffset}`)
+        }
+      }
+
+      mergedCells.push({
+        key: row._key
+          ? `${row._key}-${cellIndex}`
+          : `${rowIndex}-${cellIndex}-${parsed.tag}-${resolvedColSpan}-${resolvedRowSpan}`,
+        tag: parsed.tag,
+        colSpan: resolvedColSpan,
+        rowSpan: resolvedRowSpan,
+        content: parsed.content,
+      })
+    }
+
+    mergedRows.push({
+      key: row._key ?? `merged-row-${rowIndex}`,
+      cells: mergedCells,
+    })
+  }
+
+  return mergedRows
+}
+
 export default function TableBlock({ block }: { block: TableBlockData }) {
   const variant = block.backgroundVariant ?? 'lightGray'
   const theme = getSharedBackgroundTheme(variant)
   const sourceRows = extractRows(block.table).filter((row) => (row.cells?.length ?? 0) > 0)
+  const usesMergeSyntax = sourceRows.some((row) => (row.cells ?? []).some((cell) => isMergeSyntaxCell(cell)))
   const { rows } = normalizeRows(sourceRows)
+  const mergedRows = usesMergeSyntax ? buildMergedRows(sourceRows) : []
   const hasHeader = Boolean(block.hasHeaderRow) && rows.length > 0
   const headerCells = hasHeader ? rows[0] : []
   const bodyRows = hasHeader ? rows.slice(1) : rows
@@ -234,7 +379,7 @@ export default function TableBlock({ block }: { block: TableBlockData }) {
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full border-collapse">
-                {hasHeader && (
+                {!usesMergeSyntax && hasHeader && (
                   <thead className="bg-sky-300 text-black">
                     <tr>
                       {headerCells.map((cell, idx) => (
@@ -252,23 +397,50 @@ export default function TableBlock({ block }: { block: TableBlockData }) {
                 )}
 
                 <tbody>
-                  {bodyRows.map((row, rowIdx) => (
-                    <tr
-                      key={rowIdx}
-                      className={`border-t ${rowDividerClass} ${rowHoverClass} transition-colors`}
-                    >
-                      {row.map((cell, cellIdx) => (
-                        <td
-                          key={`${rowIdx}-${cellIdx}`}
-                          className={`px-5 py-4 text-sm text-slate-600 text-center align-middle leading-relaxed ${
-                            cellIdx < row.length - 1 ? `border-r ${columnDividerClass}` : ''
-                          }`}
+                  {usesMergeSyntax
+                    ? mergedRows.map((row) => (
+                        <tr
+                          key={row.key}
+                          className={`border-t ${rowDividerClass} ${rowHoverClass} transition-colors`}
                         >
-                          {renderCellContent(cell, 'body')}
-                        </td>
+                          {row.cells.map((cell) => {
+                            const Tag = cell.tag
+                            const isHeaderCell = cell.tag === 'th'
+
+                            return (
+                              <Tag
+                                key={cell.key}
+                                colSpan={cell.colSpan}
+                                rowSpan={cell.rowSpan}
+                                className={
+                                  isHeaderCell
+                                    ? `border ${columnDividerClass} bg-sky-300 px-5 py-4 text-center align-middle text-xs font-black tracking-[0.16em] text-black md:text-sm`
+                                    : `border ${columnDividerClass} px-5 py-4 text-center align-middle text-sm leading-relaxed text-slate-600`
+                                }
+                              >
+                                {renderCellContent(cell.content, isHeaderCell ? 'header' : 'body')}
+                              </Tag>
+                            )
+                          })}
+                        </tr>
+                      ))
+                    : bodyRows.map((row, rowIdx) => (
+                        <tr
+                          key={rowIdx}
+                          className={`border-t ${rowDividerClass} ${rowHoverClass} transition-colors`}
+                        >
+                          {row.map((cell, cellIdx) => (
+                            <td
+                              key={`${rowIdx}-${cellIdx}`}
+                              className={`px-5 py-4 text-sm text-slate-600 text-center align-middle leading-relaxed ${
+                                cellIdx < row.length - 1 ? `border-r ${columnDividerClass}` : ''
+                              }`}
+                            >
+                              {renderCellContent(cell, 'body')}
+                            </td>
+                          ))}
+                        </tr>
                       ))}
-                    </tr>
-                  ))}
                 </tbody>
               </table>
             </div>
