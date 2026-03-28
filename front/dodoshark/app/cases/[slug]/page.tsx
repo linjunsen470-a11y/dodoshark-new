@@ -269,7 +269,7 @@ export default async function CaseDetailPage({ params }: CaseDetailPageProps) {
 
   return (
     <div className="bg-white text-slate-900">
-      <section className="relative overflow-hidden bg-slate-800 pb-40 pt-32 text-white">
+      <section className="relative overflow-hidden bg-slate-800 pb-24 pt-28 text-white">
         {coverImageSrc && (
           <div className="absolute inset-0 opacity-30">
             <Image
@@ -284,10 +284,10 @@ export default async function CaseDetailPage({ params }: CaseDetailPageProps) {
           </div>
         )}
         <div className="relative z-10 mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-          <div className="mb-8 inline-flex items-center justify-center rounded-md border border-white/20 bg-white/10 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] backdrop-blur-md">
-            customer cases
+          <div className="inline-flex items-center gap-2 rounded-full border border-orange-400/30 bg-orange-500/20 px-4 py-2 text-sm font-medium text-orange-300">
+            <span className="h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
+            <span>Customer Cases</span>
           </div>
-
           {caseStudy.title && (
             <h1 className="mb-8 text-4xl font-display font-black leading-tight tracking-tight md:text-6xl">
               {caseStudy.title}
