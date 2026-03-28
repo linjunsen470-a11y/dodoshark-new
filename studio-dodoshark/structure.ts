@@ -33,6 +33,15 @@ export const structure: StructureResolver = (S) =>
     .title('DoDoShark CMS')
     .items([
       S.listItem()
+        .id('globalSettings')
+        .title('Global Settings')
+        .icon(CogIcon)
+        .child(
+          S.document()
+            .schemaType('globalSettings')
+            .documentId('globalSettings'),
+        ),
+      S.listItem()
         .id('contentManagement')
         .title('Site Pages')
         .icon(HomeIcon)
@@ -55,6 +64,7 @@ export const structure: StructureResolver = (S) =>
               ),
             ),
         ),
+      S.divider(),
       S.listItem()
         .id('dynamicContent')
         .title('Collections')
@@ -85,7 +95,6 @@ export const structure: StructureResolver = (S) =>
               S.documentTypeListItem('productVariant').title('Product Variants').icon(ControlsIcon),
               S.documentTypeListItem('accessory').title('Accessories').icon(PlugIcon),
               S.documentTypeListItem('author').title('Authors').icon(UserIcon),
-              S.documentTypeListItem('globalSettings').title('Global Settings').icon(CogIcon),
             ]),
         ),
     ])
