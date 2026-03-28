@@ -2,16 +2,19 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 
+import dynamic from 'next/dynamic'
 import { client, urlFor } from '@/app/lib/sanity'
 import { buildPageMetadata } from '@/app/lib/seo'
 import { normalizeYouTubeEmbedUrl, resolveYouTubeThumbnailUrl } from '@/app/lib/video'
 import type { SeoMeta, SanityImage } from '@/app/lib/types/sanity'
-import DeferredHeroCarousel from '@/components/home/DeferredHeroCarousel'
-import DeferredHomeBlogCarousel from '@/components/home/DeferredHomeBlogCarousel'
-import DeferredProjectCasesCarousel from '@/components/home/DeferredProjectCasesCarousel'
+
+const DeferredHeroCarousel = dynamic(() => import('@/components/home/DeferredHeroCarousel'))
+const DeferredHomeBlogCarousel = dynamic(() => import('@/components/home/DeferredHomeBlogCarousel'))
+const DeferredProjectCasesCarousel = dynamic(() => import('@/components/home/DeferredProjectCasesCarousel'))
+const VideoPreviewTrigger = dynamic(() => import('@/components/ui/VideoPreviewTrigger'))
+
 import { type HeroCarouselImage } from '@/components/home/HeroCarousel'
 import HeroTitle from '@/components/ui/HeroTitle'
-import VideoPreviewTrigger from '@/components/ui/VideoPreviewTrigger'
 import ViewDetailsLink from '@/components/ui/ViewDetailsLink'
 
 type HomeSanityImage = SanityImage & {
@@ -879,7 +882,7 @@ export default async function HomePage() {
                   <div className="home-advantage-icon">
                     <Image src={item.image} alt={item.title} width={56} height={56} className="h-14 w-14 object-contain" />
                   </div>
-                  <h4 className="text-lg font-bold text-white">{item.title}</h4>
+                  <h3 className="text-lg font-bold text-white">{item.title}</h3>
                   <p className="mt-2 text-sm leading-7 text-white/60">{item.description}</p>
                 </article>
               ))}

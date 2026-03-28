@@ -213,11 +213,13 @@ function HeroIndicators({
           key={item._key ?? index}
           type="button"
           onClick={() => onSelect(index)}
-          className={`h-2.5 rounded-full transition-all ${
-            index === activeIndex ? 'w-7 bg-orange-400' : 'w-2.5 bg-black/35 hover:bg-black/60'
-          }`}
+          className="group flex h-10 w-10 items-center justify-center -mx-1 -my-1"
           aria-label={`Switch hero image ${index + 1}`}
-        />
+        >
+          <span className={`h-2.5 rounded-full transition-all ${
+            index === activeIndex ? 'w-7 bg-orange-400' : 'w-2.5 bg-black/35 group-hover:bg-black/60'
+          }`} />
+        </button>
       ))}
     </div>
   )

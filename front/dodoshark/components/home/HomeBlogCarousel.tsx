@@ -65,21 +65,21 @@ export default function HomeBlogCarousel({ items }: HomeBlogCarouselProps) {
       <button
         type="button"
         aria-label="Previous videos"
-        className="absolute left-2 top-[35%] z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-slate-900 shadow-xl transition hover:bg-orange-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-35 md:h-11 md:w-11 md:-left-3 xl:opacity-0 xl:group-hover/carousel:opacity-100"
+        className="absolute left-2 top-[35%] z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white text-slate-900 shadow-xl transition hover:bg-orange-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-35 md:-left-3 xl:opacity-0 xl:group-hover/carousel:opacity-100"
         disabled={safeCurrentIndex === 0}
         onClick={() => setCurrentIndex(Math.max(0, safeCurrentIndex - 1))}
       >
-        <ArrowLeft className="h-5 w-5" />
+        <ArrowLeft className="h-6 w-6" />
       </button>
 
       <button
         type="button"
         aria-label="Next videos"
-        className="absolute right-2 top-[35%] z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-slate-900 shadow-xl transition hover:bg-orange-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-35 md:h-11 md:w-11 md:-right-3 xl:opacity-0 xl:group-hover/carousel:opacity-100"
+        className="absolute right-2 top-[35%] z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white text-slate-900 shadow-xl transition hover:bg-orange-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-35 md:-right-3 xl:opacity-0 xl:group-hover/carousel:opacity-100"
         disabled={safeCurrentIndex >= maxIndex}
         onClick={() => setCurrentIndex(Math.min(maxIndex, safeCurrentIndex + 1))}
       >
-        <ArrowRight className="h-5 w-5" />
+        <ArrowRight className="h-6 w-6" />
       </button>
 
       <div className="overflow-hidden">
@@ -105,7 +105,7 @@ export default function HomeBlogCarousel({ items }: HomeBlogCarouselProps) {
                 imageSizes="(max-width: 767px) 100vw, (max-width: 1199px) 50vw, 25vw"
               >
                 <div className="border-t border-slate-200 bg-white p-4">
-                  <h4 className="line-clamp-2 text-sm font-bold text-slate-900">{item.title}</h4>
+                  <h3 className="line-clamp-2 text-sm font-bold text-slate-900">{item.title}</h3>
                   <p className="mt-2 text-xs text-slate-400">{item.metaText}</p>
                 </div>
               </VideoPreviewTrigger>

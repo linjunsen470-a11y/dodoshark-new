@@ -61,12 +61,12 @@ export default function MobileNavToggle({ navItems, ctaHref, ctaLabel }: MobileN
     <div className="xl:hidden">
       <button
         type="button"
-        className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#cfc7b7] bg-[#f5f5f0] text-[#1e3a5f] shadow-[0_10px_24px_-18px_rgba(15,23,42,0.3)] transition hover:border-[#bfb5a2] hover:bg-[#efede6]"
+        className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-[#cfc7b7] bg-[#f5f5f0] text-[#1e3a5f] shadow-[0_10px_24px_-18px_rgba(15,23,42,0.3)] transition hover:border-[#bfb5a2] hover:bg-[#efede6]"
         aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
         aria-expanded={mobileOpen}
         onClick={() => setMobileOpen((prev) => !prev)}
       >
-        {mobileOpen ? <CloseIcon className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
+        {mobileOpen ? <CloseIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
       </button>
 
       {mobileOpen ? (
@@ -87,7 +87,7 @@ export default function MobileNavToggle({ navItems, ctaHref, ctaLabel }: MobileN
                     key={`mobile-${item.label}-${item.href}`}
                     href={item.href}
                     aria-current={isActive ? 'page' : undefined}
-                    className={`rounded-xl px-4 py-3 text-sm font-semibold tracking-[0.05em] transition-[color,filter,background-color] duration-300 hover:bg-[#ece7dc] hover:text-[#f97316] hover:brightness-110 ${
+                    className={`rounded-xl px-4 py-3.5 text-sm font-semibold tracking-[0.05em] transition-[color,filter,background-color] duration-300 hover:bg-[#ece7dc] hover:text-[#f97316] hover:brightness-110 ${
                       isActive ? 'bg-[#efe4d2] text-[#b85b16]' : 'text-[#1e3a5f]'
                     }`}
                     onClick={() => setMobileOpen(false)}

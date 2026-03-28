@@ -12,7 +12,8 @@ import {
   type SharedBackgroundVariant,
 } from './backgroundTheme'
 import AccentTitle from './AccentTitle'
-import RichSectionMediaCarousel from './RichSectionMediaCarousel'
+import dynamic from 'next/dynamic'
+const RichSectionMediaCarousel = dynamic(() => import('./RichSectionMediaCarousel'))
 import {
   getValidRichSectionMediaItems,
   RichSectionMediaGrid,
