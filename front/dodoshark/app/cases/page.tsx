@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import Link from 'next/link'
 
 import { client } from '@/app/lib/sanity'
 import { firstParam, toImageSrc, type QueryParamValue } from '@/app/lib/sanity-utils'
@@ -8,12 +7,6 @@ import type { SeoMeta, SanityImage } from '@/app/lib/types/sanity'
 import Icon from '@/components/ui/Icon'
 import LandingCardPager, { type LandingCardItem } from '@/components/ui/LandingCardPager'
 import TagCloudPanel, { type TagCloudItem } from '@/components/ui/TagCloudPanel'
-
-type CategoryItem = {
-  _id?: string
-  title?: string
-  slug?: { current?: string }
-}
 
 type ContentTagItem = {
   _id?: string
@@ -33,7 +26,7 @@ type CaseCard = {
   excerpt?: string
   location?: string
   coverImage?: SanityImage
-  industry?: CategoryItem
+  clientLogo?: SanityImage
   tags?: ContentTagItem[]
   impactStats?: CaseStat[]
 }
@@ -88,12 +81,29 @@ const casesListQuery = `*[
   location,
   coverImage{
     alt,
-    asset
+    asset->{
+      _id,
+      url,
+      metadata{
+        dimensions{
+          width,
+          height
+        }
+      }
+    }
   },
-  industry->{
-    _id,
-    title,
-    slug{current}
+  clientLogo{
+    alt,
+    asset->{
+      _id,
+      url,
+      metadata{
+        dimensions{
+          width,
+          height
+        }
+      }
+    }
   },
   tags[]->{
     _id,
@@ -124,6 +134,21 @@ function buildHref({ tag, page }: { tag?: string; page?: number }) {
   if (page && page > 1) params.set('page', String(page))
   const query = params.toString()
   return query ? `/cases?${query}` : '/cases'
+}
+
+function getImageAspectRatio(image?: SanityImage, fallback = 2) {
+  const width = image?.asset?.metadata?.dimensions?.width
+  const height = image?.asset?.metadata?.dimensions?.height
+
+  if (!width || !height) return fallback
+
+  const ratio = width / height
+  return Number.isFinite(ratio) && ratio > 0 ? ratio : fallback
+}
+
+function getCoverImageAspectRatio(image?: SanityImage, fallback = 2) {
+  const ratio = getImageAspectRatio(image, fallback)
+  return Math.abs(ratio - fallback) < 0.01 ? fallback : ratio
 }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -170,9 +195,12 @@ export default async function CasesPage({ searchParams }: CasesPageProps) {
       title: item.title?.trim() || 'Case Study',
       description:
         item.excerpt?.trim() || 'Detailed case study content is available in the full project report.',
-      imageSrc: toImageSrc(item.coverImage, 900, { height: 450, fit: 'crop' }),
+      imageSrc: toImageSrc(item.coverImage, 900),
       imageAlt: item.coverImage?.alt || item.title || 'Case cover',
-      tag: item.tags?.[0]?.title?.trim() || item.industry?.title?.trim() || 'Case Study',
+      imageAspectRatio: getCoverImageAspectRatio(item.coverImage),
+      logoSrc: toImageSrc(item.clientLogo, 320),
+      logoAlt: item.clientLogo?.alt || item.title || 'Client logo',
+      tag: item.tags?.[0]?.title?.trim() || 'Case Study',
       metaText: item.location?.trim(),
     }
   })
