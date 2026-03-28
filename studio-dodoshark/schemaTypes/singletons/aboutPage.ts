@@ -19,6 +19,19 @@ function imageField(name: string, title: string, description: string) {
   })
 }
 
+function deprecatedField(config: Parameters<typeof defineField>[0]) {
+  return defineField({
+    ...config,
+    deprecated: {
+      reason:
+        'No longer consumed by the frontend. Kept temporarily to avoid data loss during cleanup.',
+    },
+    readOnly: true,
+    hidden: ({value}) => value === undefined,
+    initialValue: undefined,
+  })
+}
+
 export default defineType({
   name: 'aboutPage',
   title: 'About Page',
@@ -26,6 +39,7 @@ export default defineType({
   icon: InfoOutlineIcon,
   groups: [
     {name: 'hero', title: 'Hero', default: true},
+    {name: 'content', title: 'Editable Text'},
     {name: 'images', title: 'Images'},
     {name: 'seo', title: 'SEO'},
   ],
@@ -37,10 +51,55 @@ export default defineType({
       type: 'object',
       group: 'hero',
       fields: [
-        defineField({name: 'estYear', title: 'Established Year', type: 'string', description: 'Example: Est. 2006'}),
-        defineField({name: 'title', title: 'Title', type: 'string', description: 'Main hero title.', validation: (rule) => rule.required()}),
-        defineField({name: 'subtitle', title: 'Subtitle', type: 'text', rows: 3, description: 'Supporting intro copy.'}),
         imageField('image', 'Hero Image', 'Used in the page hero and Studio preview.'),
+        deprecatedField({
+          name: 'estYear',
+          title: 'Established Year (Deprecated)',
+          type: 'string',
+        }),
+        deprecatedField({
+          name: 'title',
+          title: 'Hero Title (Deprecated)',
+          type: 'string',
+        }),
+        deprecatedField({
+          name: 'subtitle',
+          title: 'Hero Subtitle (Deprecated)',
+          type: 'text',
+          rows: 3,
+        }),
+      ],
+    }),
+    defineField({
+      name: 'brandStoryVideoUrl',
+      title: 'Brand Story Video URL',
+      type: 'url',
+      group: 'content',
+      description: 'YouTube or Vimeo HTTPS URL used by the brand story video card.',
+      validation: (rule) =>
+        rule.uri({scheme: ['https']}).warning('Use a valid HTTPS video URL.'),
+    }),
+    defineField({
+      name: 'cta',
+      title: 'Bottom CTA',
+      type: 'object',
+      group: 'content',
+      fields: [
+        defineField({name: 'eyebrow', title: 'Eyebrow', type: 'string'}),
+        defineField({name: 'title', title: 'Title', type: 'string'}),
+        defineField({
+          name: 'description',
+          title: 'Description',
+          type: 'text',
+          rows: 4,
+        }),
+        defineField({name: 'buttonLabel', title: 'Button Label', type: 'string'}),
+        defineField({
+          name: 'buttonHref',
+          title: 'Button Link',
+          type: 'string',
+          description: 'Internal path like /contact or a full absolute URL.',
+        }),
       ],
     }),
     defineField({
@@ -119,14 +178,15 @@ export default defineType({
   ],
   preview: {
     select: {
-      title: 'hero.title',
-      subtitle: 'hero.subtitle',
+      ctaTitle: 'cta.title',
       media: 'hero.image',
+      videoUrl: 'brandStoryVideoUrl',
     },
-    prepare({title, subtitle, media}) {
+    prepare({ctaTitle, media, videoUrl}) {
       return {
-        title: title || 'About Page',
-        subtitle: subtitle || 'Hero content with 13 additional image slots',
+        title: 'About Page',
+        subtitle:
+          ctaTitle || (videoUrl ? 'Brand story video configured' : 'About page singleton'),
         media,
       }
     },

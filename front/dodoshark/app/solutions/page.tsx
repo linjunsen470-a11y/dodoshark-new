@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { client } from '@/app/lib/sanity'
+import { buildPageMetadata } from '@/app/lib/seo'
 import { firstParam, toImageSrc, type QueryParamValue } from '@/app/lib/sanity-utils'
 import type { SeoMeta, SanityImage } from '@/app/lib/types/sanity'
 import LandingCardPager, { type LandingCardItem } from '@/components/ui/LandingCardPager'
@@ -106,15 +107,11 @@ function buildHref({
 
 export async function generateMetadata(): Promise<Metadata> {
   const landing = await client.fetch<SolutionsLandingData | null>(solutionsLandingQuery)
-  const seo = landing?.seo
-
-  return {
-    title: seo?.title || 'Industrial Solutions | DoDoShark',
-    description: seo?.description || 'Explore material processing solutions across industries.',
-    keywords: seo?.keywords,
-    alternates: seo?.canonicalUrl ? { canonical: seo.canonicalUrl } : undefined,
-    robots: { index: false, follow: false },
-  }
+  return buildPageMetadata({
+    seo: landing?.seo,
+    fallbackTitle: 'Industrial Solutions | DoDoShark',
+    fallbackDescription: 'Explore material processing solutions across industries.',
+  })
 }
 
 export default async function SolutionsPage({ searchParams }: SolutionsPageProps) {

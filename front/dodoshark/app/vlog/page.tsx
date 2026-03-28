@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { client } from '@/app/lib/sanity'
+import { buildPageMetadata } from '@/app/lib/seo'
 import { firstParam, toImageSrc, type QueryParamValue } from '@/app/lib/sanity-utils'
 import type { SeoMeta, SanityImage } from '@/app/lib/types/sanity'
 import VlogVideoGrid, { type VlogVideoCardItem } from '@/components/vlog/VlogVideoGrid'
@@ -118,28 +119,17 @@ function buildHref({
   return query ? `/vlog?${query}` : '/vlog'
 }
 
-function formatDate(value?: string) {
-  if (!value) return ''
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return ''
-  return new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: '2-digit',
-    year: 'numeric',
-  }).format(date)
+function hasSanityImageAsset(image?: SanityImage) {
+  return Boolean(image?.asset?._ref || image?.asset?._id || image?.asset?.url)
 }
 
 export async function generateMetadata(): Promise<Metadata> {
   const landing = await client.fetch<VlogLandingData | null>(blogsLandingQuery)
-  const seo = landing?.seo
-
-  return {
-    title: seo?.title || 'Industrial Video Insights | DoDoShark',
-    description: seo?.description || 'Watch machine demos, process walkthroughs, and industrial video updates.',
-    keywords: seo?.keywords,
-    alternates: seo?.canonicalUrl ? { canonical: seo.canonicalUrl } : undefined,
-    robots: { index: false, follow: false },
-  }
+  return buildPageMetadata({
+    seo: landing?.seo,
+    fallbackTitle: 'Industrial Video Insights | DoDoShark',
+    fallbackDescription: 'Watch machine demos, process walkthroughs, and industrial video updates.',
+  })
 }
 
 export default async function BlogsPage({ searchParams }: BlogsPageProps) {
@@ -179,7 +169,7 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
     title: post.title?.trim() || 'Video',
     excerpt: post.excerpt?.trim() || 'Watch the full video for equipment demos and process highlights.',
     imageSrc: toImageSrc(post.coverImage, 900),
-    imageAlt: post.coverImage?.alt || post.title || 'Video cover',
+    imageAlt: hasSanityImageAsset(post.coverImage) ? post.coverImage?.alt || post.title || 'Video cover' : post.title || 'Video cover',
     youtubeUrl: post.youtubeUrl?.trim(),
     tagLabel: post.tags?.[0]?.title?.trim() || 'Video',
   }))

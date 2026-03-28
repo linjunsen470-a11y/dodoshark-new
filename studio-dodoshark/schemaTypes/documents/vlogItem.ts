@@ -71,7 +71,8 @@ export default defineType({
       title: 'Cover Image',
       type: 'image',
       group: 'basic',
-      description: 'Main card image for the vlog listing.',
+      description:
+        'Main card image for homepage featured videos and the /vlog listing. Recommended for portrait/Shorts videos. If left empty, the frontend falls back to the YouTube preview image.',
       options: {hotspot: true},
       fields: [{name: 'alt', type: 'string', title: 'Alt Text', validation: (Rule) => Rule.required()}],
     }),

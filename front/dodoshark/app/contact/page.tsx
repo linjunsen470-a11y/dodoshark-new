@@ -1,18 +1,79 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import Link from 'next/link'
+import { cache } from 'react'
 
 import { getGlobalContact } from '@/app/lib/global-contact'
+import { client } from '@/app/lib/sanity'
+import { buildPageMetadata } from '@/app/lib/seo'
+import { toImageSrc } from '@/app/lib/sanity-utils'
+import type { SanityImage, SeoMeta } from '@/app/lib/types/sanity'
 import LeadInquiryForm from '@/components/forms/LeadInquiryForm'
 
-export const metadata: Metadata = {
-  title: 'Contact Us | DoDoShark Machinery',
-  description: 'Contact DoDoShark for machine recommendations, quotations, and technical support. Headquartered in Nanjing, China with production bases in Shandong.',
+type ContactPageData = {
+  seo?: SeoMeta
+  hero?: {
+    title?: string
+    subtitle?: string
+    backgroundImage?: SanityImage
+  }
+  showroom?: {
+    title?: string
+    description?: string
+    image?: SanityImage
+  }
+  inquiryPanel?: {
+    title?: string
+    description?: string
+  }
 }
 
+const CONTACT_PAGE_QUERY = `coalesce(
+  *[_id == "contactPage"][0],
+  *[_type == "contactPage"][0]
+){
+  seo,
+  hero{
+    title,
+    subtitle,
+    backgroundImage{
+      alt,
+      asset
+    }
+  },
+  showroom{
+    title,
+    description,
+    image{
+      alt,
+      asset
+    }
+  },
+  inquiryPanel{
+    title,
+    description
+  }
+}`
+
+const getContactPageData = cache(async () => client.fetch<ContactPageData | null>(CONTACT_PAGE_QUERY))
+
 export default async function ContactPage() {
-  // We can still fetch global contact in case we want to merge dynamic data in the future
-  const contact = await getGlobalContact()
+  const [contact, pageData] = await Promise.all([getGlobalContact(), getContactPageData()])
+  const heroTitle = pageData?.hero?.title?.trim() || 'Get In Touch'
+  const heroSubtitle =
+    pageData?.hero?.subtitle?.trim() ||
+    'Reach out to our expert team for recommendations, quotations, and global technical support.'
+  const heroImageSrc = toImageSrc(pageData?.hero?.backgroundImage, 1800) || '/assets/images/about/contact-hero.jpg'
+  const heroImageAlt = pageData?.hero?.backgroundImage?.alt || 'DoDoShark Contact Center'
+  const showroomTitle = pageData?.showroom?.title?.trim() || 'Our Showroom'
+  const showroomDescription =
+    pageData?.showroom?.description?.trim() ||
+    'Visit our facility in Nanjing to see our high-precision machinery in action and discuss your production needs with our experts.'
+  const showroomImageSrc = toImageSrc(pageData?.showroom?.image, 1400) || '/assets/images/showroom-1.jpg'
+  const showroomImageAlt = pageData?.showroom?.image?.alt || 'DoDoShark Showroom'
+  const inquiryTitle = pageData?.inquiryPanel?.title?.trim() || 'Send Inquiry'
+  const inquiryDescription =
+    pageData?.inquiryPanel?.description?.trim() ||
+    'Leave your contact details and city. Our team will respond shortly.'
 
   return (
     <main className="bg-[#fcfdfd] text-slate-900 font-sans selection:bg-orange-100 selection:text-orange-900">
@@ -21,8 +82,8 @@ export default async function ContactPage() {
       <section className="relative pt-32 pb-48 overflow-hidden bg-slate-800">
         <div className="absolute inset-0 opacity-30">
           <Image
-            src="/assets/images/about/contact-hero.jpg"
-            alt="DoDoShark Contact Center"
+            src={heroImageSrc}
+            alt={heroImageAlt}
             fill
             sizes="100vw"
             className="object-cover"
@@ -33,10 +94,10 @@ export default async function ContactPage() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           <h1 className="font-display font-extrabold text-5xl md:text-7xl text-white mb-6 leading-[1.1] tracking-[-0.02em]">
-            Get In <span className="bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent">Touch</span>
+            {heroTitle}
           </h1>
           <p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto font-normal leading-relaxed">
-            Reach out to our expert team for recommendations, quotations, and global technical support.
+            {heroSubtitle}
           </p>
         </div>
       </section>
@@ -122,8 +183,8 @@ export default async function ContactPage() {
               {/* Left Column: Image */}
               <div className="lg:col-span-2 relative h-full min-h-[450px] md:min-h-[600px] rounded-2xl overflow-hidden shadow-2xl border border-slate-800 group">
                 <Image
-                  src="/assets/images/showroom-1.jpg"
-                  alt="DoDoShark Showroom"
+                  src={showroomImageSrc}
+                  alt={showroomImageAlt}
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                   sizes="(max-width: 1024px) 100vw, 40vw"
@@ -131,10 +192,10 @@ export default async function ContactPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent opacity-80" />
                 <div className="absolute bottom-8 left-8 right-8">
                   <h2 className="text-2xl lg:text-3xl font-display font-extrabold text-white uppercase tracking-tight mb-3">
-                    Our <span className="text-orange-500">Showroom</span>
+                    {showroomTitle}
                   </h2>
                   <p className="text-slate-200 text-sm font-light leading-relaxed">
-                    Visit our facility in Nanjing to see our high-precision machinery in action and discuss your production needs with our experts.
+                    {showroomDescription}
                   </p>
                 </div>
               </div>
@@ -142,9 +203,9 @@ export default async function ContactPage() {
               {/* Right Column: The Form */}
               <div className="lg:col-span-3">
                 <div className="bg-white rounded-xl p-8 md:p-10 shadow-2xl text-slate-900">
-                  <h3 className="text-2xl font-display font-extrabold text-slate-900 mb-2 uppercase tracking-tight">Send Inquiry</h3>
+                  <h3 className="text-2xl font-display font-extrabold text-slate-900 mb-2 uppercase tracking-tight">{inquiryTitle}</h3>
                   <p className="text-slate-500 text-sm mb-8">
-                    Leave your contact details and city. Our team will respond shortly.
+                    {inquiryDescription}
                   </p>
 
                   <LeadInquiryForm
@@ -162,4 +223,14 @@ export default async function ContactPage() {
       </section>
     </main>
   )
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const pageData = await getContactPageData()
+  return buildPageMetadata({
+    seo: pageData?.seo,
+    fallbackTitle: 'Contact Us | DoDoShark Machinery',
+    fallbackDescription:
+      'Contact DoDoShark for machine recommendations, quotations, and technical support. Headquartered in Nanjing, China with production bases in Shandong.',
+  })
 }

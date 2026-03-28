@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 
 import { client } from '@/app/lib/sanity'
+import { buildPageMetadata } from '@/app/lib/seo'
 import { firstParam, toImageSrc, type QueryParamValue } from '@/app/lib/sanity-utils'
 import type { SeoMeta, SanityImage } from '@/app/lib/types/sanity'
 import Icon from '@/components/ui/Icon'
@@ -161,15 +162,11 @@ const casesCardTagLabelClassName = 'max-w-[220px]'
 
 export async function generateMetadata(): Promise<Metadata> {
   const landing = await client.fetch<CasesLandingData | null>(casesLandingQuery)
-  const seo = landing?.seo
-
-  return {
-    title: seo?.title || 'Global Success Stories | DoDoShark',
-    description: seo?.description || 'Explore real industrial project case studies and outcomes.',
-    keywords: seo?.keywords,
-    alternates: seo?.canonicalUrl ? { canonical: seo.canonicalUrl } : undefined,
-    robots: { index: false, follow: false },
-  }
+  return buildPageMetadata({
+    seo: landing?.seo,
+    fallbackTitle: 'Global Success Stories | DoDoShark',
+    fallbackDescription: 'Explore real industrial project case studies and outcomes.',
+  })
 }
 
 export default async function CasesPage({ searchParams }: CasesPageProps) {

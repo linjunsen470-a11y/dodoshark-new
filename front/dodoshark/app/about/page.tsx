@@ -1,18 +1,13 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import type { ReactNode } from 'react'
+import { cache, type ReactNode } from 'react'
 
 import { client } from '@/app/lib/sanity'
+import { buildPageMetadata } from '@/app/lib/seo'
 import { toImageSrc } from '@/app/lib/sanity-utils'
-import type { SanityImage } from '@/app/lib/types/sanity'
+import type { SanityImage, SeoMeta } from '@/app/lib/types/sanity'
 import AboutVideoCard from '@/components/about/AboutVideoCard'
-
-export const metadata: Metadata = {
-  title: 'About Us | DoDoShark Machinery',
-  description:
-    "Rooted in China, Serving the World. Discover DoDoShark's 50-year engineering heritage and our commitment to high-performance agricultural and food processing machinery.",
-}
 
 type AboutPageImages = {
   brandStoryThumbnail?: SanityImage
@@ -31,10 +26,19 @@ type AboutPageImages = {
 }
 
 type AboutPageData = {
+  seo?: SeoMeta
   hero?: {
     image?: SanityImage
   }
   images?: AboutPageImages
+  brandStoryVideoUrl?: string
+  cta?: {
+    eyebrow?: string
+    title?: string
+    description?: string
+    buttonLabel?: string
+    buttonHref?: string
+  }
 }
 
 type ProductSystemImageKey =
@@ -71,6 +75,7 @@ const ABOUT_PAGE_QUERY = `coalesce(
   *[_id == "aboutPage"][0],
   *[_type == "aboutPage"][0]
 ){
+  seo,
   hero{
     image{
       alt,
@@ -130,8 +135,18 @@ const ABOUT_PAGE_QUERY = `coalesce(
       alt,
       asset
     }
+  },
+  brandStoryVideoUrl,
+  cta{
+    eyebrow,
+    title,
+    description,
+    buttonLabel,
+    buttonHref
   }
 }`
+
+const getAboutPageData = cache(async () => client.fetch<AboutPageData | null>(ABOUT_PAGE_QUERY))
 
 function resolvePageImage(
   image: SanityImage | undefined,
@@ -245,7 +260,7 @@ const TIMELINE: TimelineItem[] = [
 ]
 
 export default async function AboutPage() {
-  const pageData = await client.fetch<AboutPageData | null>(ABOUT_PAGE_QUERY)
+  const pageData = await getAboutPageData()
 
   const heroImage = resolvePageImage(
     pageData?.hero?.image,
@@ -259,6 +274,8 @@ export default async function AboutPage() {
     'DoDoShark Brand Story',
     900,
   )
+  const brandStoryVideoUrl =
+    pageData?.brandStoryVideoUrl?.trim() || 'https://www.youtube.com/shorts/C_JWSMn42eA'
   const globalLayoutImage = resolvePageImage(
     pageData?.images?.globalLayoutBackgroundImage,
     '/assets/images/about/global-layout.jpg',
@@ -283,6 +300,13 @@ export default async function AboutPage() {
     'Join DoDoShark Team',
     1200,
   )
+  const ctaEyebrow = pageData?.cta?.eyebrow?.trim() || 'Value Proposition'
+  const ctaTitle = pageData?.cta?.title?.trim() || 'Partnerships Beyond Equipment'
+  const ctaDescription =
+    pageData?.cta?.description?.trim() ||
+    'We have moved beyond simple equipment sales to an "Effect-based Sales" model, providing full life-cycle solutions from process planning to technical implementation. With an industry-leading 10-year warranty on core components, we upgrade short-term cooperation into long-term strategic partnerships.'
+  const ctaButtonLabel = pageData?.cta?.buttonLabel?.trim() || 'Connect With Us Today'
+  const ctaButtonHref = pageData?.cta?.buttonHref?.trim() || '/contact'
 
   return (
     <main className="bg-[#fcfdfd] text-slate-900 font-sans selection:bg-orange-100 selection:text-orange-900">
@@ -323,7 +347,7 @@ export default async function AboutPage() {
           <div className="flex flex-col items-start gap-12 lg:flex-row lg:gap-20">
             <div className="w-full lg:sticky lg:top-32 lg:w-5/12">
               <AboutVideoCard
-                youtubeUrl="https://www.youtube.com/shorts/C_JWSMn42eA"
+                youtubeUrl={brandStoryVideoUrl}
                 title="DoDoShark Brand Story"
                 thumbnailUrl={brandStoryThumbnail.src}
                 thumbnailAlt={brandStoryThumbnail.alt}
@@ -361,7 +385,7 @@ export default async function AboutPage() {
                   Technical <span className="text-orange-500">Strength</span>
                 </h2>
                 <p className="text-lg leading-relaxed font-light text-slate-600">
-                  Our products significantly outperform peers. For instance, our stainless steel crushers were the first to achieve <strong>150-mesh fineness at 1 ton/hour</strong>, supporting 12 hours continuous operation鈥攎ultiplying standard industry efficiency.
+                  Our products significantly outperform peers. For instance, our stainless steel crushers were the first to achieve <strong>150-mesh fineness at 1 ton/hour</strong>, supporting 12 hours continuous operation, multiplying standard industry efficiency.
                 </p>
               </div>
             </div>
@@ -598,20 +622,20 @@ export default async function AboutPage() {
             <div className="relative z-10 flex flex-col items-center gap-12 lg:flex-row">
               <div className="text-center lg:w-7/12 lg:text-left">
                 <h2 className="mb-4 font-display font-semibold uppercase tracking-[0.2em] text-orange-500 text-xs text-center lg:text-left">
-                  Value Proposition
+                  {ctaEyebrow}
                 </h2>
                 <h3 className="mb-8 font-display text-4xl font-extrabold uppercase tracking-tight text-white md:text-5xl">
-                  Partnerships Beyond Equipment
+                  {ctaTitle}
                 </h3>
                 <p className="mb-10 text-lg leading-relaxed font-light text-slate-300">
-                  We have moved beyond simple equipment sales to an "Effect-based Sales" model, providing full life-cycle solutions from process planning to technical implementation. With an industry-leading <strong>10-year warranty on core components</strong>, we upgrade short-term cooperation into long-term strategic partnerships.
+                  {ctaDescription}
                 </p>
                 <div className="flex flex-wrap justify-center gap-4 lg:justify-start">
                   <Link
-                    href="/contact"
+                    href={ctaButtonHref}
                     className="inline-block rounded-full bg-orange-500 px-10 py-4 text-sm font-black uppercase tracking-widest text-white shadow-xl shadow-orange-500/20 transition-all hover:bg-orange-600"
                   >
-                    Connect With Us Today
+                    {ctaButtonLabel}
                   </Link>
                 </div>
               </div>
@@ -640,4 +664,14 @@ export default async function AboutPage() {
       </section>
     </main>
   )
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const pageData = await getAboutPageData()
+  return buildPageMetadata({
+    seo: pageData?.seo,
+    fallbackTitle: 'About Us | DoDoShark Machinery',
+    fallbackDescription:
+      "Rooted in China, Serving the World. Discover DoDoShark's 50-year engineering heritage and our commitment to high-performance agricultural and food processing machinery.",
+  })
 }

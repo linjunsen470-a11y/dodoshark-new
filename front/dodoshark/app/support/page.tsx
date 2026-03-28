@@ -1,12 +1,30 @@
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import type { Metadata } from 'next'
+import { cache } from 'react'
 
 import { client } from '@/app/lib/sanity'
+import { buildPageMetadata } from '@/app/lib/seo'
 import { toImageSrc } from '@/app/lib/sanity-utils'
-import type { SanityImage } from '@/app/lib/types/sanity'
+import type { SanityImage, SeoMeta } from '@/app/lib/types/sanity'
 
 type SupportPageData = {
+  seo?: SeoMeta
+  hero?: {
+    eyebrow?: string
+    title?: string
+    description?: string
+  }
+  urgentAssistance?: {
+    title?: string
+    description?: string
+  }
+  cta?: {
+    title?: string
+    description?: string
+    buttonLabel?: string
+    buttonHref?: string
+  }
   images?: {
     heroBackground?: SanityImage
     preSalesStageImage?: SanityImage
@@ -20,6 +38,10 @@ const SUPPORT_PAGE_QUERY = `coalesce(
   *[_id == "supportPage"][0],
   *[_type == "supportPage"][0]
 ){
+  seo,
+  hero,
+  urgentAssistance,
+  cta,
   images{
     heroBackground{
       alt,
@@ -44,6 +66,8 @@ const SUPPORT_PAGE_QUERY = `coalesce(
   }
 }`
 
+const getSupportPageData = cache(async () => client.fetch<SupportPageData | null>(SUPPORT_PAGE_QUERY))
+
 function resolvePageImage(
   image: SanityImage | undefined,
   fallbackSrc: string,
@@ -56,20 +80,28 @@ function resolvePageImage(
   }
 }
 
-export const metadata: Metadata = {
-  title: 'Service & Support | DoDoShark Machinery',
-  description: 'We are more than just an equipment supplier—we are your lifelong partner in value co-creation. From tailored pre-sales solutions to a 3-year core warranty, we ensure your production efficiency.',
-}
-
 const SERVICE_STAGES = [
   {
     id: '01',
     phase: 'Pre-Sales',
     title: 'Solution Co-creation & Professional Selection',
-    description: 'Beyond selling equipment, we guarantee results. Through deep research into material properties, capacity requirements, and site conditions, we output precision analysis reports to anchor your efficiency targets.',
-    features: ['Full-Dimensional Deep Research', 'Customized Process Solutions', 'Free Trial Production & Optimization', 'Transparent Efficiency Modeling'],
+    description:
+      'Beyond selling equipment, we guarantee results. Through deep research into material properties, capacity requirements, and site conditions, we output precision analysis reports to anchor your efficiency targets.',
+    features: [
+      'Full-Dimensional Deep Research',
+      'Customized Process Solutions',
+      'Free Trial Production & Optimization',
+      'Transparent Efficiency Modeling',
+    ],
     icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+        />
+      </svg>
     ),
     imageKey: 'preSalesStageImage' as const,
     fallbackImageSrc: '/assets/images/about/support-hero.jpg',
@@ -78,10 +110,23 @@ const SERVICE_STAGES = [
     id: '02',
     phase: 'Mid-Sales',
     title: 'Precise Implementation & Efficiency Delivery',
-    description: 'A seamless transfer of knowledge and technology. All equipment undergoes 12-hour factory stress tests of core components and full-system assembly trails to ensure stability before arrival.',
-    features: ['12h Factory Performance Test', 'Professional Export Packaging', 'Technical Documentation Transfer', '30-Day Priority Response Support'],
+    description:
+      'A seamless transfer of knowledge and technology. All equipment undergoes 12-hour factory stress tests of core components and full-system assembly trails to ensure stability before arrival.',
+    features: [
+      '12h Factory Performance Test',
+      'Professional Export Packaging',
+      'Technical Documentation Transfer',
+      '30-Day Priority Response Support',
+    ],
     icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
+        />
+      </svg>
     ),
     imageKey: 'midSalesStageImage' as const,
     fallbackImageSrc: '/assets/images/about/dust-control.png',
@@ -90,18 +135,36 @@ const SERVICE_STAGES = [
     id: '03',
     phase: 'After-Sales',
     title: 'Lifelong Service & Continuous Optimization',
-    description: 'Beyond standard maintenance—we safeguard your full lifecycle efficiency. This includes remote guidance for technical challenges, 3-year core warranty, and annual reviews to identify upgrade potential.',
-    features: ['3-Year Core Component Warranty', 'Annual Efficiency Review & Upgrade', 'Ongoing Technical Empowerment', 'Rapid Maintenance Support'],
+    description:
+      'Beyond standard maintenance, we safeguard your full lifecycle efficiency. This includes remote guidance for technical challenges, 3-year core warranty, and annual reviews to identify upgrade potential.',
+    features: [
+      '3-Year Core Component Warranty',
+      'Annual Efficiency Review & Upgrade',
+      'Ongoing Technical Empowerment',
+      'Rapid Maintenance Support',
+    ],
     icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
     ),
     imageKey: 'afterSalesStageImage' as const,
     fallbackImageSrc: '/assets/images/about/join-us.jpg',
   },
 ]
 
+export async function generateMetadata(): Promise<Metadata> {
+  const pageData = await getSupportPageData()
+  return buildPageMetadata({
+    seo: pageData?.seo,
+    fallbackTitle: 'Service & Support | DoDoShark Machinery',
+    fallbackDescription:
+      'We are more than just an equipment supplier, we are your lifelong partner in value co-creation. From tailored pre-sales solutions to a 3-year core warranty, we ensure your production efficiency.',
+  })
+}
+
 export default async function SupportPage() {
-  const pageData = await client.fetch<SupportPageData | null>(SUPPORT_PAGE_QUERY)
+  const pageData = await getSupportPageData()
   const heroImage = resolvePageImage(
     pageData?.images?.heroBackground,
     '/assets/images/about/support-hero.jpg',
@@ -114,12 +177,26 @@ export default async function SupportPage() {
     'DoDoShark Global Support Team',
     1400,
   )
+  const heroEyebrow = pageData?.hero?.eyebrow?.trim() || 'World-Class Service Network'
+  const heroTitle = pageData?.hero?.title?.trim() || 'Service That Powers Results'
+  const heroDescription =
+    pageData?.hero?.description?.trim() ||
+    'We are not just an equipment supplier, but your lifelong partner in value co-creation. We deliver measurable, continuously optimized production results.'
+  const urgentAssistanceTitle =
+    pageData?.urgentAssistance?.title?.trim() || 'Need Urgent Assistance?'
+  const urgentAssistanceDescription =
+    pageData?.urgentAssistance?.description?.trim() ||
+    'Our global technical response team is on standby to help you resolve equipment issues, order spare parts, or schedule an efficiency audit.'
+  const ctaTitle = pageData?.cta?.title?.trim() || 'Ready to Optimize Your Value Partnership?'
+  const ctaDescription =
+    pageData?.cta?.description?.trim() ||
+    'Experience the DoDoShark difference with a partner that accompanies your growth from equipment service to full-lifecycle empowerment.'
+  const ctaButtonLabel = pageData?.cta?.buttonLabel?.trim() || 'Request Efficiency Audit'
+  const ctaButtonHref = pageData?.cta?.buttonHref?.trim() || '/contact'
 
   return (
     <main className="bg-[#fcfdfd] text-slate-900 font-sans selection:bg-orange-100 selection:text-orange-900">
-
-      {/* Hero Section */}
-      <section className="relative pt-24 pb-32 overflow-hidden bg-slate-800">
+      <section className="relative overflow-hidden bg-slate-800 pb-32 pt-24">
         <div className="absolute inset-0 z-0">
           <Image
             src={heroImage.src}
@@ -132,52 +209,58 @@ export default async function SupportPage() {
           <div className="absolute inset-0 bg-gradient-to-b from-slate-800/90 via-slate-800/40 to-slate-800" />
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-bold uppercase tracking-widest mb-6">
-              <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
-              <span>World-Class Service Network</span>
+            <div className="mb-6 inline-flex items-center space-x-2 rounded-full border border-orange-500/20 bg-orange-500/10 px-3 py-1 text-xs font-bold uppercase tracking-widest text-orange-400">
+              <span className="h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
+              <span>{heroEyebrow}</span>
             </div>
-            <h1 className="font-display font-extrabold text-5xl md:text-7xl text-white mb-8 leading-[1.1] tracking-[-0.02em]">
-              Service That <br />
-              <span className="bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent">Powers Results</span>
+            <h1 className="mb-8 font-display text-5xl font-extrabold leading-[1.1] tracking-[-0.02em] text-white md:text-7xl">
+              {heroTitle}
             </h1>
-            <p className="text-lg md:text-xl text-slate-300 font-normal leading-relaxed mb-10 border-l-2 border-orange-500/50 pl-6">
-              We are not just an equipment supplier, but your lifelong partner in value co-creation. We deliver measurable, continuously optimized production results.
+            <p className="mb-10 border-l-2 border-orange-500/50 pl-6 text-lg font-normal leading-relaxed text-slate-300 md:text-xl">
+              {heroDescription}
             </p>
-
           </div>
         </div>
 
-        {/* Floating Stats */}
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#fcfdfd] to-transparent z-10" />
+        <div className="absolute bottom-0 left-0 right-0 z-10 h-24 bg-gradient-to-t from-[#fcfdfd] to-transparent" />
       </section>
 
-      {/* Trust Badges */}
       <section className="relative z-20 -mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {[
               { label: 'Core Component Warranty', val: '3 Years' },
               { label: 'Technical Response Time', val: '24/7' },
               { label: 'Countries Served', val: '100+' },
               { label: 'Spare Parts Availability', val: '99%' },
             ].map((stat) => (
-              <div key={stat.label} className="bg-white p-6 rounded-2xl shadow-xl border border-slate-100 text-center">
-                <div className="text-2xl font-display font-extrabold text-slate-900 mb-1">{stat.val}</div>
-                <div className="text-[10px] font-display font-semibold uppercase tracking-widest text-slate-400">{stat.label}</div>
+              <div
+                key={stat.label}
+                className="rounded-2xl border border-slate-100 bg-white p-6 text-center shadow-xl"
+              >
+                <div className="mb-1 text-2xl font-display font-extrabold text-slate-900">
+                  {stat.val}
+                </div>
+                <div className="text-[10px] font-display font-semibold uppercase tracking-widest text-slate-400">
+                  {stat.label}
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Service Stages */}
-      <section className="py-32 bg-[#fcfdfd]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-24">
-            <h2 className="text-sm font-display font-semibold text-orange-500 uppercase tracking-[0.3em] mb-4">Value Co-Creation</h2>
-            <h3 className="font-display text-4xl font-extrabold text-slate-900 leading-[1.15] tracking-[-0.02em] md:text-5xl">Full-Lifecycle Efficiency Empowerment</h3>
+      <section className="bg-[#fcfdfd] py-32">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-24 text-center">
+            <h2 className="mb-4 text-sm font-display font-semibold uppercase tracking-[0.3em] text-orange-500">
+              Value Co-Creation
+            </h2>
+            <h3 className="font-display text-4xl font-extrabold leading-[1.15] tracking-[-0.02em] text-slate-900 md:text-5xl">
+              Full-Lifecycle Efficiency Empowerment
+            </h3>
           </div>
 
           <div className="space-y-32">
@@ -190,36 +273,50 @@ export default async function SupportPage() {
               )
 
               return (
-                <div key={stage.id} className={`flex flex-col lg:flex-row items-center gap-16 lg:gap-24 ${idx % 2 !== 0 ? 'lg:flex-row-reverse' : ''}`}>
+                <div
+                  key={stage.id}
+                  className={`flex flex-col items-center gap-16 lg:flex-row lg:gap-24 ${
+                    idx % 2 !== 0 ? 'lg:flex-row-reverse' : ''
+                  }`}
+                >
                   <div className="w-full lg:w-1/2">
-                    <div className="flex items-center space-x-4 mb-6">
-                      <span className="text-6xl font-display font-black text-slate-100 leading-none">{stage.id}</span>
+                    <div className="mb-6 flex items-center space-x-4">
+                      <span className="text-6xl font-display font-black leading-none text-orange-500/80">
+                        {stage.id}
+                      </span>
                       <div>
-                        <span className="text-xs font-display font-semibold text-orange-500 uppercase tracking-widest block mb-1">{stage.phase}</span>
-                        <h4 className="text-3xl font-display font-extrabold text-slate-900 leading-tight tracking-[-0.02em]">{stage.title}</h4>
+                        <span className="mb-1 block text-xs font-display font-semibold uppercase tracking-widest text-orange-500">
+                          {stage.phase}
+                        </span>
+                        <h4 className="text-3xl font-display font-extrabold leading-tight tracking-[-0.02em] text-slate-900">
+                          {stage.title}
+                        </h4>
                       </div>
                     </div>
-                    <p className="text-slate-600 font-light text-lg leading-relaxed mb-8">
+                    <p className="mb-8 text-lg font-light leading-relaxed text-slate-600">
                       {stage.description}
                     </p>
-                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {stage.features.map(feat => (
-                        <li key={feat} className="flex items-center space-x-3 text-sm font-medium text-slate-700">
-                          <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-orange-500" />
+                    <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      {stage.features.map((feat) => (
+                        <li
+                          key={feat}
+                          className="flex items-center space-x-3 text-sm font-medium text-slate-700"
+                        >
+                          <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-orange-500" />
                           <span>{feat}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
                   <div className="w-full lg:w-1/2">
-                    <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl group">
+                    <div className="group relative aspect-[4/3] overflow-hidden rounded-3xl shadow-2xl">
                       <Image
                         src={stageImage.src}
                         alt={stageImage.alt}
                         fill
-                        className={`object-cover group-hover:scale-105 transition-transform duration-700 ${idx === 1 ? 'object-contain bg-white p-8' : ''}`}
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
                       />
-                      <div className="absolute inset-0 bg-orange-500/10 group-hover:bg-transparent transition-colors duration-500" />
+                      <div className="absolute inset-0 bg-orange-500/10 transition-colors duration-500 group-hover:bg-transparent" />
                     </div>
                   </div>
                 </div>
@@ -229,42 +326,74 @@ export default async function SupportPage() {
         </div>
       </section>
 
-      {/* Global Tech Support / Hotline */}
-      <section className="py-24 bg-slate-950 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-orange-500 rounded-full blur-[150px] opacity-10" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500 rounded-full blur-[150px] opacity-10" />
+      <section className="relative overflow-hidden bg-slate-950 py-24">
+        <div className="absolute right-0 top-0 h-96 w-96 rounded-full bg-orange-500 opacity-10 blur-[150px]" />
+        <div className="absolute bottom-0 left-0 h-96 w-96 rounded-full bg-blue-500 opacity-10 blur-[150px]" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-[2rem] p-10 md:p-16">
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="rounded-[2rem] border border-white/5 bg-slate-900/50 p-10 backdrop-blur-sm md:p-16">
+            <div className="grid items-center gap-16 lg:grid-cols-2">
               <div>
-                <h2 className="text-3xl md:text-4xl font-display font-extrabold text-white mb-6 uppercase tracking-[-0.02em]">Need Urgent Assistance?</h2>
-                <p className="text-slate-400 font-light text-lg leading-relaxed mb-8">
-                  Our global technical response team is on standby to help you resolve equipment issues, order spare parts, or schedule an efficiency audit.
+                <h2 className="mb-6 text-3xl font-display font-extrabold uppercase tracking-[-0.02em] text-white md:text-4xl">
+                  {urgentAssistanceTitle}
+                </h2>
+                <p className="mb-8 text-lg font-light leading-relaxed text-slate-400">
+                  {urgentAssistanceDescription}
                 </p>
                 <div className="space-y-6">
                   <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center text-orange-500">
-                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-500/20 text-orange-500">
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                        />
+                      </svg>
                     </div>
                     <div>
-                      <div className="text-white font-bold mb-1">24/7 Hotline</div>
-                      <div className="text-orange-400 text-2xl font-black">+86 182-5199-9196</div>
+                      <div className="mb-1 font-bold text-white">24/7 Hotline</div>
+                      <div className="text-2xl font-black text-orange-400">+86 19941519694</div>
                     </div>
                   </div>
                   <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-slate-400">
-                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v10a2 2 0 002 2z" /></svg>
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/5 text-slate-400">
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v10a2 2 0 002 2z"
+                        />
+                      </svg>
                     </div>
-                    <div>
-                      <div className="text-white font-bold mb-1">Email Support</div>
-                      <div className="text-slate-400 font-medium">sales@dodoshark.com</div>
+                    <div className="flex-1">
+                      <div className="mb-4 font-bold text-white">Email Channels</div>
+                      <div className="flex flex-col gap-y-6 sm:flex-row sm:gap-x-12">
+                        <div>
+                          <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+                            Sales
+                          </div>
+                          <div className="text-lg font-medium tracking-tight text-white">
+                            sales@dodoshark.com
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+                            Technical Support
+                          </div>
+                          <div className="text-lg font-medium tracking-tight text-white">
+                            support@dodoshark.com
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
               <div className="relative">
-                <div className="aspect-square bg-white/5 rounded-3xl border border-white/10 p-2 flex flex-col justify-center items-center text-center group overflow-hidden">
+                <div className="group flex aspect-square flex-col items-center justify-center overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-2 text-center">
                   <Image
                     src={supportTeamImage.src}
                     alt={supportTeamImage.alt}
@@ -273,8 +402,12 @@ export default async function SupportPage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
                   <div className="absolute bottom-8 left-8 right-8">
-                    <p className="text-white font-display font-extrabold text-xl uppercase tracking-tight">Experts You Can Trust</p>
-                    <p className="text-slate-400 text-sm font-light">Direct connection to senior engineers.</p>
+                    <p className="text-xl font-display font-extrabold uppercase tracking-tight text-white">
+                      Experts You Can Trust
+                    </p>
+                    <p className="text-sm font-light text-slate-400">
+                      Direct connection to senior engineers.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -283,21 +416,22 @@ export default async function SupportPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-32 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-5xl font-display font-extrabold text-slate-900 mb-8 leading-[1.1] tracking-[-0.02em]">Ready to Optimize Your <br /> <span className="text-orange-500">Value Partnership?</span></h2>
-          <p className="text-slate-500 font-light text-lg mb-12">
-            Experience the DoDoShark difference with a partner that accompanies your growth from equipment service to full-lifecycle empowerment.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/contact" className="bg-orange-500 hover:bg-orange-600 text-white px-10 py-5 rounded-full font-black text-sm uppercase tracking-widest transition-all shadow-xl shadow-orange-500/20">
-              Request Efficiency Audit
+      <section className="bg-white py-32">
+        <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
+          <h2 className="mb-8 text-3xl font-display font-extrabold leading-[1.1] tracking-[-0.02em] text-slate-900 md:text-5xl">
+            {ctaTitle}
+          </h2>
+          <p className="mb-12 text-lg font-light text-slate-500">{ctaDescription}</p>
+          <div className="flex flex-col justify-center gap-4 sm:flex-row">
+            <Link
+              href={ctaButtonHref}
+              className="rounded-full bg-orange-500 px-10 py-5 text-sm font-black uppercase tracking-widest text-white shadow-xl shadow-orange-500/20 transition-all hover:bg-orange-600"
+            >
+              {ctaButtonLabel}
             </Link>
           </div>
         </div>
       </section>
-
     </main>
   )
 }

@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { client } from '@/app/lib/sanity'
+import { buildPageMetadata } from '@/app/lib/seo'
 import { firstParam, toImageSrc, type QueryParamValue } from '@/app/lib/sanity-utils'
 import type { SeoMeta, SanityImage } from '@/app/lib/types/sanity'
 import LandingCardPager, { type LandingCardItem } from '@/components/ui/LandingCardPager'
@@ -108,15 +109,11 @@ function buildHref({
 
 export async function generateMetadata(): Promise<Metadata> {
   const landing = await client.fetch<ProductLandingData | null>(productLandingQuery)
-  const seo = landing?.seo
-
-  return {
-    title: seo?.title || 'Product Catalog | DoDoShark',
-    description: seo?.description || 'Explore industrial grinding and mixing machine lines.',
-    keywords: seo?.keywords,
-    alternates: seo?.canonicalUrl ? { canonical: seo.canonicalUrl } : undefined,
-    robots: seo?.noIndex ? { index: false, follow: false } : undefined,
-  }
+  return buildPageMetadata({
+    seo: landing?.seo,
+    fallbackTitle: 'Product Catalog | DoDoShark',
+    fallbackDescription: 'Explore industrial grinding and mixing machine lines.',
+  })
 }
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {

@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { client, urlFor } from '@/app/lib/sanity'
+import { buildPageMetadata } from '@/app/lib/seo'
 import { normalizeYouTubeEmbedUrl } from '@/app/lib/video'
 import type { SeoMeta, SanityImage } from '@/app/lib/types/sanity'
 import DeferredHeroCarousel from '@/components/home/DeferredHeroCarousel'
@@ -111,6 +112,10 @@ const homeQuery = `coalesce(
     title,
     description,
     keywords,
+    ogImage{
+      alt,
+      asset
+    },
     canonicalUrl,
     noIndex
   },
@@ -398,6 +403,10 @@ function getSanityImageUrl(image?: HomeSanityImage, options?: { width?: number; 
   return null
 }
 
+function hasSanityImageAsset(image?: HomeSanityImage) {
+  return Boolean(image?.asset?._ref || image?.asset?._id || image?.asset?.url || image?.imageUrl?.trim())
+}
+
 function buildDetailHref(basePath: '/products' | '/solutions' | '/cases', slug?: HomeSlug) {
   const current = slug?.current?.trim()
   return current ? `${basePath}/${current}` : basePath
@@ -445,7 +454,7 @@ function ProductCard({
 }) {
   return (
     <article className="home-product-card overflow-hidden rounded-[1rem] bg-white">
-      <div className="relative h-64 overflow-hidden bg-slate-100">
+      <div className="relative aspect-square overflow-hidden bg-slate-100">
         <Image src={image} alt={title} fill sizes="(max-width: 1023px) 100vw, 33vw" className="object-cover" />
         {badge ? <div className={`absolute right-4 top-4 rounded-full px-3 py-1 text-xs font-bold text-white ${badge.className}`}>{badge.label}</div> : null}
       </div>
@@ -463,7 +472,7 @@ function ProductCard({
 function SolutionCard({ title, description, image, href }: { title: string; description: string; image: string; href?: string }) {
   return (
     <article className="overflow-hidden rounded-lg border border-slate-100 bg-white transition hover:shadow-lg">
-      <div className="relative h-48 overflow-hidden bg-slate-100">
+      <div className="relative aspect-square overflow-hidden bg-slate-100">
         <Image src={image} alt={title} fill sizes="(max-width: 1023px) 100vw, 33vw" className="object-cover transition-transform duration-500 hover:scale-105" />
       </div>
       <div className="p-6">
@@ -489,16 +498,12 @@ async function getHomePageData() {
 
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getHomePageData()
-  const seo = data?.seo
-
-  return {
-    title: seo?.title || 'DoDoShark - Professional Crushing & Grinding Equipment Manufacturer',
-    description:
-      seo?.description || 'DoDoShark Machinery, 20 years of focus on industrial crushing, grinding, and mixing equipment, serving 100+ countries.',
-    keywords: seo?.keywords,
-    alternates: seo?.canonicalUrl ? { canonical: seo.canonicalUrl } : undefined,
-    robots: seo?.noIndex ? { index: false, follow: false } : undefined,
-  }
+  return buildPageMetadata({
+    seo: data?.seo,
+    fallbackTitle: 'DoDoShark - Professional Crushing & Grinding Equipment Manufacturer',
+    fallbackDescription:
+      'DoDoShark Machinery, 20 years of focus on industrial crushing, grinding, and mixing equipment, serving 100+ countries.',
+  })
 }
 
 export default async function HomePage() {
@@ -524,7 +529,7 @@ export default async function HomePage() {
   const featuredAgriProducts: HomeProductCard[] =
     data?.featuredAgriProducts
       ?.map((product) => {
-        const image = getSanityImageUrl(product.mainImage, { width: 900, height: 720 })
+        const image = getSanityImageUrl(product.mainImage, { width: 800, height: 800 })
         if (!image) return null
 
         return {
@@ -542,7 +547,7 @@ export default async function HomePage() {
   const featuredFoodProducts: HomeProductCard[] =
     data?.featuredFoodProducts
       ?.map((product) => {
-        const image = getSanityImageUrl(product.mainImage, { width: 900, height: 720 })
+        const image = getSanityImageUrl(product.mainImage, { width: 800, height: 800 })
         if (!image) return null
 
         return {
@@ -560,7 +565,7 @@ export default async function HomePage() {
   const featuredSolutions: HomeSolutionCard[] =
     data?.featuredSolutions
       ?.map((solution) => {
-        const image = getSanityImageUrl(solution.heroImage, { width: 900, height: 640 })
+        const image = getSanityImageUrl(solution.heroImage, { width: 800, height: 800 })
         if (!image) return null
 
         return {
@@ -575,7 +580,7 @@ export default async function HomePage() {
   const featuredCases: HomeCaseCard[] =
     data?.featuredCases
       ?.map((caseItem) => {
-        const image = getSanityImageUrl(caseItem.coverImage, { width: 1200, height: 900 })
+        const image = getSanityImageUrl(caseItem.coverImage, { width: 1200, height: 600 })
         if (!image) return null
 
         return {
@@ -602,8 +607,8 @@ export default async function HomePage() {
         return {
           id: video._id,
           title: video.title?.trim() || 'Video',
-          imageSrc: getSanityImageUrl(video.coverImage, { width: 1200, height: 675 }) || undefined,
-          imageAlt: video.coverImage?.alt || video.title || 'Video cover',
+          imageSrc: getSanityImageUrl(video.coverImage, { width: 1200 }) || undefined,
+          imageAlt: hasSanityImageAsset(video.coverImage) ? video.coverImage?.alt || video.title || 'Video cover' : video.title || 'Video cover',
           youtubeUrl,
           metaText: formatHomeVideoMeta(video.publishedAt, video.tags?.[0]?.title),
         }
@@ -805,7 +810,7 @@ export default async function HomePage() {
         <div className="relative z-20 mx-auto -mt-24 max-w-6xl px-4 sm:px-6 lg:px-8 lg:-mt-28">
           <div className="rounded-lg bg-white shadow-xl">
             <div className="border-b border-slate-200 py-8 text-center">
-              <h3 className="text-2xl font-bold text-slate-900 md:text-3xl">Grinding & Mixing Solutions <br/>(Dust-Free)</h3>
+              <h3 className="text-2xl font-bold text-slate-900 md:text-3xl">Grinding & Mixing Solutions <br />(Dust-Free)</h3>
             </div>
             <div className="p-6 sm:p-8 md:p-12">
               <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">

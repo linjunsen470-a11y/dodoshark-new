@@ -4,8 +4,8 @@ import Link from 'next/link'
 const contactItems = [
   {
     label: 'Phone',
-    value: '+86 18251999196',
-    href: 'tel:+8618251999196',
+    value: '+86 19941519694',
+    href: 'tel:+8619941519694',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path
@@ -36,8 +36,8 @@ const contactItems = [
   },
   {
     label: 'Email',
-    value: 'sales@dodoshark.com',
-    href: 'mailto:sales@dodoshark.com',
+    value: ['sales@dodoshark.com', 'support@dodoshark.com'],
+    href: ['mailto:sales@dodoshark.com', 'mailto:support@dodoshark.com'],
     icon: (
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path
@@ -116,11 +116,18 @@ export default function Footer() {
                   <span className="footer-icon-chip">{item.icon}</span>
                   <div>
                     <span className="footer-meta-label">{item.label}</span>
-                    <span className="footer-meta-value">
-                      <a href={item.href} target={item.href.startsWith('https') ? '_blank' : undefined} rel={item.href.startsWith('https') ? 'noreferrer' : undefined}>
-                        {item.value}
-                      </a>
-                    </span>
+                    <div className="flex flex-col">
+                      {(Array.isArray(item.value) ? item.value : [item.value]).map((val, idx) => {
+                        const href = Array.isArray(item.href) ? item.href[idx] : item.href
+                        return (
+                          <span key={val} className="footer-meta-value">
+                            <a href={href} target={href?.startsWith('https') ? '_blank' : undefined} rel={href?.startsWith('https') ? 'noreferrer' : undefined}>
+                              {val}
+                            </a>
+                          </span>
+                        )
+                      })}
+                    </div>
                   </div>
                 </li>
               ))}
