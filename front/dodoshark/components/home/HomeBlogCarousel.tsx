@@ -1,10 +1,8 @@
 'use client'
 
-import Image from 'next/image'
 import { useEffect, useState } from 'react'
 
-import { normalizeYouTubeEmbedUrl } from '@/app/lib/video'
-import VideoLightbox from '@/components/page-builder/VideoLightbox'
+import VideoPreviewTrigger from '@/components/ui/VideoPreviewTrigger'
 
 export type HomeBlogCarouselItem = {
   id: string
@@ -35,18 +33,9 @@ function ArrowRight({ className }: { className?: string }) {
   )
 }
 
-function PlayIcon({ className }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M8.25 6.402c0-.81.878-1.312 1.572-.9l8.625 5.098a1.04 1.04 0 0 1 0 1.8l-8.625 5.098c-.694.41-1.572-.09-1.572-.9V6.402Z" />
-    </svg>
-  )
-}
-
 export default function HomeBlogCarousel({ items }: HomeBlogCarouselProps) {
   const [itemsVisible, setItemsVisible] = useState(4)
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [activeVideo, setActiveVideo] = useState<{ src: string; title: string } | null>(null)
 
   useEffect(() => {
     function syncItemsVisible() {
@@ -103,49 +92,27 @@ export default function HomeBlogCarousel({ items }: HomeBlogCarouselProps) {
           {items.map((item) => (
             <article
               key={item.id}
-              className="group home-blog-card box-border flex-shrink-0 rounded-[1rem] border border-slate-200 bg-white shadow-sm"
+              className="home-blog-card box-border flex-shrink-0 rounded-[1rem] border border-slate-200 bg-white shadow-sm"
               style={{ width: `calc(${100 / itemsVisible}% - ${(itemsVisible - 1) * 24 / itemsVisible}px)` }}
             >
-              <button
-                type="button"
-                className="flex w-full flex-col text-left"
-                onClick={() => {
-                  const embedSrc = item.youtubeUrl ? normalizeYouTubeEmbedUrl(item.youtubeUrl) : undefined
-                  if (!embedSrc) return
-
-                  setActiveVideo({
-                    src: embedSrc,
-                    title: item.title,
-                  })
-                }}
-                disabled={!item.youtubeUrl}
-                aria-label={item.youtubeUrl ? `Play ${item.title}` : `${item.title} video is unavailable`}
+              <VideoPreviewTrigger
+                title={item.title}
+                youtubeUrl={item.youtubeUrl}
+                imageSrc={item.imageSrc}
+                imageAlt={item.imageAlt || item.title}
+                className="group"
+                mediaClassName="h-56 overflow-hidden bg-slate-100 md:h-48"
+                imageSizes="(max-width: 767px) 100vw, (max-width: 1199px) 50vw, 25vw"
               >
-                <div className="relative h-56 overflow-hidden bg-slate-100 md:h-48">
-                  {item.imageSrc ? (
-                    <Image src={item.imageSrc} alt={item.imageAlt || item.title} fill sizes="(max-width: 767px) 100vw, (max-width: 1199px) 50vw, 25vw" className="object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-slate-300">
-                      <PlayIcon className="h-12 w-12" />
-                    </div>
-                  )}
-                  <div className="home-play-button">
-                    <PlayIcon className="ml-1 h-5 w-5" />
-                  </div>
-                </div>
                 <div className="border-t border-slate-200 bg-white p-4">
                   <h4 className="line-clamp-2 text-sm font-bold text-slate-900">{item.title}</h4>
                   <p className="mt-2 text-xs text-slate-400">{item.metaText}</p>
                 </div>
-              </button>
+              </VideoPreviewTrigger>
             </article>
           ))}
         </div>
       </div>
-
-      {activeVideo ? (
-        <VideoLightbox src={activeVideo.src} title={activeVideo.title} onClose={() => setActiveVideo(null)} />
-      ) : null}
     </div>
   )
 }

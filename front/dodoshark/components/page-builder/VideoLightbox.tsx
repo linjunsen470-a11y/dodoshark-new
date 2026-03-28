@@ -3,14 +3,16 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 
+import type { VideoOrientation } from '@/app/lib/video'
+
 type VideoLightboxProps = {
   src: string
   title: string
-  aspectRatio?: string
+  orientation?: VideoOrientation
   onClose: () => void
 }
 
-export default function VideoLightbox({ src, title, aspectRatio = 'aspect-video', onClose }: VideoLightboxProps) {
+export default function VideoLightbox({ src, title, orientation = 'landscape', onClose }: VideoLightboxProps) {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -32,8 +34,14 @@ export default function VideoLightbox({ src, title, aspectRatio = 'aspect-video'
 
   if (!mounted) return null
 
-  const isVertical = aspectRatio === 'aspect-[9/16]'
-  const maxWidth = isVertical ? 'calc(80vh * 9 / 16)' : '72rem' // 72rem = max-w-6xl
+  const isPortrait = orientation === 'portrait'
+  const frameClassName = isPortrait ? 'aspect-[9/16]' : 'aspect-video'
+  const containerMaxWidth = isPortrait
+    ? 'min(100%, 28rem, calc((100dvh - 7rem) * 9 / 16))'
+    : 'min(100%, 72rem)'
+  const frameStyle = isPortrait
+    ? { maxHeight: 'calc(100dvh - 7rem)' }
+    : { maxHeight: '85vh' }
 
   const content = (
     <div
@@ -46,7 +54,7 @@ export default function VideoLightbox({ src, title, aspectRatio = 'aspect-video'
       <div className="mx-auto flex h-full w-full items-center justify-center">
         <div 
           className="w-full mx-auto" 
-          style={{ maxWidth }}
+          style={{ maxWidth: containerMaxWidth }}
           onClick={(event) => event.stopPropagation()}
         >
           <div className="mb-3 flex items-center justify-between text-white">
@@ -59,7 +67,7 @@ export default function VideoLightbox({ src, title, aspectRatio = 'aspect-video'
               Close
             </button>
           </div>
-          <div className={`relative w-full overflow-hidden rounded-lg bg-black shadow-2xl ${aspectRatio}`} style={{ maxHeight: '85vh' }}>
+          <div className={`relative w-full overflow-hidden rounded-lg bg-black shadow-2xl ${frameClassName}`} style={frameStyle}>
             <iframe
               src={src}
               title={title}

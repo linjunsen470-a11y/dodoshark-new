@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useState } from 'react'
-import { normalizeYouTubeEmbedUrl } from '@/app/lib/video'
+import { getVideoOrientation, normalizeYouTubeEmbedUrl, resolveYouTubeThumbnailUrl } from '@/app/lib/video'
 import VideoLightbox from '@/components/page-builder/VideoLightbox'
 
 interface AboutVideoCardProps {
@@ -23,16 +23,11 @@ export default function AboutVideoCard({
   const [showLightbox, setShowLightbox] = useState(false)
   
   const embedUrl = normalizeYouTubeEmbedUrl(youtubeUrl)
-  
-  // Extract video ID for high quality thumbnail if not provided
-  const extractVideoId = (url: string) => {
-    if (url.includes('shorts/')) return url.split('shorts/')[1]?.split('?')[0]
-    if (url.includes('v=')) return url.split('v=')[1]?.split('&')[0]
-    return url.split('/').pop()?.split('?')[0]
-  }
-  
-  const videoId = extractVideoId(youtubeUrl)
-  const finalThumbnail = thumbnailUrl || (videoId ? `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg` : 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80')
+  const orientation = aspectRatio === 'aspect-[9/16]' ? 'portrait' : getVideoOrientation(youtubeUrl)
+  const finalThumbnail =
+    thumbnailUrl ||
+    resolveYouTubeThumbnailUrl(youtubeUrl, 'maxresdefault') ||
+    'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80'
 
   return (
     <>
@@ -81,7 +76,7 @@ export default function AboutVideoCard({
         <VideoLightbox
           src={embedUrl}
           title={title}
-          aspectRatio={aspectRatio}
+          orientation={orientation}
           onClose={() => setShowLightbox(false)}
         />
       )}

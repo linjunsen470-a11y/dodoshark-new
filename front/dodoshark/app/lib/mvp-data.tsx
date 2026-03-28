@@ -327,7 +327,7 @@ export const CHOOSE_CONFIDENCE_CARDS: ChooseConfidenceCard[] = [
       'Uniform mixing of dozens of powders in about 15 minutes.',
       'Dust suppression ratio up to 99.99% in configured systems.',
     ],
-    imagePath: '/assets/images/技术领先.png',
+    imagePath: '/assets/images/technology-leadership.png',
     imageAlt: 'Technical leadership in industrial machinery',
   },
   {
@@ -338,7 +338,7 @@ export const CHOOSE_CONFIDENCE_CARDS: ChooseConfidenceCard[] = [
       'From feeding to finished output with complete line thinking.',
       'Flexible combinations for capacity, material, and site limits.',
     ],
-    imagePath: '/assets/images/不止单品.png',
+    imagePath: '/assets/images/beyond-single-products.png',
     imageAlt: 'Custom integrated machinery solutions',
   },
   {
@@ -349,7 +349,7 @@ export const CHOOSE_CONFIDENCE_CARDS: ChooseConfidenceCard[] = [
       'Precision machining process for stable long-duty operation.',
       'Mainframe design life can exceed 10 years in normal use.',
     ],
-    imagePath: '/assets/images/出厂严格.png',
+    imagePath: '/assets/images/rigorous-factory-inspection.png',
     imageAlt: 'Strict quality assurance in factory production',
   },
 ]
