@@ -89,13 +89,13 @@ export default function Header() {
   const desktopHeaderBackgroundStyle =
     !desktopFloating && isDesktopViewport
       ? {
-          backgroundColor: '#17346e',
-          backgroundImage:
-            "linear-gradient(90deg, rgba(7, 26, 58, 0.72) 0%, rgba(7, 26, 58, 0.18) 42%, rgba(7, 26, 58, 0.28) 64%, rgba(7, 26, 58, 0.76) 100%), linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(5, 18, 44, 0.08) 38%, rgba(5, 18, 44, 0.3) 100%), url('/assets/images/background/footer-background.png')",
-          backgroundPosition: 'center, center, 66% 24%',
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: 'cover, cover, 138% auto',
-        }
+        backgroundColor: '#17346e',
+        backgroundImage:
+          "linear-gradient(90deg, rgba(7, 26, 58, 0.72) 0%, rgba(7, 26, 58, 0.18) 42%, rgba(7, 26, 58, 0.28) 64%, rgba(7, 26, 58, 0.76) 100%), linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(5, 18, 44, 0.08) 38%, rgba(5, 18, 44, 0.3) 100%), url('/assets/images/background/footer-background.png')",
+        backgroundPosition: 'center, center, 66% 24%',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover, cover, 138% auto',
+      }
       : undefined
   const desktopHeaderClass = desktopFloating
     ? 'xl:border-white/10 xl:shadow-none'
@@ -122,8 +122,8 @@ export default function Header() {
                 <PromiseIcon />
               </div>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.05em] text-slate-500">Our Promise</p>
-                <p className="text-[13px] font-bold text-[#1e3a5f]">Safe Production, Satisfying Harvest</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.05em] text-slate-500">Our Slogan</p>
+                <p className="text-[13px] font-bold text-[#1e3a5f]">Work with Confidence, Reap in Joy</p>
               </div>
             </div>
 
@@ -181,9 +181,8 @@ export default function Header() {
                       {item.label}
                       <span
                         aria-hidden="true"
-                        className={`absolute left-0 top-[calc(100%+0.35rem)] h-[3px] rounded-full bg-orange-500 transition-transform duration-300 ${
-                          isActive ? 'w-full scale-x-100' : 'w-full scale-x-0'
-                        }`}
+                        className={`absolute left-0 top-[calc(100%+0.35rem)] h-[3px] rounded-full bg-orange-500 transition-transform duration-300 ${isActive ? 'w-full scale-x-100' : 'w-full scale-x-0'
+                          }`}
                       />
                     </span>
                   </Link>
@@ -206,11 +205,10 @@ export default function Header() {
               <div className="hidden xl:block">
                 <Link
                   href={cta.href}
-                  className={`inline-flex min-h-10 items-center justify-center rounded-full border px-5 py-[10px] text-[11px] font-bold uppercase tracking-[0.1em] transition ${
-                    desktopFloating
-                      ? 'border-white/42 bg-slate-950/18 text-white shadow-[0_12px_28px_-20px_rgba(15,23,42,0.7)] backdrop-blur-md hover:border-white/60 hover:bg-slate-950/28'
-                      : 'border-[#fbbf24]/75 bg-[#fbbf24]/12 text-[#fff6d4] hover:border-[#fbbf24] hover:bg-[#fbbf24]/18'
-                  }`}
+                  className={`inline-flex min-h-10 items-center justify-center rounded-full border px-5 py-[10px] text-[11px] font-bold uppercase tracking-[0.1em] transition ${desktopFloating
+                    ? 'border-white/42 bg-slate-950/18 text-white shadow-[0_12px_28px_-20px_rgba(15,23,42,0.7)] backdrop-blur-md hover:border-white/60 hover:bg-slate-950/28'
+                    : 'border-[#fbbf24]/75 bg-[#fbbf24]/12 text-[#fff6d4] hover:border-[#fbbf24] hover:bg-[#fbbf24]/18'
+                    }`}
                 >
                   {cta.label}
                 </Link>
@@ -220,9 +218,8 @@ export default function Header() {
             </div>
 
             <div
-              className={`pointer-events-none absolute inset-x-0 bottom-0 hidden xl:block ${
-                desktopFloating ? 'border-b border-white/14' : 'border-b border-white/10'
-              }`}
+              className={`pointer-events-none absolute inset-x-0 bottom-0 hidden xl:block ${desktopFloating ? 'border-b border-white/14' : 'border-b border-white/10'
+                }`}
             />
           </div>
         </div>

@@ -3,12 +3,13 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { client, urlFor } from '@/app/lib/sanity'
+import { normalizeYouTubeEmbedUrl } from '@/app/lib/video'
 import type { SeoMeta, SanityImage } from '@/app/lib/types/sanity'
 import DeferredHeroCarousel from '@/components/home/DeferredHeroCarousel'
-import DeferredLiteYouTube from '@/components/home/DeferredLiteYouTube'
 import DeferredHomeBlogCarousel from '@/components/home/DeferredHomeBlogCarousel'
 import DeferredProjectCasesCarousel from '@/components/home/DeferredProjectCasesCarousel'
 import { type HeroCarouselImage } from '@/components/home/HeroCarousel'
+import VideoPreviewTrigger from '@/components/ui/VideoPreviewTrigger'
 import ViewDetailsLink from '@/components/ui/ViewDetailsLink'
 
 type HomeSanityImage = SanityImage & {
@@ -209,19 +210,19 @@ const aboutFeatures = [
     title: 'Est. 1970',
     description:
       'Formerly a state-owned mill factory, DoDoShark was established in 2019 after restructuring. Anchored by the mission of "Empowering Productivity," we began a new brand journey.',
-    image: '/assets/images/图标-始于1970年.png',
+    image: '/assets/images/icon-since-1970.png',
   },
   {
     title: 'Three Production Bases',
     description:
       'A modern production network delivers stable output, standardized manufacturing, and the flexibility required for custom industrial projects.',
-    image: '/assets/images/图标-三大生产基地.png',
+    image: '/assets/images/icon-three-production-bases.png',
   },
   {
     title: 'Two Product Lines',
     description:
       'Agri-processing and food-processing machinery operate as dual growth engines, covering crushing, grinding, mixing, and integrated line solutions.',
-    image: '/assets/images/图标-两大产品线.png',
+    image: '/assets/images/icon-two-product-lines.png',
   },
 ]
 
@@ -230,19 +231,19 @@ const confidenceCards = [
     title: 'Technical Lead',
     subtitle: 'Continuous Innovation as Industry Model',
     points: ['Grain grinding fineness up to 150 mesh', 'Uniform mixing of dozens of powders in 15 min', 'Dust suppression ratio up to 99.99%'],
-    image: '/assets/images/技术领先.png',
+    image: '/assets/images/technology-leadership.png',
   },
   {
     title: 'Rigorous Delivery',
     subtitle: 'Factory Inspection on Every Critical Detail',
     points: ['Strict process inspection before shipment', 'Stable structure for long-cycle operation', 'Delivery quality controlled by full-line checks'],
-    image: '/assets/images/出厂严格.png',
+    image: '/assets/images/rigorous-factory-inspection.png',
   },
   {
     title: 'Beyond Single Products',
     subtitle: 'Integrated Equipment for Complete Workflows',
     points: ['Single-machine and line integration available', 'Flexible matching for powders and granules', 'One supplier for equipment and process support'],
-    image: '/assets/images/不止单品.png',
+    image: '/assets/images/beyond-single-products.png',
   },
 ]
 
@@ -250,19 +251,19 @@ const agriProducts = [
   {
     title: 'Iron Hammer Mill',
     description: 'Suitable for grain, corn, and tuber crops, with fineness reaching 10-150 mesh.',
-    image: '/assets/images/粉碎大分类.png',
+    image: '/assets/images/grinding-category.png',
     badge: { label: 'Hot', className: 'bg-orange-500' },
   },
   {
     title: 'Wheat Grinder',
     description: 'Handles wheat, corn, and sorghum with efficiency, fineness up to 40-100 mesh.',
-    image: '/assets/images/玉米物料.png',
+    image: '/assets/images/corn-materials.png',
     badge: { label: 'New', className: 'bg-green-500' },
   },
   {
     title: 'Mixer Machine',
     description: 'For feed, chemical, and building materials. High uniformity with variation coefficient under 5.',
-    image: '/assets/images/机械大板块.png',
+    image: '/assets/images/machinery-category.png',
   },
 ]
 
@@ -270,17 +271,17 @@ const foodProducts = [
   {
     title: 'SUS304 Grinder',
     description: 'For food, herbs, and corrosive materials. Dust-free, fineness up to 10-150 mesh.',
-    image: '/assets/images/玉米物料.png',
+    image: '/assets/images/corn-materials.png',
   },
   {
     title: 'SUS304 Mixer',
     description: 'Highly uniform mixing for powders and fine particles in food and chemical sectors.',
-    image: '/assets/images/手动50型.png',
+    image: '/assets/images/manual-model-50.png',
   },
   {
     title: 'Dough Mixer',
     description: 'Fast and durable for large batches, ideal for eateries and food factories.',
-    image: '/assets/images/出厂严格.png',
+    image: '/assets/images/rigorous-factory-inspection.png',
   },
 ]
 
@@ -288,17 +289,17 @@ const grindingSolutions = [
   {
     title: 'Corn Milling Solution',
     description: 'Efficient corn crushing and milling for individuals to large factories.',
-    image: '/assets/images/粉碎大分类.png',
+    image: '/assets/images/grinding-category.png',
   },
   {
     title: 'Grain Milling Solution',
     description: 'Dust-free grain processing for agricultural and industrial sectors.',
-    image: '/assets/images/粉碎大分类.png',
+    image: '/assets/images/grinding-category.png',
   },
   {
     title: 'Salt & Sugar Milling',
     description: 'Precise milling for spice, salt, and sugar with dust control.',
-    image: '/assets/images/机械大板块.png',
+    image: '/assets/images/machinery-category.png',
   },
 ]
 
@@ -306,17 +307,17 @@ const mixingSolutions = [
   {
     title: 'Powder Mixing Solution',
     description: 'High-uniformity mixing for fine powders in industrial sectors.',
-    image: '/assets/images/谷物加工.png',
+    image: '/assets/images/grain-processing.png',
   },
   {
     title: 'Granule Mixing Solution',
     description: 'Stable mixing performance for diverse granular materials.',
-    image: '/assets/images/手动50型.png',
+    image: '/assets/images/manual-model-50.png',
   },
   {
     title: 'Fertilizer Mixing',
     description: 'Massive throughput for agricultural compound fertilizer production.',
-    image: '/assets/images/混合设备.png',
+    image: '/assets/images/mixing-equipment.png',
   },
 ]
 
@@ -325,35 +326,35 @@ const projectCaseItems = [
     title: 'New Hope Group',
     description: 'Complete 100-mesh dust-free corn processing line for international export standard.',
     image: '/assets/images/showroom-1.jpg',
-    logo: '/assets/images/优秀项目-logo-新希望.png',
+    logo: '/assets/images/featured-project-logo-new-hope.png',
     href: '#',
   },
   {
     title: 'Uni-President Milling Upgrade',
     description: 'Integrated grinding workflow designed for stable output and cleaner industrial processing conditions.',
     image: '/assets/images/showroom-1.jpg',
-    logo: '/assets/images/优秀项目-logo-统一.png',
+    logo: '/assets/images/featured-project-logo-uni-president.png',
     href: '#'
   },
   {
     title: 'Angel Yeast Powder System',
     description: 'Customized stainless processing solution balancing food-grade standards with long-cycle plant operation.',
     image: '/assets/images/showroom-1.jpg',
-    logo: '/assets/images/优秀项目-logo-安琪.png',
+    logo: '/assets/images/featured-project-logo-angel-yeast.png',
     href: '#',
   },
   {
     title: 'Changming Pharma Material Line',
     description: 'Precision handling and low-dust conveying for fine pharmaceutical material preparation workflows.',
     image: '/assets/images/showroom-1.jpg',
-    logo: '/assets/images/优秀项目-logo-昌明药业.png',
+    logo: '/assets/images/featured-project-logo-changming-pharma.png',
     href: '#',
   },
   {
     title: 'New Hope Overseas Delivery',
     description: 'Benchmark export project built around dependable commissioning, throughput stability, and after-sales support.',
     image: '/assets/images/showroom-1.jpg',
-    logo: '/assets/images/优秀项目-logo-新希望.png',
+    logo: '/assets/images/featured-project-logo-new-hope.png',
     href: '#',
   },
 ]
@@ -362,22 +363,22 @@ const advantages = [
   {
     title: 'Smart Mfg. Strength',
     description: 'Scale efficiency balanced with bespoke innovation.',
-    image: '/assets/images/图标-专业技术.png',
+    image: '/assets/images/icon-professional-technology.png',
   },
   {
     title: 'Total Range Strategy',
     description: 'One-stop solutions reducing costs and boosting speed.',
-    image: '/assets/images/图标-匠心精工.png',
+    image: '/assets/images/icon-craftsmanship.png',
   },
   {
     title: 'Full-Life Service',
     description: 'From process design to training, we navigate with you.',
-    image: '/assets/images/图标-个性定制.png',
+    image: '/assets/images/icon-custom-solutions.png',
   },
   {
     title: 'Extended Warranty',
     description: '10-year core component warranty for total peace of mind.',
-    image: '/assets/images/图标-一次选择.png',
+    image: '/assets/images/icon-one-choice.png',
   },
 ]
 
@@ -395,49 +396,6 @@ function getSanityImageUrl(image?: HomeSanityImage, options?: { width?: number; 
   if (image.asset?.url?.trim()) return image.asset.url
 
   return null
-}
-
-function toEmbedVideoUrl(rawUrl?: string) {
-  if (!rawUrl?.trim()) return null
-
-  try {
-    const url = new URL(rawUrl)
-    const host = url.hostname.replace('www.', '')
-
-    if (host === 'youtu.be') {
-      const id = url.pathname.split('/').filter(Boolean)[0]
-      return id ? `https://www.youtube.com/embed/${id}` : null
-    }
-
-    if (host === 'youtube.com' || host === 'm.youtube.com') {
-      if (url.pathname === '/watch') {
-        const id = url.searchParams.get('v')
-        return id ? `https://www.youtube.com/embed/${id}` : null
-      }
-
-      if (url.pathname.startsWith('/embed/')) return rawUrl
-
-      if (url.pathname.startsWith('/shorts/')) {
-        const id = url.pathname.split('/').filter(Boolean)[1]
-        return id ? `https://www.youtube.com/embed/${id}` : null
-      }
-    }
-
-    if (host === 'vimeo.com') {
-      const id = url.pathname.split('/').filter(Boolean)[0]
-      return id ? `https://player.vimeo.com/video/${id}` : null
-    }
-  } catch {
-    return null
-  }
-
-  return null
-}
-
-function extractYouTubeId(embedUrl: string | null): string | null {
-  if (!embedUrl) return null
-  const match = embedUrl.match(/embed\/([^?]+)/)
-  return match?.[1] ?? null
 }
 
 function buildDetailHref(basePath: '/products' | '/solutions' | '/cases', slug?: HomeSlug) {
@@ -468,14 +426,6 @@ function ArrowRightIcon({ className }: { className?: string }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-    </svg>
-  )
-}
-
-function PlayIcon({ className }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M8.25 6.402c0-.81.878-1.312 1.572-.9l8.625 5.098a1.04 1.04 0 0 1 0 1.8l-8.625 5.098c-.694.41-1.572-.09-1.572-.9V6.402Z" />
     </svg>
   )
 }
@@ -570,8 +520,7 @@ export default async function HomePage() {
       ? heroSlides
       : [{ src: '/assets/images/banner.png', alt: 'DoDoShark factory banner' }]
 
-  const videoEmbedUrl = toEmbedVideoUrl(data?.whyChooseUsVideoUrl)
-  const youtubeVideoId = extractYouTubeId(videoEmbedUrl)
+  const heroVideoUrl = data?.whyChooseUsVideoUrl?.trim()
   const featuredAgriProducts: HomeProductCard[] =
     data?.featuredAgriProducts
       ?.map((product) => {
@@ -648,7 +597,7 @@ export default async function HomePage() {
       ?.filter((video) => video?.status === 'published')
       .map((video) => {
         const youtubeUrl = video.youtubeUrl?.trim()
-        if (!youtubeUrl || !toEmbedVideoUrl(youtubeUrl)) return null
+        if (!youtubeUrl || !normalizeYouTubeEmbedUrl(youtubeUrl)) return null
 
         return {
           id: video._id,
@@ -756,29 +705,18 @@ export default async function HomePage() {
               </p>
             </div>
 
-            <div className="group relative overflow-hidden rounded-[1rem] shadow-2xl">
-              {youtubeVideoId ? (
-                <DeferredLiteYouTube videoId={youtubeVideoId} title="DoDoShark Factory Video" className="rounded-[1rem]" />
-              ) : videoEmbedUrl ? (
-                <div className="relative aspect-video">
-                  <iframe
-                    src={videoEmbedUrl}
-                    title="DoDoShark Factory Video"
-                    className="absolute inset-0 h-full w-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
-                  />
-                </div>
-              ) : (
-                <div className="relative aspect-video">
-                  <Image src="/assets/images/工厂展示.png" alt="DoDoShark Factory Video" fill sizes="(max-width: 1023px) 100vw, 50vw" className="object-cover" />
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition group-hover:bg-black/30">
-                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-black/60 transition group-hover:scale-110">
-                      <PlayIcon className="ml-1 h-8 w-8 text-white" />
-                    </div>
-                  </div>
-                </div>
-              )}
+            <div className="overflow-hidden rounded-[1rem] shadow-2xl">
+              <VideoPreviewTrigger
+                title="DoDoShark Factory Video"
+                youtubeUrl={heroVideoUrl}
+                imageSrc="/assets/images/factory-showcase.png"
+                imageAlt="DoDoShark Factory Video"
+                className="group"
+                mediaClassName="aspect-video rounded-[1rem]"
+                imageSizes="(max-width: 1023px) 100vw, 50vw"
+                playButtonClassName="h-20 w-20 bg-black/60 group-hover:bg-black/70"
+                overlayClassName="bg-black/20 transition group-hover:bg-black/30"
+              />
             </div>
           </div>
 
