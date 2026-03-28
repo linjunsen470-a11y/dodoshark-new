@@ -39,7 +39,7 @@ export default defineType({
       type: 'object',
       group: 'hero',
       fields: [
-        defineField({name: 'title', title: 'Title', type: 'string'}),
+        defineField({name: 'title', title: 'Title', type: 'text', rows: 2}),
         defineField({name: 'eyebrow', title: 'Eyebrow', type: 'string'}),
         defineField({name: 'subtitle', title: 'Description', type: 'text', rows: 4}),
         defineField({name: 'primaryCtaLabel', title: 'Primary CTA Label', type: 'string'}),

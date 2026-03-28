@@ -7,6 +7,7 @@ import { client } from '@/app/lib/sanity'
 import { buildPageMetadata } from '@/app/lib/seo'
 import { toImageSrc } from '@/app/lib/sanity-utils'
 import type { SanityImage, SeoMeta } from '@/app/lib/types/sanity'
+import HeroTitle from '@/components/ui/HeroTitle'
 
 type RecruitAgentsPageData = {
   seo?: SeoMeta
@@ -240,7 +241,7 @@ export default async function RecruitAgentsPage() {
 
         <div className="relative z-10 mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
           <h1 className="mb-6 text-4xl font-black leading-tight tracking-tight text-white md:text-6xl">
-            {heroTitle}
+            <HeroTitle title={heroTitle} fallback="Partner with DoDoShark Explore Global Blue Oceans" />
           </h1>
           <p className="mb-8 font-serif text-xl font-bold italic text-orange-400">{heroEyebrow}</p>
           <p className="mx-auto max-w-4xl text-lg font-light leading-relaxed text-slate-300">
