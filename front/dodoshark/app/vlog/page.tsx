@@ -9,6 +9,7 @@ import type { SeoMeta, SanityImage } from '@/app/lib/types/sanity'
 import VlogVideoGrid, { type VlogVideoCardItem } from '@/components/vlog/VlogVideoGrid'
 import Icon from '@/components/ui/Icon'
 import TagCloudPanel, { type TagCloudItem } from '@/components/ui/TagCloudPanel'
+import HeroTitle from '@/components/ui/HeroTitle'
 
 type ContentTagItem = {
   _id?: string
@@ -219,13 +220,14 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
             </div>
           )}
           <h1 className="mb-8 text-5xl font-display font-black leading-tight tracking-tight text-white md:text-7xl">
-            {heroTitle ? (
-              heroTitle
-            ) : (
-              <>
-                DoDoShark <span className="accent-gradient-text">Video Hub</span>
-              </>
-            )}
+            <HeroTitle
+              title={heroTitle}
+              fallback={
+                <>
+                  DoDoShark <span className="accent-gradient-text">Video Hub</span>
+                </>
+              }
+            />
           </h1>
           <p className="mx-auto max-w-2xl text-xl font-light leading-relaxed text-slate-400">{heroSubtitle}</p>
         </div>

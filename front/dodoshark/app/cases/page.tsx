@@ -6,6 +6,7 @@ import { firstParam, toImageSrc, type QueryParamValue } from '@/app/lib/sanity-u
 import type { SeoMeta, SanityImage } from '@/app/lib/types/sanity'
 import Icon from '@/components/ui/Icon'
 import LandingCardPager, { type LandingCardItem } from '@/components/ui/LandingCardPager'
+import HeroTitle from '@/components/ui/HeroTitle'
 import TagCloudPanel, { type TagCloudItem } from '@/components/ui/TagCloudPanel'
 
 type ContentTagItem = {
@@ -249,13 +250,14 @@ export default async function CasesPage({ searchParams }: CasesPageProps) {
               </div>
             )}
             <h1 className="mb-8 text-5xl font-display font-black leading-tight tracking-tight text-white md:text-7xl">
-              {heroTitle ? (
-                heroTitle
-              ) : (
-                <>
-                  Success Stories <span className="accent-gradient-text">in Action</span>
-                </>
-              )}
+              <HeroTitle
+                title={heroTitle}
+                fallback={
+                  <>
+                    Success Stories <span className="accent-gradient-text">in Action</span>
+                  </>
+                }
+              />
             </h1>
             <p className="mx-auto max-w-3xl text-xl font-light leading-relaxed text-slate-400">{heroSubtitle}</p>
             {heroStats.length ? (

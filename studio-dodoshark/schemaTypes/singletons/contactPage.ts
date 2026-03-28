@@ -41,7 +41,8 @@ export default defineType({
         defineField({
           name: 'title',
           title: 'Title',
-          type: 'string',
+          type: 'text',
+          rows: 2,
           validation: (rule) => rule.required(),
         }),
         defineField({name: 'subtitle', title: 'Subtitle', type: 'text', rows: 3}),

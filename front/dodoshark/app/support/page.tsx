@@ -7,6 +7,7 @@ import { client } from '@/app/lib/sanity'
 import { buildPageMetadata } from '@/app/lib/seo'
 import { toImageSrc } from '@/app/lib/sanity-utils'
 import type { SanityImage, SeoMeta } from '@/app/lib/types/sanity'
+import HeroTitle from '@/components/ui/HeroTitle'
 
 type SupportPageData = {
   seo?: SeoMeta
@@ -216,7 +217,7 @@ export default async function SupportPage() {
               <span>{heroEyebrow}</span>
             </div>
             <h1 className="mb-8 font-display text-5xl font-extrabold leading-[1.1] tracking-[-0.02em] text-white md:text-7xl">
-              {heroTitle}
+              <HeroTitle title={heroTitle} fallback="Service That Powers Results" />
             </h1>
             <p className="mb-10 border-l-2 border-orange-500/50 pl-6 text-lg font-normal leading-relaxed text-slate-300 md:text-xl">
               {heroDescription}

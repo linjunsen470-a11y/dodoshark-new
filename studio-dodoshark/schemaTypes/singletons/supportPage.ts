@@ -40,7 +40,7 @@ export default defineType({
       group: 'hero',
       fields: [
         defineField({name: 'eyebrow', title: 'Eyebrow', type: 'string'}),
-        defineField({name: 'title', title: 'Title', type: 'string'}),
+        defineField({name: 'title', title: 'Title', type: 'text', rows: 2}),
         defineField({name: 'description', title: 'Description', type: 'text', rows: 4}),
       ],
     }),

@@ -25,7 +25,8 @@ export default defineType({
     defineField({
       name: 'heroTitle',
       title: 'Hero Title',
-      type: 'string',
+      type: 'text',
+      rows: 2,
       group: 'hero',
       description: 'Primary hero heading shown on the homepage banner.',
     }),

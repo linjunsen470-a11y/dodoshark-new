@@ -829,24 +829,6 @@ export default async function HomePage() {
         </div>
 
         <div className="mx-auto max-w-6xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
-          {/* <div className="rounded-lg bg-white shadow-lg">
-            <div className="border-b border-slate-200 py-8 text-center">
-              <h3 className="text-2xl font-bold text-slate-900 md:text-3xl">Efficient Mixing Solutions</h3>
-            </div>
-            <div className="p-6 sm:p-8 md:p-12">
-              <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
-                {mixingSolutions.map((item) => (
-                  <SolutionCard key={item.title} {...item} />
-                ))}
-              </div>
-              <div className="mt-10 text-center">
-                <Link href="/solutions" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#fbbf24] px-8 py-3 font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-[#f59e0b] sm:w-auto">
-                  View More
-                  <ArrowRightIcon className="h-4 w-4" />
-                </Link>
-              </div>
-            </div>
-          </div> */}
         </div>
       </section>
 

@@ -7,6 +7,7 @@ import { buildPageMetadata } from '@/app/lib/seo'
 import { firstParam, toImageSrc, type QueryParamValue } from '@/app/lib/sanity-utils'
 import type { SeoMeta, SanityImage } from '@/app/lib/types/sanity'
 import LandingCardPager, { type LandingCardItem } from '@/components/ui/LandingCardPager'
+import HeroTitle from '@/components/ui/HeroTitle'
 
 type CategoryItem = {
   _id?: string
@@ -168,13 +169,14 @@ export default async function SolutionsPage({ searchParams }: SolutionsPageProps
             </div>
           )}
           <h1 className="mb-8 text-5xl font-display font-black leading-tight tracking-tight text-white md:text-7xl">
-            {heroTitle ? (
-              heroTitle
-            ) : (
-              <>
-                Material Processing <span className="accent-gradient-text">Solutions</span>
-              </>
-            )}
+            <HeroTitle
+              title={heroTitle}
+              fallback={
+                <>
+                  Material Processing <span className="accent-gradient-text">Solutions</span>
+                </>
+              }
+            />
           </h1>
           <p className="mx-auto max-w-3xl text-xl font-light leading-relaxed text-slate-400">{heroSubtitle}</p>
         </div>
