@@ -65,7 +65,9 @@ export function resolveYouTubeThumbnailUrl(raw?: string, quality: YouTubePosterQ
   const videoId = extractYouTubeVideoId(raw)
   if (!videoId) return undefined
 
-  return `https://i.ytimg.com/vi/${videoId}/${quality}.jpg`
+  const thumbnailPath = isYouTubeShortsUrl(raw) ? 'oardefault.jpg' : `${quality}.jpg`
+
+  return `https://i.ytimg.com/vi/${videoId}/${thumbnailPath}`
 }
 
 export function normalizeYouTubeEmbedUrl(raw: string) {

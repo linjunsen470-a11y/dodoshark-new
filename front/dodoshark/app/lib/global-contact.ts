@@ -12,8 +12,6 @@ const FALLBACK_CONTACT: GlobalContact = {
   phone: '+86 13662385371',
 }
 
-const FIXED_BUSINESS_EMAIL = 'service@dodoshark.com'
-
 function getNormalizedValue(rawValue: string | undefined, fallback: string) {
   const normalized = rawValue?.trim()
   return normalized || fallback
@@ -22,7 +20,7 @@ function getNormalizedValue(rawValue: string | undefined, fallback: string) {
 export async function getGlobalContact(): Promise<GlobalContact> {
   const global = await getGlobalSettings()
   return {
-    email: FIXED_BUSINESS_EMAIL,
+    email: getNormalizedValue(global?.contact?.email, FALLBACK_CONTACT.email),
     whatsapp: getNormalizedValue(global?.contact?.whatsapp, FALLBACK_CONTACT.whatsapp),
     phone: getNormalizedValue(global?.contact?.phone, FALLBACK_CONTACT.phone),
   }

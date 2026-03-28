@@ -26,16 +26,48 @@ export default defineType({
   type: 'document',
   icon: BulbOutlineIcon,
   fields: [
+    defineField({name: 'seo', title: 'SEO Settings', type: 'seoMeta'}),
+    defineField({
+      name: 'hero',
+      title: 'Hero Content',
+      type: 'object',
+      fields: [
+        defineField({name: 'eyebrow', title: 'Eyebrow', type: 'string'}),
+        defineField({name: 'title', title: 'Title', type: 'string'}),
+        defineField({name: 'description', title: 'Description', type: 'text', rows: 4}),
+      ],
+    }),
+    defineField({
+      name: 'urgentAssistance',
+      title: 'Urgent Assistance',
+      type: 'object',
+      fields: [
+        defineField({name: 'title', title: 'Title', type: 'string'}),
+        defineField({name: 'description', title: 'Description', type: 'text', rows: 4}),
+      ],
+    }),
+    defineField({
+      name: 'cta',
+      title: 'Bottom CTA',
+      type: 'object',
+      fields: [
+        defineField({name: 'title', title: 'Title', type: 'string'}),
+        defineField({name: 'description', title: 'Description', type: 'text', rows: 4}),
+        defineField({name: 'buttonLabel', title: 'Button Label', type: 'string'}),
+        defineField({
+          name: 'buttonHref',
+          title: 'Button Link',
+          type: 'string',
+          description: 'Internal path like /contact or a full absolute URL.',
+        }),
+      ],
+    }),
     defineField({
       name: 'images',
       title: 'Page Images',
       type: 'object',
       fields: [
-        imageField(
-          'heroBackground',
-          'Hero Background Image',
-          'Top hero background image.',
-        ),
+        imageField('heroBackground', 'Hero Background Image', 'Top hero background image.'),
         imageField(
           'preSalesStageImage',
           'Pre-Sales Stage Image',
@@ -61,18 +93,16 @@ export default defineType({
   ],
   preview: {
     select: {
-      title: 'images.heroBackground.alt',
-      subtitle: 'images.supportTeamImage.alt',
+      title: 'hero.title',
+      subtitle: 'urgentAssistance.title',
       media: 'images.heroBackground',
     },
     prepare({title, subtitle, media}) {
       return {
-        title: 'Support Page',
+        title: title || 'Support Page',
         subtitle:
-          joinPreview([
-            pickText(title) ? 'Hero image set' : undefined,
-            pickText(subtitle) ? 'Support team image set' : undefined,
-          ]) || 'Support page image slots',
+          joinPreview([pickText(subtitle), pickText(title) ? 'Mapped hero content' : undefined]) ||
+          'Support page image slots and key copy',
         media,
       }
     },

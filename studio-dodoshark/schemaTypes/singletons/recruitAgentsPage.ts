@@ -26,16 +26,55 @@ export default defineType({
   type: 'document',
   icon: UserIcon,
   fields: [
+    defineField({name: 'seo', title: 'SEO Settings', type: 'seoMeta'}),
+    defineField({
+      name: 'hero',
+      title: 'Hero Content',
+      type: 'object',
+      fields: [
+        defineField({name: 'title', title: 'Title', type: 'string'}),
+        defineField({name: 'eyebrow', title: 'Eyebrow', type: 'string'}),
+        defineField({name: 'subtitle', title: 'Description', type: 'text', rows: 4}),
+        defineField({name: 'primaryCtaLabel', title: 'Primary CTA Label', type: 'string'}),
+        defineField({
+          name: 'primaryCtaHref',
+          title: 'Primary CTA Link',
+          type: 'string',
+          description: 'Internal path like /contact or a full absolute URL.',
+        }),
+      ],
+    }),
+    defineField({
+      name: 'scope',
+      title: 'Recruitment Scope Intro',
+      type: 'object',
+      fields: [
+        defineField({name: 'title', title: 'Title', type: 'string'}),
+        defineField({name: 'description', title: 'Description', type: 'text', rows: 4}),
+      ],
+    }),
+    defineField({
+      name: 'cta',
+      title: 'Bottom CTA',
+      type: 'object',
+      fields: [
+        defineField({name: 'title', title: 'Title', type: 'string'}),
+        defineField({name: 'description', title: 'Description', type: 'text', rows: 4}),
+        defineField({name: 'buttonLabel', title: 'Button Label', type: 'string'}),
+        defineField({
+          name: 'buttonHref',
+          title: 'Button Link',
+          type: 'string',
+          description: 'Internal path like /contact or a full absolute URL.',
+        }),
+      ],
+    }),
     defineField({
       name: 'images',
       title: 'Page Images',
       type: 'object',
       fields: [
-        imageField(
-          'heroBackground',
-          'Hero Background Image',
-          'Top hero background image.',
-        ),
+        imageField('heroBackground', 'Hero Background Image', 'Top hero background image.'),
         imageField(
           'recruitmentScopeImage',
           'Recruitment Scope Image',
@@ -46,18 +85,16 @@ export default defineType({
   ],
   preview: {
     select: {
-      title: 'images.heroBackground.alt',
-      subtitle: 'images.recruitmentScopeImage.alt',
+      title: 'hero.title',
+      subtitle: 'cta.title',
       media: 'images.heroBackground',
     },
     prepare({title, subtitle, media}) {
       return {
-        title: 'Recruit Agents Page',
+        title: title || 'Recruit Agents Page',
         subtitle:
-          joinPreview([
-            pickText(title) ? 'Hero image set' : undefined,
-            pickText(subtitle) ? 'Scope image set' : undefined,
-          ]) || 'Recruit agents page image slots',
+          joinPreview([pickText(subtitle), pickText(title) ? 'Mapped hero content' : undefined]) ||
+          'Recruit agents page image slots and key copy',
         media,
       }
     },
