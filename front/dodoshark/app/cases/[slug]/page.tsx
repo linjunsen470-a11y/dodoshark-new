@@ -14,7 +14,7 @@ interface CaseDetailPageProps {
   params: Promise<{ slug: string }>
 }
 
-type CategoryData = {
+type ContentTagData = {
   _id?: string
   title?: string
   slug?: { current?: string }
@@ -56,7 +56,8 @@ type CaseStudyData = {
   location?: string
   seo?: SeoMeta
   coverImage?: SanityImage
-  industry?: CategoryData
+  clientLogo?: SanityImage
+  tags?: ContentTagData[]
   metrics?: CaseMetric[]
   body?: PortableTextBlock[]
   usedEquipment?: CaseEquipment[]
@@ -83,7 +84,20 @@ const caseBySlugQuery = `*[_type == "caseStudy" && slug.current == $slug][0]{
     ...,
     asset
   },
-  industry->{
+  clientLogo{
+    alt,
+    asset->{
+      _id,
+      url,
+      metadata{
+        dimensions{
+          width,
+          height
+        }
+      }
+    }
+  },
+  tags[]->{
     _id,
     title,
     slug{current}
@@ -116,6 +130,16 @@ const caseBySlugQuery = `*[_type == "caseStudy" && slug.current == $slug][0]{
 
 async function getCaseBySlug(slug: string) {
   return client.fetch<CaseStudyData | null>(caseBySlugQuery, { slug })
+}
+
+function getImageAspectRatio(image?: SanityImage, fallback = 2) {
+  const width = image?.asset?.metadata?.dimensions?.width
+  const height = image?.asset?.metadata?.dimensions?.height
+
+  if (!width || !height) return fallback
+
+  const ratio = width / height
+  return Number.isFinite(ratio) && ratio > 0 ? ratio : fallback
 }
 
 function buildPortableTextComponents(): PortableTextComponents {
@@ -264,11 +288,12 @@ export default async function CaseDetailPage({ params }: CaseDetailPageProps) {
   }
 
   const coverImageSrc = toImageSrc(caseStudy.coverImage, 1800)
-  const metrics = (caseStudy.metrics ?? []).filter((item) => item?.label || item?.value)
+  const clientLogoSrc = toImageSrc(caseStudy.clientLogo, 420)
   const usedEquipment = (caseStudy.usedEquipment ?? []).filter(
     (item) => item?._id && (item?.title || item?.modelName),
   )
   const components = buildPortableTextComponents()
+  const caseTags = (caseStudy.tags ?? []).filter((item) => item?.title?.trim() && item?.slug?.current?.trim())
 
   return (
     <div className="bg-white text-slate-900">
@@ -291,20 +316,37 @@ export default async function CaseDetailPage({ params }: CaseDetailPageProps) {
             <span className="h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
             <span>Customer Cases</span>
           </div>
+          {clientLogoSrc ? (
+            <div className="mx-auto mt-8 w-full max-w-[220px] rounded-[1.5rem] border border-white/20 bg-white/92 px-4 py-3 shadow-[0_20px_45px_-24px_rgba(15,23,42,0.95)] backdrop-blur-sm">
+              <Image
+                src={clientLogoSrc}
+                alt={caseStudy.clientLogo?.alt || caseStudy.title || 'Client logo'}
+                width={176}
+                height={56}
+                sizes="176px"
+                className="mx-auto h-10 w-auto object-contain"
+                priority
+              />
+            </div>
+          ) : null}
           {caseStudy.title && (
-            <h1 className="mb-8 text-4xl font-display font-black leading-tight tracking-tight md:text-6xl">
+            <h1 className="mb-8 mt-8 text-4xl font-display font-black leading-tight tracking-tight md:text-6xl">
               {caseStudy.title}
             </h1>
           )}
 
-          {(caseStudy.industry?.title || caseStudy.location) && (
+          {(caseTags.length > 0 || caseStudy.location) && (
             <div className="mb-8 flex flex-wrap justify-center gap-4">
-              {caseStudy.industry?.title && (
-                <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-300">
-                  <Icon icon="industry" className="h-4 w-4 text-orange-400" />
-                  <span>{caseStudy.industry.title}</span>
-                </div>
-              )}
+              {caseTags.map((tag) => (
+                <Link
+                  key={tag._id || tag.slug?.current}
+                  href={`/cases?${new URLSearchParams({ tag: tag.slug?.current ?? '' }).toString()}`}
+                  className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-300 transition hover:border-orange-400/40 hover:text-white"
+                >
+                  <span className="h-2 w-2 rounded-full bg-orange-400" />
+                  <span>{tag.title}</span>
+                </Link>
+              ))}
               {caseStudy.location && (
                 <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-300">
                   <Icon icon="location" className="h-4 w-4 text-orange-400" />

@@ -14,6 +14,9 @@ export type LandingCardItem = {
   description: string
   imageSrc?: string
   imageAlt?: string
+  imageAspectRatio?: number
+  logoSrc?: string
+  logoAlt?: string
   tag: string
   metaText?: string
 }
@@ -170,8 +173,10 @@ export default function LandingCardPager({
             >
               <span className="sr-only">View details for {item.title}</span>
             </Link>
-
-            <div className={`relative overflow-hidden bg-slate-100 ${imageAspectClassName}`}>
+            <div
+              className={`relative overflow-hidden bg-slate-100 ${imageAspectClassName}`}
+              style={item.imageAspectRatio ? { aspectRatio: item.imageAspectRatio } : undefined}
+            >
               {item.imageSrc ? (
                 <Image
                   src={item.imageSrc}
@@ -185,6 +190,19 @@ export default function LandingCardPager({
                   <Icon icon="image" className="h-10 w-10" />
                 </div>
               )}
+
+              {item.logoSrc ? (
+                <div className="absolute bottom-4 left-4 z-[1] inline-flex max-w-[min(10rem,calc(100%-2rem))] items-center justify-center rounded-2xl border border-white/30 bg-white/92 px-3 py-2 shadow-[0_18px_38px_-22px_rgba(15,23,42,0.95)] backdrop-blur-sm">
+                  <Image
+                    src={item.logoSrc}
+                    alt={item.logoAlt || `${item.title} logo`}
+                    width={132}
+                    height={40}
+                    sizes="132px"
+                    className="h-6 w-auto object-contain"
+                  />
+                </div>
+              ) : null}
             </div>
 
             <div className="flex flex-1 flex-col p-7">
