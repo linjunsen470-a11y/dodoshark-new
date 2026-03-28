@@ -180,9 +180,9 @@ export default function LandingCardPager({
             <Link
               href={item.href}
               className="absolute inset-0 z-10 rounded-[inherit] focus-visible:outline-none"
-              aria-label={`View details for ${item.title}`}
+              aria-label={`View Details - ${item.title}`}
             >
-              <span className="sr-only">View details for {item.title}</span>
+              <span className="sr-only">View Details - {item.title}</span>
             </Link>
             <div
               className={`relative overflow-hidden bg-slate-100 ${imageAspectClassName}`}
@@ -267,13 +267,15 @@ export default function LandingCardPager({
                   filterParamValue,
                   page: pageNumber,
                 })}
-                className={`h-3 rounded-full transition-all ${
-                  active ? 'w-8 bg-orange-500' : 'w-3 bg-slate-200 hover:bg-slate-300'
-                }`}
+                className="group flex h-12 w-12 items-center justify-center -mx-3 -my-3"
                 aria-label={`Go to page ${pageNumber}`}
                 aria-current={active ? 'page' : undefined}
                 onClick={() => setCurrentPage(pageNumber)}
-              />
+              >
+                <div className={`h-3 rounded-full transition-all ${
+                  active ? 'w-8 bg-orange-500' : 'w-3 bg-slate-200 group-hover:bg-slate-300'
+                }`} />
+              </Link>
             )
           })}
         </div>

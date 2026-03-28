@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import {notFound} from 'next/navigation'
 
+import dynamic from 'next/dynamic'
 import {client} from '@/app/lib/sanity'
 import {toImageSrc} from '@/app/lib/sanity-utils'
 import {
@@ -10,33 +11,34 @@ import {
   type SolutionHtmlTemplateData,
 } from '@/app/lib/solution-template'
 import type {SanityImage, SeoMeta} from '@/app/lib/types/sanity'
-import CardGridBlock, {type CardGridBlockData} from '@/components/page-builder/CardGridBlock'
-import CollectionReferenceBlock, {
-  type CollectionReferenceBlockData,
-} from '@/components/page-builder/CollectionReferenceBlock'
-import CtaBlock, {type CtaBlockData} from '@/components/page-builder/CtaBlock'
-import FeatureListBlock, {
-  type FeatureListBlockData,
-} from '@/components/page-builder/FeatureListBlock'
-import HeroBlock, {type HeroBlockData} from '@/components/page-builder/HeroBlock'
-import MediaGalleryBlock, {
-  type MediaGalleryBlockData,
-} from '@/components/page-builder/MediaGalleryBlock'
-import MergedRichFeatureSection from '@/components/page-builder/MergedRichFeatureSection'
-import MachineSelectorBlock, {
-  type MachineSelectorBlockData,
-} from '@/components/page-builder/MachineSelectorBlock'
-import MetricsBlock, {type MetricsBlockData} from '@/components/page-builder/MetricsBlock'
-import PortableTextBlock, {
-  type PortableTextBlockData,
-} from '@/components/page-builder/PortableTextBlock'
-import RichSectionBlock, {
-  type RichSectionBlockData,
-} from '@/components/page-builder/RichSectionBlock'
-import ShowcaseBlock, {
-  type ShowcaseBlockData,
-} from '@/components/page-builder/ShowcaseBlock'
-import TableBlock, {type TableBlockData} from '@/components/page-builder/TableBlock'
+
+const CardGridBlock = dynamic(() => import('@/components/page-builder/CardGridBlock'))
+const CollectionReferenceBlock = dynamic(() => import('@/components/page-builder/CollectionReferenceBlock'))
+const CtaBlock = dynamic(() => import('@/components/page-builder/CtaBlock'))
+const FeatureListBlock = dynamic(() => import('@/components/page-builder/FeatureListBlock'))
+const HeroBlock = dynamic(() => import('@/components/page-builder/HeroBlock'))
+const MediaGalleryBlock = dynamic(() => import('@/components/page-builder/MediaGalleryBlock'))
+const MergedRichFeatureSection = dynamic(() => import('@/components/page-builder/MergedRichFeatureSection'))
+const MachineSelectorBlock = dynamic(() => import('@/components/page-builder/MachineSelectorBlock'))
+const MetricsBlock = dynamic(() => import('@/components/page-builder/MetricsBlock'))
+const PortableTextBlock = dynamic(() => import('@/components/page-builder/PortableTextBlock'))
+const RichSectionBlock = dynamic(() => import('@/components/page-builder/RichSectionBlock'))
+const ShowcaseBlock = dynamic(() => import('@/components/page-builder/ShowcaseBlock'))
+const TableBlock = dynamic(() => import('@/components/page-builder/TableBlock'))
+
+import type { CardGridBlockData } from '@/components/page-builder/CardGridBlock'
+import type { CollectionReferenceBlockData } from '@/components/page-builder/CollectionReferenceBlock'
+import type { CtaBlockData } from '@/components/page-builder/CtaBlock'
+import type { FeatureListBlockData } from '@/components/page-builder/FeatureListBlock'
+import type { HeroBlockData } from '@/components/page-builder/HeroBlock'
+import type { MediaGalleryBlockData } from '@/components/page-builder/MediaGalleryBlock'
+import type { MachineSelectorBlockData } from '@/components/page-builder/MachineSelectorBlock'
+import type { MetricsBlockData } from '@/components/page-builder/MetricsBlock'
+import type { PortableTextBlockData } from '@/components/page-builder/PortableTextBlock'
+import type { RichSectionBlockData } from '@/components/page-builder/RichSectionBlock'
+import type { ShowcaseBlockData } from '@/components/page-builder/ShowcaseBlock'
+import type { TableBlockData } from '@/components/page-builder/TableBlock'
+
 import {
   groupPageBuilderBlocks,
   type PageBuilderRenderGroup,

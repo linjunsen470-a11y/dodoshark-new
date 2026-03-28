@@ -196,7 +196,7 @@ export default function Header() {
               <div className="xl:hidden">
                 <Link
                   href={cta.href}
-                  className="inline-flex min-h-10 items-center justify-center rounded-full bg-[#f0c54a] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.06em] text-[#1e3a5f] shadow-[0_10px_24px_-18px_rgba(240,197,74,0.7)] transition hover:bg-[#e7bb3a]"
+                  className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#f0c54a] px-5 py-2 text-[11px] font-bold uppercase tracking-[0.06em] text-[#1e3a5f] shadow-[0_10px_24px_-18px_rgba(240,197,74,0.7)] transition hover:bg-[#e7bb3a]"
                 >
                   Quote
                 </Link>
