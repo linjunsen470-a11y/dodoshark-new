@@ -2,6 +2,57 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 
+import { client } from '@/app/lib/sanity'
+import { toImageSrc } from '@/app/lib/sanity-utils'
+import type { SanityImage } from '@/app/lib/types/sanity'
+
+type SupportPageData = {
+  images?: {
+    heroBackground?: SanityImage
+    preSalesStageImage?: SanityImage
+    midSalesStageImage?: SanityImage
+    afterSalesStageImage?: SanityImage
+    supportTeamImage?: SanityImage
+  }
+}
+
+const SUPPORT_PAGE_QUERY = `*[_type == "supportPage"][0]{
+  images{
+    heroBackground{
+      alt,
+      asset
+    },
+    preSalesStageImage{
+      alt,
+      asset
+    },
+    midSalesStageImage{
+      alt,
+      asset
+    },
+    afterSalesStageImage{
+      alt,
+      asset
+    },
+    supportTeamImage{
+      alt,
+      asset
+    }
+  }
+}`
+
+function resolvePageImage(
+  image: SanityImage | undefined,
+  fallbackSrc: string,
+  fallbackAlt: string,
+  width: number,
+) {
+  return {
+    src: toImageSrc(image, width) || fallbackSrc,
+    alt: image?.alt?.trim() || fallbackAlt,
+  }
+}
+
 export const metadata: Metadata = {
   title: 'Service & Support | DoDoShark Machinery',
   description: 'Experience industry-leading support with DoDoShark. From pre-sales process planning to a 10-year core warranty, we ensure your production never stops.',
@@ -16,7 +67,9 @@ const SERVICE_STAGES = [
     features: ['Material Sample Testing', 'Custom Process Layout', 'Energy Efficiency Projection', 'ROI Analysis Reports'],
     icon: (
       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-    )
+    ),
+    imageKey: 'preSalesStageImage' as const,
+    fallbackImageSrc: '/assets/images/about/support-hero.jpg',
   },
   {
     id: '02',
@@ -26,7 +79,9 @@ const SERVICE_STAGES = [
     features: ['12h Factory Stress Test', 'Smart Modular Packaging', 'Technical Handover Kits', 'On-site Calibration Guides'],
     icon: (
       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
-    )
+    ),
+    imageKey: 'midSalesStageImage' as const,
+    fallbackImageSrc: '/assets/images/about/dust-control.png',
   },
   {
     id: '03',
@@ -36,11 +91,27 @@ const SERVICE_STAGES = [
     features: ['10-Year Core Warranty', '24/7 Technical Response', 'Predictive Maintenance', 'Annual Efficiency Reviews'],
     icon: (
       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-    )
-  }
+    ),
+    imageKey: 'afterSalesStageImage' as const,
+    fallbackImageSrc: '/assets/images/about/join-us.jpg',
+  },
 ]
 
-export default function SupportPage() {
+export default async function SupportPage() {
+  const pageData = await client.fetch<SupportPageData | null>(SUPPORT_PAGE_QUERY)
+  const heroImage = resolvePageImage(
+    pageData?.images?.heroBackground,
+    '/assets/images/about/support-hero.jpg',
+    'DoDoShark Global Service',
+    1800,
+  )
+  const supportTeamImage = resolvePageImage(
+    pageData?.images?.supportTeamImage,
+    '/assets/images/about/team.jpg',
+    'DoDoShark Global Support Team',
+    1400,
+  )
+
   return (
     <main className="bg-[#fcfdfd] text-slate-900 font-sans selection:bg-orange-100 selection:text-orange-900">
 
@@ -48,8 +119,8 @@ export default function SupportPage() {
       <section className="relative pt-24 pb-32 overflow-hidden bg-slate-800">
         <div className="absolute inset-0 z-0">
           <Image
-            src="/assets/images/about/support-hero.jpg"
-            alt="DoDoShark Global Service"
+            src={heroImage.src}
+            alt={heroImage.alt}
             fill
             sizes="100vw"
             className="object-cover opacity-40"
@@ -107,41 +178,50 @@ export default function SupportPage() {
           </div>
 
           <div className="space-y-32">
-            {SERVICE_STAGES.map((stage, idx) => (
-              <div key={stage.id} className={`flex flex-col lg:flex-row items-center gap-16 lg:gap-24 ${idx % 2 !== 0 ? 'lg:flex-row-reverse' : ''}`}>
-                <div className="w-full lg:w-1/2">
-                  <div className="flex items-center space-x-4 mb-6">
-                    <span className="text-6xl font-black text-slate-100 leading-none">{stage.id}</span>
-                    <div>
-                      <span className="text-xs font-black text-orange-500 uppercase tracking-widest block mb-1">{stage.phase}</span>
-                      <h4 className="text-3xl font-black text-slate-900 leading-tight">{stage.title}</h4>
+            {SERVICE_STAGES.map((stage, idx) => {
+              const stageImage = resolvePageImage(
+                pageData?.images?.[stage.imageKey],
+                stage.fallbackImageSrc,
+                stage.title,
+                1400,
+              )
+
+              return (
+                <div key={stage.id} className={`flex flex-col lg:flex-row items-center gap-16 lg:gap-24 ${idx % 2 !== 0 ? 'lg:flex-row-reverse' : ''}`}>
+                  <div className="w-full lg:w-1/2">
+                    <div className="flex items-center space-x-4 mb-6">
+                      <span className="text-6xl font-black text-slate-100 leading-none">{stage.id}</span>
+                      <div>
+                        <span className="text-xs font-black text-orange-500 uppercase tracking-widest block mb-1">{stage.phase}</span>
+                        <h4 className="text-3xl font-black text-slate-900 leading-tight">{stage.title}</h4>
+                      </div>
+                    </div>
+                    <p className="text-slate-600 font-light text-lg leading-relaxed mb-8">
+                      {stage.description}
+                    </p>
+                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {stage.features.map(feat => (
+                        <li key={feat} className="flex items-center space-x-3 text-sm font-medium text-slate-700">
+                          <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-orange-500" />
+                          <span>{feat}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="w-full lg:w-1/2">
+                    <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl group">
+                      <Image
+                        src={stageImage.src}
+                        alt={stageImage.alt}
+                        fill
+                        className={`object-cover group-hover:scale-105 transition-transform duration-700 ${idx === 1 ? 'object-contain bg-white p-8' : ''}`}
+                      />
+                      <div className="absolute inset-0 bg-orange-500/10 group-hover:bg-transparent transition-colors duration-500" />
                     </div>
                   </div>
-                  <p className="text-slate-600 font-light text-lg leading-relaxed mb-8">
-                    {stage.description}
-                  </p>
-                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {stage.features.map(feat => (
-                      <li key={feat} className="flex items-center space-x-3 text-sm font-medium text-slate-700">
-                        <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-orange-500" />
-                        <span>{feat}</span>
-                      </li>
-                    ))}
-                  </ul>
                 </div>
-                <div className="w-full lg:w-1/2">
-                  <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl group">
-                    <Image
-                      src={idx === 0 ? '/assets/images/about/support-hero.jpg' : idx === 1 ? '/assets/images/about/dust-control.png' : '/assets/images/about/join-us.jpg'}
-                      alt={stage.title}
-                      fill
-                      className={`object-cover group-hover:scale-105 transition-transform duration-700 ${idx === 1 ? 'object-contain bg-white p-8' : ''}`}
-                    />
-                    <div className="absolute inset-0 bg-orange-500/10 group-hover:bg-transparent transition-colors duration-500" />
-                  </div>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
@@ -183,8 +263,8 @@ export default function SupportPage() {
               <div className="relative">
                 <div className="aspect-square bg-white/5 rounded-3xl border border-white/10 p-2 flex flex-col justify-center items-center text-center group overflow-hidden">
                   <Image
-                    src="/assets/images/about/team.jpg"
-                    alt="DoDoShark Global Support Team"
+                    src={supportTeamImage.src}
+                    alt={supportTeamImage.alt}
                     fill
                     className="object-cover transition-transform duration-1000 group-hover:scale-110"
                   />

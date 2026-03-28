@@ -189,7 +189,7 @@ export default async function CasesPage({ searchParams }: CasesPageProps) {
   const heroTitle = landing?.hero?.title?.trim()
   const heroSubtitle =
     landing?.hero?.subtitle?.trim() ||
-    'Discover how industrial partners improve throughput and efficiency with real deployments.'
+    'Discover how DoDoShark help customers improve throughput and efficiency with real deployments.'
   const heroStats = landing?.hero?.stats ?? []
   const caseItems: LandingCardItem[] = cases.map((item) => {
     const slug = item.slug?.current?.trim()

@@ -2,6 +2,42 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 
+import { client } from '@/app/lib/sanity'
+import { toImageSrc } from '@/app/lib/sanity-utils'
+import type { SanityImage } from '@/app/lib/types/sanity'
+
+type RecruitAgentsPageData = {
+  images?: {
+    heroBackground?: SanityImage
+    recruitmentScopeImage?: SanityImage
+  }
+}
+
+const RECRUIT_AGENTS_PAGE_QUERY = `*[_type == "recruitAgentsPage"][0]{
+  images{
+    heroBackground{
+      alt,
+      asset
+    },
+    recruitmentScopeImage{
+      alt,
+      asset
+    }
+  }
+}`
+
+function resolvePageImage(
+  image: SanityImage | undefined,
+  fallbackSrc: string,
+  fallbackAlt: string,
+  width: number,
+) {
+  return {
+    src: toImageSrc(image, width) || fallbackSrc,
+    alt: image?.alt?.trim() || fallbackAlt,
+  }
+}
+
 export const metadata: Metadata = {
   title: 'Recruit Agents | DoDoShark Machinery',
   description: 'Join the DoDoShark global network. We are looking for high-quality partners to share global industrial dividends and set new brand benchmarks.',
@@ -64,7 +100,23 @@ const SUPPORT = [
   }
 ]
 
-export default function RecruitAgentsPage() {
+export default async function RecruitAgentsPage() {
+  const pageData = await client.fetch<RecruitAgentsPageData | null>(
+    RECRUIT_AGENTS_PAGE_QUERY,
+  )
+  const heroImage = resolvePageImage(
+    pageData?.images?.heroBackground,
+    '/assets/images/about/join-us.jpg',
+    'DoDoShark Global Partnership',
+    1800,
+  )
+  const scopeImage = resolvePageImage(
+    pageData?.images?.recruitmentScopeImage,
+    '/assets/images/about/global-layout.jpg',
+    'DoDoShark Global Layout',
+    1400,
+  )
+
   return (
     <main className="bg-[#fcfdfd] text-slate-900 font-sans selection:bg-orange-100 selection:text-orange-900">
 
@@ -72,8 +124,8 @@ export default function RecruitAgentsPage() {
       <section className="relative pt-32 pb-48 overflow-hidden bg-slate-800">
         <div className="absolute inset-0 opacity-30">
           <Image
-            src="/assets/images/about/join-us.jpg"
-            alt="DoDoShark Global Partnership"
+            src={heroImage.src}
+            alt={heroImage.alt}
             fill
             sizes="100vw"
             className="object-cover"
@@ -146,8 +198,8 @@ export default function RecruitAgentsPage() {
             </div>
             <div className="w-full lg:w-1/2 relative aspect-square md:aspect-video lg:aspect-square rounded-xl overflow-hidden shadow-2xl">
               <Image
-                src="/assets/images/about/global-layout.jpg"
-                alt="DoDoShark Global Layout"
+                src={scopeImage.src}
+                alt={scopeImage.alt}
                 fill
                 className="object-cover"
               />

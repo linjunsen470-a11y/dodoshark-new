@@ -32,6 +32,8 @@ export const structure: StructureResolver = (S) =>
               S.documentTypeListItem('homePage').title('Home Page').icon(HomeIcon),
               S.documentTypeListItem('aboutPage').title('About Page').icon(UserIcon),
               S.documentTypeListItem('contactPage').title('Contact Page').icon(EnvelopeIcon),
+              S.documentTypeListItem('supportPage').title('Support Page').icon(BulbOutlineIcon),
+              S.documentTypeListItem('recruitAgentsPage').title('Recruit Agents Page').icon(UserIcon),
               S.documentTypeListItem('blogPage').title('Vlog Listing Page').icon(VideoIcon),
               S.documentTypeListItem('solutionsPage').title('Solutions Listing Page').icon(BulbOutlineIcon),
               S.documentTypeListItem('casesPage').title('Case Studies Listing Page').icon(CaseIcon),

@@ -44,6 +44,8 @@ import blogPage from './singletons/blogPage'
 import solutionsPage from './singletons/solutionsPage'
 import casesPage from './singletons/casesPage'
 import productPage from './singletons/productPage'
+import supportPage from './singletons/supportPage'
+import recruitAgentsPage from './singletons/recruitAgentsPage'
 
 export const schemaTypes = [
     // Objects
@@ -92,6 +94,8 @@ export const schemaTypes = [
     solutionsPage,
     casesPage,
     productPage,
+    supportPage,
+    recruitAgentsPage,
 ]
 
 // Singleton type names used by structure.ts and sanity.config.ts
@@ -104,4 +108,6 @@ export const singletonTypes = new Set([
     'solutionsPage',
     'casesPage',
     'productPage',
+    'supportPage',
+    'recruitAgentsPage',
 ])

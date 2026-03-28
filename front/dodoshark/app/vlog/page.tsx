@@ -170,7 +170,7 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
   const heroBadge = landing?.hero?.badge?.trim()
   const heroTitle = landing?.hero?.title?.trim()
   const heroSubtitle =
-    landing?.hero?.subtitle?.trim() || 'Machine demos, process walkthroughs, and industrial video updates.'
+    landing?.hero?.subtitle?.trim() || 'Product demonstrations, processing materials, integrated solutions, customer usage scenarios, etc.'
   const videoItems: VlogVideoCardItem[] = posts.map((post) => ({
     id: post._id,
     title: post.title?.trim() || 'Video',
