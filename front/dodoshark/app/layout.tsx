@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { draftMode } from "next/headers";
+import { VisualEditing } from "next-sanity/visual-editing";
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
@@ -48,11 +50,13 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const draft = await draftMode();
+
   return (
     <html lang="en" className="scroll-smooth">
       <body
@@ -61,6 +65,7 @@ export default function RootLayout({
         <Header />
         {children}
         <Footer />
+        {draft.isEnabled && <VisualEditing />}
       </body>
     </html>
   );
