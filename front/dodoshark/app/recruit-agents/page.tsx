@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { cache } from 'react'
+import type { ReactNode } from 'react'
 
-import { client } from '@/app/lib/sanity'
+import { fetchSanityData } from '@/app/lib/sanity.live'
 import { buildPageMetadata } from '@/app/lib/seo'
-import { toImageSrc } from '@/app/lib/sanity-utils'
+import { cleanText, renderText, toImageSrc } from '@/app/lib/sanity-utils'
 import type { SanityImage, SeoMeta } from '@/app/lib/types/sanity'
 import HeroTitle from '@/components/ui/HeroTitle'
 
@@ -22,6 +22,22 @@ type RecruitAgentsPageData = {
     title?: string
     description?: string
   }
+  whyChooseUs?: Array<{
+    title?: string
+    description?: string
+  }>
+  scopeRegions?: Array<{
+    region?: string
+    countries?: string[]
+  }>
+  requirements?: Array<{
+    title?: string
+    items?: string[]
+  }>
+  supportSections?: Array<{
+    title?: string
+    items?: string[]
+  }>
   cta?: {
     title?: string
     description?: string
@@ -40,7 +56,23 @@ const RECRUIT_AGENTS_PAGE_QUERY = `coalesce(
 ){
   seo,
   hero,
+  whyChooseUs[]{
+    title,
+    description
+  },
   scope,
+  scopeRegions[]{
+    region,
+    countries
+  },
+  requirements[]{
+    title,
+    items
+  },
+  supportSections[]{
+    title,
+    items
+  },
   cta,
   images{
     heroBackground{
@@ -54,9 +86,12 @@ const RECRUIT_AGENTS_PAGE_QUERY = `coalesce(
   }
 }`
 
-const getRecruitAgentsPageData = cache(
-  async () => client.fetch<RecruitAgentsPageData | null>(RECRUIT_AGENTS_PAGE_QUERY),
-)
+async function getRecruitAgentsPageData(stega?: boolean) {
+  return fetchSanityData<RecruitAgentsPageData | null>({
+    query: RECRUIT_AGENTS_PAGE_QUERY,
+    stega,
+  })
+}
 
 function resolvePageImage(
   image: SanityImage | undefined,
@@ -66,7 +101,7 @@ function resolvePageImage(
 ) {
   return {
     src: toImageSrc(image, width) || fallbackSrc,
-    alt: image?.alt?.trim() || fallbackAlt,
+    alt: cleanText(image?.alt) || fallbackAlt,
   }
 }
 
@@ -180,7 +215,7 @@ const SUPPORT = [
 ]
 
 export async function generateMetadata(): Promise<Metadata> {
-  const pageData = await getRecruitAgentsPageData()
+  const pageData = await getRecruitAgentsPageData(false)
   return buildPageMetadata({
     seo: pageData?.seo,
     fallbackTitle: 'Recruit Agents | DoDoShark Machinery',
@@ -204,24 +239,76 @@ export default async function RecruitAgentsPage() {
     1400,
   )
   const heroTitle =
-    pageData?.hero?.title?.trim() || 'Partner with DoDoShark Explore Global Blue Oceans'
+    renderText(pageData?.hero?.title) || 'Partner with DoDoShark Explore Global Blue Oceans'
   const heroEyebrow =
-    pageData?.hero?.eyebrow?.trim() || 'Overseas Partner (Agent) Recruitment Plan'
+    renderText(pageData?.hero?.eyebrow) || 'Overseas Partner (Agent) Recruitment Plan'
   const heroSubtitle =
-    pageData?.hero?.subtitle?.trim() ||
+    renderText(pageData?.hero?.subtitle) ||
     'In the wave of global manufacturing upgrades, premium mechanical equipment is the core competitiveness. DoDoShark invites you to seize regional market dividends and embark on a new journey of growth together.'
-  const heroCtaLabel = pageData?.hero?.primaryCtaLabel?.trim() || 'Apply Now'
-  const heroCtaHref = pageData?.hero?.primaryCtaHref?.trim() || '/contact'
-  const scopeTitle = pageData?.scope?.title?.trim() || 'Strategic Layout, Precise Recruitment'
+  const heroCtaLabel = renderText(pageData?.hero?.primaryCtaLabel) || 'Apply Now'
+  const heroCtaHref = cleanText(pageData?.hero?.primaryCtaHref) || '/contact'
+  const scopeTitle = renderText(pageData?.scope?.title) || 'Strategic Layout, Precise Recruitment'
   const scopeDescription =
-    pageData?.scope?.description?.trim() ||
+    renderText(pageData?.scope?.description) ||
     'We are actively expanding our global presence, focusing on regions with high agricultural and industrial potential.'
-  const ctaTitle = pageData?.cta?.title?.trim() || 'Act Now and Share the Dividends'
+  const whyChooseUs =
+    pageData?.whyChooseUs
+      ?.map((item, index) => {
+        const title = renderText(item?.title)
+        const description = renderText(item?.description)
+        if (!title || !description) return null
+        return {
+          title,
+          description,
+          icon: WHY_CHOOSE_US[index]?.icon ?? WHY_CHOOSE_US[0].icon,
+        }
+      })
+      .filter((item): item is {title: string; description: string; icon: ReactNode} => Boolean(item)) ?? WHY_CHOOSE_US
+  const scopeRegions =
+    pageData?.scopeRegions
+      ?.map((item, index) => {
+        const region = renderText(item?.region)
+        if (!region) return null
+        return {
+          region,
+          countries: (item?.countries ?? []).map((country) => renderText(country)).filter((country): country is string => Boolean(country)),
+          color: SCOPE[index]?.color ?? 'from-orange-500/10 to-transparent',
+        }
+      })
+      .filter(Boolean) ?? SCOPE
+  const requirements =
+    pageData?.requirements
+      ?.map((item, index) => {
+        const title = renderText(item?.title)
+        if (!title) return null
+        return {
+          title,
+          items: (item?.items ?? []).map((entry) => renderText(entry)).filter((entry): entry is string => Boolean(entry)),
+          borderClass: index % 2 === 1 ? 'border-slate-900' : 'border-orange-500',
+        }
+      })
+      .filter(Boolean) ?? [
+      { title: 'Qualifications', items: ['Legal operating status & qualifications', 'Familiarity with local market & laws', 'Strong local customer resources'], borderClass: 'border-orange-500' },
+      { title: 'Capabilities', items: ['3+ years mechanical sales experience', 'Professional tech & sales team', 'Full lifecycle service capability'], borderClass: 'border-slate-900' },
+      { title: 'Compliance', items: ['Adherence to market rules & integrity', 'Solid financial & credit standing', 'Adequate capital for operations'], borderClass: 'border-orange-500' },
+    ]
+  const supportSections =
+    pageData?.supportSections
+      ?.map((section) => {
+        const title = renderText(section?.title)
+        if (!title) return null
+        return {
+          title,
+          items: (section?.items ?? []).map((entry) => renderText(entry)).filter((entry): entry is string => Boolean(entry)),
+        }
+      })
+      .filter(Boolean) ?? SUPPORT
+  const ctaTitle = renderText(pageData?.cta?.title) || 'Act Now and Share the Dividends'
   const ctaDescription =
-    pageData?.cta?.description?.trim() ||
+    renderText(pageData?.cta?.description) ||
     "We believe that combining DoDoShark's excellent products with your localized advantages will create miracles. If you are ready to start a new chapter, contact us today."
-  const ctaButtonLabel = pageData?.cta?.buttonLabel?.trim() || 'Contact Us To Apply'
-  const ctaButtonHref = pageData?.cta?.buttonHref?.trim() || '/contact'
+  const ctaButtonLabel = renderText(pageData?.cta?.buttonLabel) || 'Contact Us To Apply'
+  const ctaButtonHref = cleanText(pageData?.cta?.buttonHref) || '/contact'
 
   return (
     <main className="bg-[#fcfdfd] text-slate-900 font-sans selection:bg-orange-100 selection:text-orange-900">
@@ -267,7 +354,7 @@ export default async function RecruitAgentsPage() {
             <div className="mx-auto mt-4 h-1.5 w-24 rounded-full bg-orange-500" />
           </div>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-            {WHY_CHOOSE_US.map((item) => (
+            {whyChooseUs.map((item) => (
               <div
                 key={item.title}
                 className="group rounded-xl border border-slate-200 bg-slate-50 p-8 shadow-xl transition-all duration-300 hover:border-orange-500"
@@ -296,7 +383,7 @@ export default async function RecruitAgentsPage() {
                 {scopeDescription}
               </p>
               <div className="grid gap-4 sm:grid-cols-2">
-                {SCOPE.map((item) => (
+                {scopeRegions.map((item) => (
                   <div
                     key={item.region}
                     className={`rounded-xl border border-slate-200 bg-gradient-to-br p-6 ${item.color}`}
@@ -335,30 +422,16 @@ export default async function RecruitAgentsPage() {
           </p>
 
           <div className="grid gap-8 text-left md:grid-cols-3">
-            <div className="rounded-b-xl border-t-4 border-orange-500 bg-white p-8 shadow-xl">
-              <h3 className="mb-6 text-xl font-black uppercase tracking-tight">Qualifications</h3>
-              <ul className="space-y-4 font-light text-slate-600">
-                <li className="flex gap-3"><span className="shrink-0 font-bold text-orange-500">+</span> Legal operating status & qualifications</li>
-                <li className="flex gap-3"><span className="shrink-0 font-bold text-orange-500">+</span> Familiarity with local market & laws</li>
-                <li className="flex gap-3"><span className="shrink-0 font-bold text-orange-500">+</span> Strong local customer resources</li>
-              </ul>
-            </div>
-            <div className="rounded-b-xl border-t-4 border-slate-900 bg-white p-8 shadow-xl">
-              <h3 className="mb-6 text-xl font-black uppercase tracking-tight">Capabilities</h3>
-              <ul className="space-y-4 font-light text-slate-600">
-                <li className="flex gap-3"><span className="shrink-0 font-bold text-orange-500">+</span> 3+ years mechanical sales experience</li>
-                <li className="flex gap-3"><span className="shrink-0 font-bold text-orange-500">+</span> Professional tech & sales team</li>
-                <li className="flex gap-3"><span className="shrink-0 font-bold text-orange-500">+</span> Full lifecycle service capability</li>
-              </ul>
-            </div>
-            <div className="rounded-b-xl border-t-4 border-orange-500 bg-white p-8 shadow-xl">
-              <h3 className="mb-6 text-xl font-black uppercase tracking-tight">Compliance</h3>
-              <ul className="space-y-4 font-light text-slate-600">
-                <li className="flex gap-3"><span className="shrink-0 font-bold text-orange-500">+</span> Adherence to market rules & integrity</li>
-                <li className="flex gap-3"><span className="shrink-0 font-bold text-orange-500">+</span> Solid financial & credit standing</li>
-                <li className="flex gap-3"><span className="shrink-0 font-bold text-orange-500">+</span> Adequate capital for operations</li>
-              </ul>
-            </div>
+            {requirements.map((section) => (
+              <div key={section.title} className={`rounded-b-xl border-t-4 ${section.borderClass} bg-white p-8 shadow-xl`}>
+                <h3 className="mb-6 text-xl font-black uppercase tracking-tight">{section.title}</h3>
+                <ul className="space-y-4 font-light text-slate-600">
+                  {section.items.map((item) => (
+                    <li key={item} className="flex gap-3"><span className="shrink-0 font-bold text-orange-500">+</span>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -379,7 +452,7 @@ export default async function RecruitAgentsPage() {
             </p>
           </div>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-            {SUPPORT.map((section) => (
+            {supportSections.map((section) => (
               <div
                 key={section.title}
                 className="rounded-xl border border-white/10 bg-white/5 p-8 transition-colors hover:bg-white/10"

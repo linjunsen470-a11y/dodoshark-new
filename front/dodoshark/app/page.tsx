@@ -3,11 +3,12 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import dynamic from 'next/dynamic'
-import { draftMode } from 'next/headers'
-import { getClient, urlFor } from '@/app/lib/sanity'
+import { fetchSanityData } from '@/app/lib/sanity.live'
+import { urlFor } from '@/app/lib/sanity'
 import { buildPageMetadata } from '@/app/lib/seo'
 import { normalizeYouTubeEmbedUrl, resolveYouTubeThumbnailUrl } from '@/app/lib/video'
 import type { SeoMeta, SanityImage } from '@/app/lib/types/sanity'
+import { cleanSlug, cleanText, renderText } from '@/app/lib/sanity-utils'
 
 const DeferredHeroCarousel = dynamic(() => import('@/components/home/DeferredHeroCarousel'))
 const DeferredHomeBlogCarousel = dynamic(() => import('@/components/home/DeferredHomeBlogCarousel'))
@@ -101,10 +102,39 @@ type HomePageData = {
   heroSubtitle?: string
   heroDescription?: string
   heroBackgrounds?: HomeSanityImage[]
+  stats?: Array<{
+    label?: string
+    value?: string
+    suffix?: string
+  }>
+  aboutFeatures?: Array<{
+    title?: string
+    description?: string
+    image?: HomeSanityImage
+  }>
+  confidenceSection?: {
+    titleLineOne?: string
+    titleLineTwo?: string
+    description?: string
+    cards?: Array<{
+      title?: string
+      subtitle?: string
+      points?: string[]
+      image?: HomeSanityImage
+    }>
+  }
   featuredAgriProducts?: FeaturedHomeProduct[]
   featuredFoodProducts?: FeaturedHomeProduct[]
   featuredSolutions?: FeaturedHomeSolution[]
   featuredCases?: FeaturedHomeCase[]
+  advantagesSection?: {
+    title?: string
+    items?: Array<{
+      title?: string
+      description?: string
+      image?: HomeSanityImage
+    }>
+  }
   featuredHomeVideos?: FeaturedHomeVideo[]
   whyChooseUsVideoUrl?: string
   whyChooseUsVideoCoverImage?: HomeSanityImage
@@ -133,6 +163,35 @@ const homeQuery = `coalesce(
     asset,
     alt,
     "imageUrl": asset->url
+  },
+  stats[]{
+    label,
+    value,
+    suffix
+  },
+  aboutFeatures[]{
+    title,
+    description,
+    image{
+      asset,
+      alt,
+      "imageUrl": asset->url
+    }
+  },
+  confidenceSection{
+    titleLineOne,
+    titleLineTwo,
+    description,
+    cards[]{
+      title,
+      subtitle,
+      points,
+      image{
+        asset,
+        alt,
+        "imageUrl": asset->url
+      }
+    }
   },
   featuredAgriProducts[]->{
     _id,
@@ -189,6 +248,18 @@ const homeQuery = `coalesce(
       asset,
       alt,
       "imageUrl": asset->url
+    }
+  },
+  advantagesSection{
+    title,
+    items[]{
+      title,
+      description,
+      image{
+        asset,
+        alt,
+        "imageUrl": asset->url
+      }
     }
   },
   featuredHomeVideos[]->{
@@ -419,7 +490,7 @@ function hasSanityImageAsset(image?: HomeSanityImage) {
 }
 
 function buildDetailHref(basePath: '/products' | '/solutions' | '/cases', slug?: HomeSlug) {
-  const current = slug?.current?.trim()
+  const current = cleanSlug(slug)
   return current ? `${basePath}/${current}` : basePath
 }
 
@@ -435,7 +506,7 @@ function formatHomeVideoMeta(publishedAt?: string, firstTagTitle?: string) {
     }
   }
 
-  return firstTagTitle?.trim() || 'Video'
+  return renderText(firstTagTitle) || 'Video'
 }
 
 function isDefined<T>(value: T | null | undefined): value is T {
@@ -501,7 +572,10 @@ function SolutionCard({ title, description, image, href }: { title: string; desc
 
 async function getHomePageData(preview = false) {
   try {
-    return await getClient(preview).fetch<HomePageData | null>(homeQuery)
+    return await fetchSanityData<HomePageData | null>({
+      query: homeQuery,
+      stega: preview ? undefined : false,
+    })
   } catch {
     return null
   }
@@ -518,8 +592,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const draft = await draftMode()
-  const data = await getHomePageData(draft.isEnabled)
+  const data = await getHomePageData(true)
 
   const heroSlides: HeroCarouselImage[] = (data?.heroBackgrounds ?? [])
     .map((image, index) => {
@@ -537,14 +610,57 @@ export default async function HomePage() {
       ? heroSlides
       : [{ src: '/assets/images/banner.png', alt: 'DoDoShark factory banner' }]
 
-  const heroVideoUrl = data?.whyChooseUsVideoUrl?.trim()
+  const heroVideoUrl = cleanText(data?.whyChooseUsVideoUrl)
   const whyChooseUsCoverImageSrc =
     getSanityImageUrl(data?.whyChooseUsVideoCoverImage, { width: 1200 }) ??
     resolveYouTubeThumbnailUrl(heroVideoUrl, 'maxresdefault') ??
     '/assets/images/factory-showcase.png'
   const whyChooseUsCoverImageAlt = hasSanityImageAsset(data?.whyChooseUsVideoCoverImage)
-    ? data?.whyChooseUsVideoCoverImage?.alt?.trim() || 'DoDoShark Factory Video'
+    ? renderText(data?.whyChooseUsVideoCoverImage?.alt) || 'DoDoShark Factory Video'
     : 'DoDoShark Factory Video'
+  const homeStats =
+    data?.stats
+      ?.map((item) => {
+        const label = renderText(item?.label)
+        const value = renderText(item?.value)
+        if (!label || !value) return null
+        return {
+          label,
+          value,
+          suffix: renderText(item?.suffix) || '',
+        }
+      })
+      .filter(isDefined) ?? stats
+  const homeAboutFeatures =
+    data?.aboutFeatures
+      ?.map((item, index) => {
+        const title = renderText(item?.title)
+        const description = renderText(item?.description)
+        const image = getSanityImageUrl(item?.image, { width: 256 }) || aboutFeatures[index]?.image
+        if (!title || !description || !image) return null
+        return { title, description, image }
+      })
+      .filter(isDefined) ?? aboutFeatures
+  const confidenceTitleLineOne = renderText(data?.confidenceSection?.titleLineOne) || 'Choose DodoShark'
+  const confidenceTitleLineTwo = renderText(data?.confidenceSection?.titleLineTwo) || 'Choose Confidence'
+  const confidenceDescription =
+    renderText(data?.confidenceSection?.description) ||
+    'DoDoShark practices "Carefree Production, Joyful Harvest" through innovation and high quality.'
+  const homeConfidenceCards =
+    data?.confidenceSection?.cards
+      ?.map((card, index) => {
+        const title = renderText(card?.title)
+        const subtitle = renderText(card?.subtitle)
+        const image = getSanityImageUrl(card?.image, { width: 1200 }) || confidenceCards[index]?.image
+        if (!title || !subtitle || !image) return null
+        return {
+          title,
+          subtitle,
+          points: (card?.points ?? []).map((point) => renderText(point)).filter(isDefined),
+          image,
+        }
+      })
+      .filter(isDefined) ?? confidenceCards
   const featuredAgriProducts: HomeProductCard[] =
     data?.featuredAgriProducts
       ?.map((product) => {
@@ -552,13 +668,13 @@ export default async function HomePage() {
         if (!image) return null
 
         return {
-          title: product.title?.trim() || 'Product',
+          title: renderText(product.title) || 'Product',
           description:
-            product.shortDescription?.trim() || 'High performance industrial processing equipment.',
+            renderText(product.shortDescription) || 'High performance industrial processing equipment.',
           image,
           href: buildDetailHref('/products', product.slug),
-          badge: product.seriesTag?.trim()
-            ? { label: product.seriesTag.trim(), className: 'bg-orange-500' }
+          badge: renderText(product.seriesTag)
+            ? { label: renderText(product.seriesTag)!, className: 'bg-orange-500' }
             : undefined,
         }
       })
@@ -570,13 +686,13 @@ export default async function HomePage() {
         if (!image) return null
 
         return {
-          title: product.title?.trim() || 'Product',
+          title: renderText(product.title) || 'Product',
           description:
-            product.shortDescription?.trim() || 'High performance industrial processing equipment.',
+            renderText(product.shortDescription) || 'High performance industrial processing equipment.',
           image,
           href: buildDetailHref('/products', product.slug),
-          badge: product.seriesTag?.trim()
-            ? { label: product.seriesTag.trim(), className: 'bg-orange-500' }
+          badge: renderText(product.seriesTag)
+            ? { label: renderText(product.seriesTag)!, className: 'bg-orange-500' }
             : undefined,
         }
       })
@@ -588,9 +704,9 @@ export default async function HomePage() {
         if (!image) return null
 
         return {
-          title: solution.title?.trim() || 'Solution',
+          title: renderText(solution.title) || 'Solution',
           description:
-            solution.summary?.trim() || 'High-efficiency and stable industrial process design.',
+            renderText(solution.summary) || 'High-efficiency and stable industrial process design.',
           image,
           href: buildDetailHref('/solutions', solution.slug),
         }
@@ -603,9 +719,9 @@ export default async function HomePage() {
         if (!image) return null
 
         return {
-          title: caseItem.title?.trim() || 'Case Study',
+          title: renderText(caseItem.title) || 'Case Study',
           description:
-            caseItem.excerpt?.trim() || 'Detailed case study content is available in the full project report.',
+            renderText(caseItem.excerpt) || 'Detailed case study content is available in the full project report.',
           image,
           logo: getSanityImageUrl(caseItem.clientLogo, { width: 264 }),
           href: buildDetailHref('/cases', caseItem.slug),
@@ -616,20 +732,30 @@ export default async function HomePage() {
   const homeFoodProducts = featuredFoodProducts.length > 0 ? featuredFoodProducts : foodProducts
   const homeSolutions = featuredSolutions.length > 0 ? featuredSolutions : grindingSolutions
   const homeCaseItems = featuredCases.length > 0 ? featuredCases : projectCaseItems
+  const homeAdvantages =
+    data?.advantagesSection?.items
+      ?.map((item, index) => {
+        const title = renderText(item?.title)
+        const description = renderText(item?.description)
+        const image = getSanityImageUrl(item?.image, { width: 256 }) || advantages[index]?.image
+        if (!title || !description || !image) return null
+        return { title, description, image }
+      })
+      .filter(isDefined) ?? advantages
   const homeVideoItems =
     data?.featuredHomeVideos
-      ?.filter((video) => video?.status === 'published')
+      ?.filter((video) => cleanText(video?.status) === 'published')
       .map((video) => {
-        const youtubeUrl = video.youtubeUrl?.trim()
+        const youtubeUrl = cleanText(video.youtubeUrl)
         if (!youtubeUrl || !normalizeYouTubeEmbedUrl(youtubeUrl)) return null
 
         return {
           id: video._id,
-          title: video.title?.trim() || 'Video',
+          title: renderText(video.title) || 'Video',
           imageSrc: getSanityImageUrl(video.coverImage, { width: 1200 }) || undefined,
-          imageAlt: hasSanityImageAsset(video.coverImage) ? video.coverImage?.alt || video.title || 'Video cover' : video.title || 'Video cover',
+          imageAlt: hasSanityImageAsset(video.coverImage) ? renderText(video.coverImage?.alt) || renderText(video.title) || 'Video cover' : renderText(video.title) || 'Video cover',
           youtubeUrl,
-          metaText: formatHomeVideoMeta(video.publishedAt, video.tags?.[0]?.title),
+          metaText: formatHomeVideoMeta(video.publishedAt, renderText(video.tags?.[0]?.title)),
         }
       })
       .filter(isDefined) ?? []
@@ -645,16 +771,16 @@ export default async function HomePage() {
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-orange-400/30 bg-orange-500/20 px-4 py-2 text-sm font-medium text-orange-300">
               <span className="h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
-              <span>{data?.heroEyebrow ?? '20 Years of Focus in Crushing & Grinding'}</span>
+              <span>{renderText(data?.heroEyebrow) ?? '20 Years of Focus in Crushing & Grinding'}</span>
             </div>
             <h1 className="mt-6 font-display text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">
               <HeroTitle title={data?.heroTitle} fallback="Dual-Engine Business Model" />
             </h1>
             <p className="mt-4 text-lg font-medium text-white/85 sm:text-xl">
-              {data?.heroSubtitle ?? 'Agri-Processing + Food Processing'}
+              {renderText(data?.heroSubtitle) ?? 'Agri-Processing + Food Processing'}
             </p>
             <p className="mt-4 max-w-lg text-sm leading-7 text-white/65 sm:text-base">
-              {data?.heroDescription ??
+              {renderText(data?.heroDescription) ??
                 'DoDoShark is dedicated to providing professional crushing, grinding, and mixing solutions, boosting efficiency and product quality for enterprises.'}
             </p>
             <div className="mt-8">
@@ -677,7 +803,7 @@ export default async function HomePage() {
       <section className="border-b border-slate-100 bg-white py-14 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 gap-x-8 gap-y-10 md:grid-cols-4 md:gap-y-12">
-            {stats.map((item) => (
+            {homeStats.map((item) => (
               <div key={item.label} className="text-center">
                 <div className="inline-flex items-baseline justify-center gap-1">
                   <span className="text-4xl font-extrabold leading-none text-orange-500 sm:text-5xl md:text-6xl">{item.value}</span>
@@ -699,7 +825,7 @@ export default async function HomePage() {
           </div>
 
           <div className="mt-16 grid gap-10 md:grid-cols-3 lg:gap-12">
-            {aboutFeatures.map((item) => (
+            {homeAboutFeatures.map((item) => (
               <article key={item.title} className="text-center">
                 <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-white/5">
                   <Image src={item.image} alt={item.title} width={48} height={48} className="h-12 w-12 object-contain" />
@@ -722,10 +848,10 @@ export default async function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-16 grid items-start gap-10 lg:grid-cols-2 lg:gap-12">
             <div className="pt-2 sm:pt-8">
-              <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl lg:text-5xl"><span>Choose DodoShark</span><br /><span>Choose Confidence</span></h2>
+              <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl lg:text-5xl"><span>{confidenceTitleLineOne}</span><br /><span>{confidenceTitleLineTwo}</span></h2>
               <div className="mt-5 h-1 w-16 bg-[#f5a623]" />
               <p className="mt-8 text-base leading-8 text-slate-600 sm:text-lg">
-                DoDoShark practices &quot;Carefree Production, Joyful Harvest&quot; through innovation and high quality.
+                {confidenceDescription}
               </p>
             </div>
 
@@ -745,7 +871,7 @@ export default async function HomePage() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {confidenceCards.map((card) => (
+            {homeConfidenceCards.map((card) => (
               <article key={card.title} className="overflow-hidden rounded-[1rem] bg-white shadow-sm transition duration-300 hover:shadow-xl">
                 <div className="p-8 pb-6">
                   <h3 className="text-xl font-bold text-slate-900">{card.title}</h3>
@@ -879,7 +1005,7 @@ export default async function HomePage() {
             </div>
             <h2 className="font-display text-3xl font-bold text-white sm:text-4xl">Right Choice, Lifelong Performance</h2>
             <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-              {advantages.map((item) => (
+              {homeAdvantages.map((item) => (
                 <article key={item.title} className="home-advantage-item rounded-[1rem] border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
                   <div className="home-advantage-icon">
                     <Image src={item.image} alt={item.title} width={56} height={56} className="h-14 w-14 object-contain" />

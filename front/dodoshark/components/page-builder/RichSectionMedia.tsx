@@ -1,6 +1,7 @@
 import Image from 'next/image'
 
 import { urlFor } from '@/app/lib/sanity'
+import { cleanText, renderText } from '@/app/lib/sanity-utils'
 
 import {
   getSharedSurfaceClasses,
@@ -80,7 +81,7 @@ export function RichSectionMediaFigure({
   const width = item.image.asset.metadata?.dimensions?.width ?? 1200
   const height = item.image.asset.metadata?.dimensions?.height ?? 900
   const hasLqip = Boolean(item.image.asset.metadata?.lqip)
-  const alt = item.alt?.trim() || item.caption?.trim() || title || 'Section media'
+  const alt = cleanText(item.alt) || cleanText(item.caption) || cleanText(title) || 'Section media'
   const frameClass = disableMediaFrameEffect
     ? 'relative overflow-hidden'
     : `relative overflow-hidden rounded-lg ${getSharedSurfaceClasses(theme, 'elevated')}`
@@ -119,8 +120,8 @@ export function RichSectionMediaCard({
   descriptionSpacingClassName?: string
   disableMediaFrameEffect?: boolean
 }) {
-  const caption = item.caption?.trim()
-  const description = showDescription ? item.description?.trim() : undefined
+  const caption = renderText(item.caption)
+  const description = showDescription ? renderText(item.description) : undefined
 
   return (
     <article className="min-w-0">

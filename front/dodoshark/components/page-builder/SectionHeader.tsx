@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { renderText } from '@/app/lib/sanity-utils'
 
 import {
   eyebrowClass,
@@ -42,8 +43,8 @@ export default function SectionHeader({
   const lineAlignClass = align === 'left' ? 'mx-0' : 'mx-auto'
   const stackClass = spacing === 'compact' ? 'space-y-3' : 'space-y-4'
   const dividerSpacingClass = spacing === 'compact' ? 'mt-4' : 'mt-5'
-  const resolvedTitle = typeof title === 'string' ? title.trim() : title
-  const resolvedSubtitle = typeof subtitle === 'string' ? subtitle.trim() : subtitle
+  const resolvedTitle = typeof title === 'string' ? renderText(title) : title
+  const resolvedSubtitle = typeof subtitle === 'string' ? renderText(subtitle) : subtitle
   const resolvedSubtitleClass =
     subtitleClassName || `${sectionSubtitleClass} max-w-3xl ${toneClasses.subtitle}`
 

@@ -1,4 +1,5 @@
 import React from 'react'
+import { renderText } from '@/app/lib/sanity-utils'
 
 interface HeroTitleProps {
   title?: string
@@ -14,13 +15,15 @@ interface HeroTitleProps {
  *    is highlighted with 'accent-gradient-text'.
  */
 const HeroTitle: React.FC<HeroTitleProps> = ({ title, fallback }) => {
-  if (!title?.trim()) {
+  const cleanTitle = renderText(title)
+
+  if (!cleanTitle) {
     return <>{fallback}</>
   }
 
   // Check for explicit newline
-  if (title.includes('\n')) {
-    const lines = title.split('\n').map(l => l.trim()).filter(Boolean)
+  if (cleanTitle.includes('\n')) {
+    const lines = cleanTitle.split('\n').map((line) => renderText(line)).filter(Boolean)
     if (lines.length >= 2) {
       return (
         <>
@@ -33,7 +36,7 @@ const HeroTitle: React.FC<HeroTitleProps> = ({ title, fallback }) => {
   }
 
   // Single line logic: split half words
-  const words = title.trim().split(/\s+/)
+  const words = cleanTitle.split(/\s+/)
   if (words.length <= 1) {
     // If only one word, maybe it's a long word or CJK. 
     // For single word, we just render it plain unless the user wants part of the word colored (not requested here).

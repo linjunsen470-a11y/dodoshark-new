@@ -1,3 +1,5 @@
+import { renderText } from '@/app/lib/sanity-utils'
+
 export default function AccentTitle({
   title,
   reserveSpace = false,
@@ -7,7 +9,7 @@ export default function AccentTitle({
   reserveSpace?: boolean
   className?: string
 }) {
-  const resolvedTitle = title?.trim()
+  const resolvedTitle = renderText(title)
 
   if (!resolvedTitle && !reserveSpace) return null
 

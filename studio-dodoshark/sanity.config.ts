@@ -6,6 +6,10 @@ import {codeInput} from '@sanity/code-input'
 import {table} from '@sanity/table'
 import {schemaTypes, singletonTypes} from './schemaTypes'
 import {structure} from './structure'
+import {presentationResolve} from './presentation/resolve'
+
+const previewOrigin =
+  process.env.SANITY_STUDIO_PREVIEW_ORIGIN?.trim() || 'http://localhost:3000'
 
 export default defineConfig({
   name: 'default',
@@ -16,10 +20,12 @@ export default defineConfig({
 
   plugins: [
     presentationTool({
+      resolve: presentationResolve,
       previewUrl: {
-        origin: 'http://localhost:3000',
-        draftMode: {
+        origin: previewOrigin,
+        previewMode: {
           enable: '/api/draft/enable',
+          disable: '/api/draft/disable',
         },
       },
     }),

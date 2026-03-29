@@ -2,10 +2,11 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import dynamic from 'next/dynamic'
+import { createDataAttribute } from 'next-sanity'
+import type { ReactNode } from 'react'
 
-import { draftMode } from 'next/headers'
-import { getClient } from '@/app/lib/sanity'
-import { toImageSrc } from '@/app/lib/sanity-utils'
+import { fetchSanityData } from '@/app/lib/sanity.live'
+import { cleanSlug, cleanText, renderText, toImageSrc } from '@/app/lib/sanity-utils'
 import type { SanityImage, SeoMeta } from '@/app/lib/types/sanity'
 
 const CardGridBlock = dynamic(() => import('@/components/page-builder/CardGridBlock'))
@@ -292,12 +293,20 @@ const productMetadataQuery = `*[_type == "product" && slug.current == $slug][0] 
   }
 }`
 
-async function getProduct(slug: string, preview = false) {
-  return getClient(preview).fetch<ProductData | null>(productQuery, { slug })
+async function getProduct(slug: string, stega?: boolean) {
+  return fetchSanityData<ProductData | null>({
+    query: productQuery,
+    params: { slug },
+    stega,
+  })
 }
 
 async function getProductMetadata(slug: string) {
-  return getClient().fetch<ProductData | null>(productMetadataQuery, { slug })
+  return fetchSanityData<ProductData | null>({
+    query: productMetadataQuery,
+    params: { slug },
+    stega: false,
+  })
 }
 
 function renderLegacyFeatureGrid(block: FeatureGridBlockData, key: string | number) {
@@ -376,9 +385,23 @@ function renderLegacyVideoGallery(block: VideoGalleryBlockData, key: string | nu
   )
 }
 
-function renderPageBuilderGroup(group: PageBuilderRenderGroup<ProductBlock>) {
+function wrapBlockForPresentation(documentId: string, blockKey: string | undefined, element: ReactNode) {
+  if (!blockKey) return element
+
+  const dataAttribute = createDataAttribute({
+    id: documentId,
+    type: 'product',
+    path: `contentBlocks[_key=="${blockKey}"]`,
+  }).toString()
+
+  return <div data-sanity={dataAttribute}>{element}</div>
+}
+
+function renderPageBuilderGroup(group: PageBuilderRenderGroup<ProductBlock>, documentId: string) {
   if (group.kind === 'mergedRichFeature') {
-    return (
+    return wrapBlockForPresentation(
+      documentId,
+      group.richBlock._key ?? group.featureBlock._key,
       <MergedRichFeatureSection
         key={group.key}
         richBlock={group.richBlock}
@@ -391,40 +414,44 @@ function renderPageBuilderGroup(group: PageBuilderRenderGroup<ProductBlock>) {
 
   switch (block._type) {
     case 'heroBlock':
-      return <HeroBlock key={key} block={block as HeroBlockData} />
+      return wrapBlockForPresentation(documentId, block._key, <HeroBlock key={key} block={block as HeroBlockData} />)
     case 'richSectionBlock':
-      return <RichSectionBlock key={key} block={block as RichSectionBlockData} />
+      return wrapBlockForPresentation(documentId, block._key, <RichSectionBlock key={key} block={block as RichSectionBlockData} />)
     case 'featureListBlock':
-      return <FeatureListBlock key={key} block={block as FeatureListBlockData} />
+      return wrapBlockForPresentation(documentId, block._key, <FeatureListBlock key={key} block={block as FeatureListBlockData} />)
     case 'mediaGalleryBlock':
-      return <MediaGalleryBlock key={key} block={block as MediaGalleryBlockData} />
+      return wrapBlockForPresentation(documentId, block._key, <MediaGalleryBlock key={key} block={block as MediaGalleryBlockData} />)
     case 'machineSelectorBlock':
-      return (
+      return wrapBlockForPresentation(
+        documentId,
+        block._key,
         <MachineSelectorBlock key={key} block={block as MachineSelectorBlockData} />
       )
     case 'cardGridBlock':
-      return <CardGridBlock key={key} block={block as CardGridBlockData} />
+      return wrapBlockForPresentation(documentId, block._key, <CardGridBlock key={key} block={block as CardGridBlockData} />)
     case 'tableBlock':
-      return <TableBlock key={key} block={block as TableBlockData} />
+      return wrapBlockForPresentation(documentId, block._key, <TableBlock key={key} block={block as TableBlockData} />)
     case 'metricsBlock':
-      return <MetricsBlock key={key} block={block as MetricsBlockData} />
+      return wrapBlockForPresentation(documentId, block._key, <MetricsBlock key={key} block={block as MetricsBlockData} />)
     case 'ctaBlock':
-      return <CtaBlock key={key} block={block as CtaBlockData} />
+      return wrapBlockForPresentation(documentId, block._key, <CtaBlock key={key} block={block as CtaBlockData} />)
     case 'portableTextBlock':
-      return <PortableTextBlock key={key} block={block as PortableTextBlockData} />
+      return wrapBlockForPresentation(documentId, block._key, <PortableTextBlock key={key} block={block as PortableTextBlockData} />)
     case 'collectionReferenceBlock':
-      return (
+      return wrapBlockForPresentation(
+        documentId,
+        block._key,
         <CollectionReferenceBlock
           key={key}
           block={block as CollectionReferenceBlockData}
         />
       )
     case 'showcaseBlock':
-      return <ShowcaseBlock key={key} block={block as ShowcaseBlockData} />
+      return wrapBlockForPresentation(documentId, block._key, <ShowcaseBlock key={key} block={block as ShowcaseBlockData} />)
     case 'featureGridBlock':
-      return renderLegacyFeatureGrid(block as FeatureGridBlockData, key)
+      return wrapBlockForPresentation(documentId, block._key, renderLegacyFeatureGrid(block as FeatureGridBlockData, key))
     case 'videoGalleryBlock':
-      return renderLegacyVideoGallery(block as VideoGalleryBlockData, key)
+      return wrapBlockForPresentation(documentId, block._key, renderLegacyVideoGallery(block as VideoGalleryBlockData, key))
     default:
       return null
   }
@@ -443,12 +470,12 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     }
   }
 
-  const title = product.seo?.title?.trim() || product.title || 'DoDoShark Product'
+  const title = cleanText(product.seo?.title) || cleanText(product.title) || 'DoDoShark Product'
   const description =
-    product.seo?.description?.trim() ||
-    product.shortDescription?.trim() ||
+    cleanText(product.seo?.description) ||
+    cleanText(product.shortDescription) ||
     'Explore DoDoShark industrial processing equipment and machine details.'
-  const canonical = product.seo?.canonicalUrl?.trim() || `/products/${product.slug?.current || slug}`
+  const canonical = cleanText(product.seo?.canonicalUrl) || `/products/${cleanSlug(product.slug) || slug}`
   const ogImage = toImageSrc(product.seo?.ogImage || product.mainImage, 1200)
 
   return {
@@ -462,7 +489,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
       description,
       type: 'website',
       images: ogImage
-        ? [{ url: ogImage, alt: product.seo?.ogImage?.alt || product.mainImage?.alt || title }]
+        ? [{ url: ogImage, alt: cleanText(product.seo?.ogImage?.alt) || cleanText(product.mainImage?.alt) || title }]
         : undefined,
     },
     twitter: {
@@ -475,9 +502,8 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const draft = await draftMode()
   const { slug } = await params
-  const product = await getProduct(slug, draft.isEnabled)
+  const product = await getProduct(slug)
 
   if (!product) {
     notFound()
@@ -495,9 +521,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-slate-900">
             <div className="grid lg:grid-cols-2 gap-20 items-center">
               <div>
-                {product.seriesTag && (
+                {renderText(product.seriesTag) && (
                   <div className="inline-flex items-center space-x-3 px-4 py-1.5 bg-blue-100 rounded-md text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] mb-8">
-                    <i className="fas fa-bolt" /> <span>{product.seriesTag}</span>
+                    <i className="fas fa-bolt" /> <span>{renderText(product.seriesTag)}</span>
                   </div>
                 )}
                 <h1 className="text-6xl md:text-7xl font-display font-black mb-8 leading-[1.05] tracking-tight">
@@ -513,7 +539,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   {mainImageSrc && (
                     <Image
                       src={mainImageSrc}
-                      alt={product.mainImage?.alt || product.title || 'Product image'}
+                      alt={cleanText(product.mainImage?.alt) || cleanText(product.title) || 'Product image'}
                       width={1000}
                       height={800}
                       className="w-full h-auto rounded-lg"
@@ -526,7 +552,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </section>
       )}
 
-      {renderGroups.map((group) => renderPageBuilderGroup(group))}
+      {renderGroups.map((group) => renderPageBuilderGroup(group, product._id))}
     </div>
   )
 }

@@ -1,9 +1,8 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 
-import { draftMode } from 'next/headers'
-import { getClient } from '@/app/lib/sanity'
-import { firstParam, toImageSrc, type QueryParamValue } from '@/app/lib/sanity-utils'
+import { fetchSanityData } from '@/app/lib/sanity.live'
+import { cleanSlug, cleanText, firstParam, renderText, toImageSrc, type QueryParamValue } from '@/app/lib/sanity-utils'
 import type { SeoMeta, SanityImage } from '@/app/lib/types/sanity'
 import Icon from '@/components/ui/Icon'
 import LandingCardPager, { type LandingCardItem } from '@/components/ui/LandingCardPager'
@@ -162,69 +161,77 @@ const casesCardTagClassName =
 const casesCardTagLabelClassName = 'max-w-[220px]'
 
 export async function generateMetadata(): Promise<Metadata> {
-  const landing = await getClient().fetch<CasesLandingData | null>(casesLandingQuery)
+  const landing = await fetchSanityData<CasesLandingData | null>({
+    query: casesLandingQuery,
+    stega: false,
+  })
   const seo = landing?.seo
 
   return {
-    title: seo?.title || 'Global Success Stories | DoDoShark',
-    description: seo?.description || 'Explore real industrial project case studies and outcomes.',
+    title: cleanText(seo?.title) || 'Global Success Stories | DoDoShark',
+    description: cleanText(seo?.description) || 'Explore real industrial project case studies and outcomes.',
     keywords: seo?.keywords,
-    alternates: seo?.canonicalUrl ? { canonical: seo.canonicalUrl } : undefined,
+    alternates: cleanText(seo?.canonicalUrl) ? { canonical: cleanText(seo?.canonicalUrl) } : undefined,
     robots: { index: false, follow: false },
   }
 }
 
 export default async function CasesPage({ searchParams }: CasesPageProps) {
-  const draft = await draftMode()
   const params = await searchParams
-  const tag = firstParam(params.tag)?.trim() || ''
+  const tag = cleanText(firstParam(params.tag)) || ''
   const initialPage = parsePositiveInt(firstParam(params.page), 1)
   const tagParams: Record<string, string> = { tag }
 
-  const sanityClient = getClient(draft.isEnabled)
-  const landing = await sanityClient.fetch<CasesLandingData | null>(casesLandingQuery)
+  const landing = await fetchSanityData<CasesLandingData | null>({
+    query: casesLandingQuery,
+  })
 
   const [cases, fallbackTags] = await Promise.all([
-    sanityClient.fetch<CaseCard[]>(casesListQuery, tagParams),
-    sanityClient.fetch<ContentTagItem[]>(allTagsQuery),
+    fetchSanityData<CaseCard[]>({
+      query: casesListQuery,
+      params: tagParams,
+    }),
+    fetchSanityData<ContentTagItem[]>({
+      query: allTagsQuery,
+    }),
   ])
 
-  const configuredTags = landing?.tagFilters?.filter((item) => item?.slug?.current) ?? []
+  const configuredTags = landing?.tagFilters?.filter((item) => cleanSlug(item?.slug)) ?? []
   const tags = configuredTags.length > 0 ? configuredTags : fallbackTags
   const heroImageSrc = toImageSrc(landing?.hero?.image, 1800)
-  const heroBadge = landing?.hero?.badge?.trim()
-  const heroTitle = landing?.hero?.title?.trim()
+  const heroBadge = renderText(landing?.hero?.badge)
+  const heroTitle = renderText(landing?.hero?.title)
   const heroSubtitle =
-    landing?.hero?.subtitle?.trim() ||
+    renderText(landing?.hero?.subtitle) ||
     'Discover how DoDoShark help customers improve throughput and efficiency with real deployments.'
   const heroStats = landing?.hero?.stats ?? []
   const caseItems: LandingCardItem[] = cases.map((item) => {
-    const slug = item.slug?.current?.trim()
+    const slug = cleanSlug(item.slug)
 
     return {
       id: item._id,
       href: slug ? `/cases/${slug}` : '/cases',
-      title: item.title?.trim() || 'Case Study',
+      title: renderText(item.title) || 'Case Study',
       description:
-        item.excerpt?.trim() || 'Detailed case study content is available in the full project report.',
+        renderText(item.excerpt) || 'Detailed case study content is available in the full project report.',
       imageSrc: toImageSrc(item.coverImage, 900),
-      imageAlt: item.coverImage?.alt || item.title || 'Case cover',
+      imageAlt: renderText(item.coverImage?.alt) || renderText(item.title) || 'Case cover',
       imageAspectRatio: getCoverImageAspectRatio(item.coverImage),
       logoSrc: toImageSrc(item.clientLogo, 320),
-      logoAlt: item.clientLogo?.alt || item.title || 'Client logo',
-      tag: item.tags?.[0]?.title?.trim() || 'Case Study',
-      metaText: item.location?.trim(),
+      logoAlt: renderText(item.clientLogo?.alt) || renderText(item.title) || 'Client logo',
+      tag: renderText(item.tags?.[0]?.title) || 'Case Study',
+      metaText: renderText(item.location),
     }
   })
   const tagCloudItems: TagCloudItem[] = tags.flatMap((item) => {
-    const slug = item.slug?.current
+    const slug = cleanSlug(item.slug)
     if (!slug) return []
 
     return [
       {
         key: item._id ?? slug,
         href: buildHref({ tag: slug }),
-        label: item.title || slug,
+        label: renderText(item.title) || slug,
         active: slug === tag,
       },
     ]
@@ -236,7 +243,7 @@ export default async function CasesPage({ searchParams }: CasesPageProps) {
         {heroImageSrc && (
           <Image
             src={heroImageSrc}
-            alt={landing?.hero?.image?.alt || 'Cases hero'}
+            alt={renderText(landing?.hero?.image?.alt) || 'Cases hero'}
             fill
             sizes="100vw"
             className="object-cover opacity-30"

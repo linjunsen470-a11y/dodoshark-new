@@ -2,10 +2,9 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { draftMode } from 'next/headers'
-import { getClient } from '@/app/lib/sanity'
+import { fetchSanityData } from '@/app/lib/sanity.live'
 import { buildPageMetadata } from '@/app/lib/seo'
-import { firstParam, toImageSrc, type QueryParamValue } from '@/app/lib/sanity-utils'
+import { cleanSlug, cleanText, firstParam, renderText, toImageSrc, type QueryParamValue } from '@/app/lib/sanity-utils'
 import type { SeoMeta, SanityImage } from '@/app/lib/types/sanity'
 import LandingCardPager, { type LandingCardItem } from '@/components/ui/LandingCardPager'
 import Icon from '@/components/ui/Icon'
@@ -110,7 +109,10 @@ function buildHref({
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const landing = await getClient().fetch<SolutionsLandingData | null>(solutionsLandingQuery)
+  const landing = await fetchSanityData<SolutionsLandingData | null>({
+    query: solutionsLandingQuery,
+    stega: false,
+  })
   return buildPageMetadata({
     seo: landing?.seo,
     fallbackTitle: 'Industrial Solutions | DoDoShark',
@@ -119,37 +121,42 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function SolutionsPage({ searchParams }: SolutionsPageProps) {
-  const draft = await draftMode()
   const params = await searchParams
-  const category = firstParam(params.category)?.trim() || ''
+  const category = cleanText(firstParam(params.category)) || ''
   const initialPage = parsePositiveInt(firstParam(params.page), 1)
 
-  const sanityClient = getClient(draft.isEnabled)
-  const landing = await sanityClient.fetch<SolutionsLandingData | null>(solutionsLandingQuery)
+  const landing = await fetchSanityData<SolutionsLandingData | null>({
+    query: solutionsLandingQuery,
+  })
 
   const [solutions, fallbackCategories] = await Promise.all([
-    sanityClient.fetch<SolutionCard[]>(solutionsListQuery, { category }),
-    sanityClient.fetch<CategoryItem[]>(allCategoriesQuery),
+    fetchSanityData<SolutionCard[]>({
+      query: solutionsListQuery,
+      params: { category },
+    }),
+    fetchSanityData<CategoryItem[]>({
+      query: allCategoriesQuery,
+    }),
   ])
 
-  const configuredCategories = landing?.solutionCategories?.filter((item) => item?.slug?.current) ?? []
+  const configuredCategories = landing?.solutionCategories?.filter((item) => cleanSlug(item?.slug)) ?? []
   const categories = configuredCategories.length > 0 ? configuredCategories : fallbackCategories
   const heroImageSrc = toImageSrc(landing?.hero?.image, 1800)
-  const heroBadge = landing?.hero?.badge?.trim()
-  const heroTitle = landing?.hero?.title?.trim()
+  const heroBadge = renderText(landing?.hero?.badge)
+  const heroTitle = renderText(landing?.hero?.title)
   const heroSubtitle =
-    landing?.hero?.subtitle?.trim() || 'Discover proven process flows for different materials and industries.'
+    renderText(landing?.hero?.subtitle) || 'Discover proven process flows for different materials and industries.'
   const solutionItems: LandingCardItem[] = solutions.map((item) => {
-    const slug = item.slug?.current?.trim()
+    const slug = cleanSlug(item.slug)
 
     return {
       id: item._id,
       href: slug ? `/solutions/${slug}` : '/solutions',
-      title: item.title?.trim() || 'Solution',
-      description: item.summary?.trim() || 'High-efficiency and stable industrial process design.',
+      title: renderText(item.title) || 'Solution',
+      description: renderText(item.summary) || 'High-efficiency and stable industrial process design.',
       imageSrc: toImageSrc(item.heroImage, 900),
-      imageAlt: item.heroImage?.alt || item.title || 'Solution image',
-      tag: item.category?.title?.trim() || 'Solution',
+      imageAlt: renderText(item.heroImage?.alt) || renderText(item.title) || 'Solution image',
+      tag: renderText(item.category?.title) || 'Solution',
     }
   })
 
@@ -159,7 +166,7 @@ export default async function SolutionsPage({ searchParams }: SolutionsPageProps
         {heroImageSrc && (
           <Image
             src={heroImageSrc}
-            alt={landing?.hero?.image?.alt || 'Solutions hero'}
+            alt={renderText(landing?.hero?.image?.alt) || 'Solutions hero'}
             fill
             className="object-cover opacity-30"
           />
@@ -201,7 +208,7 @@ export default async function SolutionsPage({ searchParams }: SolutionsPageProps
                 All Solutions
               </Link>
               {categories.map((item) => {
-                const slug = item.slug?.current
+                const slug = cleanSlug(item.slug)
                 if (!slug) return null
                 const active = slug === category
                 return (
@@ -213,7 +220,7 @@ export default async function SolutionsPage({ searchParams }: SolutionsPageProps
                       : 'border-slate-200 text-slate-700 hover:border-slate-300'
                       }`}
                   >
-                    {item.title || slug}
+                    {renderText(item.title) || slug}
                   </Link>
                 )
               })}

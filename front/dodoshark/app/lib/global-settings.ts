@@ -1,19 +1,53 @@
-import { client } from '@/app/lib/sanity'
-import type { SanityImage } from '@/app/lib/types/sanity'
+import {sanityFetch} from '@/app/lib/sanity.live'
+import type {SanityImage} from '@/app/lib/types/sanity'
 
-type GlobalSettingsContact = {
-  email?: string
-  whatsapp?: string
-  phone?: string
+export type GlobalNavItem = {
+  label?: string
+  href?: string
+}
+
+export type GlobalSocialLink = {
+  label?: string
+  icon?: string
+  href?: string
 }
 
 export type GlobalSettingsData = {
+  _id?: string
   siteName?: string
   favicon?: SanityImage
-  contact?: GlobalSettingsContact
+  logo?: SanityImage
+  header?: {
+    sloganLabel?: string
+    sloganText?: string
+    workingHoursLabel?: string
+    workingHoursText?: string
+    navigation?: GlobalNavItem[]
+    desktopCtaLabel?: string
+    desktopCtaHref?: string
+    mobileCtaLabel?: string
+    mobileCtaHref?: string
+  }
+  contact?: {
+    email?: string
+    supportEmail?: string
+    whatsapp?: string
+    phone?: string
+    websiteLabel?: string
+    websiteUrl?: string
+  }
+  footer?: {
+    headquartersKicker?: string
+    headquartersBody?: string
+    networkItems?: string[]
+    socialLinks?: GlobalSocialLink[]
+    footerLinks?: GlobalNavItem[]
+    copyrightText?: string
+  }
 }
 
 const GLOBAL_SETTINGS_QUERY = `*[_id == "globalSettings"][0]{
+  _id,
   siteName,
   favicon{
     alt,
@@ -28,16 +62,55 @@ const GLOBAL_SETTINGS_QUERY = `*[_id == "globalSettings"][0]{
       }
     }
   },
+  logo{
+    alt,
+    asset
+  },
+  header{
+    sloganLabel,
+    sloganText,
+    workingHoursLabel,
+    workingHoursText,
+    navigation[]{
+      label,
+      href
+    },
+    desktopCtaLabel,
+    desktopCtaHref,
+    mobileCtaLabel,
+    mobileCtaHref
+  },
   contact{
     email,
+    supportEmail,
     whatsapp,
-    phone
+    phone,
+    websiteLabel,
+    websiteUrl
+  },
+  footer{
+    headquartersKicker,
+    headquartersBody,
+    networkItems,
+    socialLinks[]{
+      label,
+      icon,
+      href
+    },
+    footerLinks[]{
+      label,
+      href
+    },
+    copyrightText
   }
 }`
 
 export async function getGlobalSettings(): Promise<GlobalSettingsData | null> {
   try {
-    return await client.fetch<GlobalSettingsData | null>(GLOBAL_SETTINGS_QUERY)
+    const {data} = await sanityFetch({
+      query: GLOBAL_SETTINGS_QUERY,
+    })
+    return data
   } catch {
     return null
   }

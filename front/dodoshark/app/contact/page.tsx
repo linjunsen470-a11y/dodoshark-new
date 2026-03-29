@@ -1,11 +1,10 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import { cache } from 'react'
 
 import { getGlobalContact } from '@/app/lib/global-contact'
-import { client } from '@/app/lib/sanity'
+import { fetchSanityData } from '@/app/lib/sanity.live'
 import { buildPageMetadata } from '@/app/lib/seo'
-import { toImageSrc } from '@/app/lib/sanity-utils'
+import { cleanText, renderText, toImageSrc } from '@/app/lib/sanity-utils'
 import type { SanityImage, SeoMeta } from '@/app/lib/types/sanity'
 import LeadInquiryForm from '@/components/forms/LeadInquiryForm'
 import HeroTitle from '@/components/ui/HeroTitle'
@@ -55,25 +54,30 @@ const CONTACT_PAGE_QUERY = `coalesce(
   }
 }`
 
-const getContactPageData = cache(async () => client.fetch<ContactPageData | null>(CONTACT_PAGE_QUERY))
+async function getContactPageData(stega?: boolean) {
+  return fetchSanityData<ContactPageData | null>({
+    query: CONTACT_PAGE_QUERY,
+    stega,
+  })
+}
 
 export default async function ContactPage() {
   const [contact, pageData] = await Promise.all([getGlobalContact(), getContactPageData()])
-  const heroTitle = pageData?.hero?.title?.trim() || 'Get In Touch'
+  const heroTitle = renderText(pageData?.hero?.title) || 'Get In Touch'
   const heroSubtitle =
-    pageData?.hero?.subtitle?.trim() ||
+    renderText(pageData?.hero?.subtitle) ||
     'Reach out to our expert team for recommendations, quotations, and global technical support.'
   const heroImageSrc = toImageSrc(pageData?.hero?.backgroundImage, 1800) || '/assets/images/about/contact-hero.jpg'
-  const heroImageAlt = pageData?.hero?.backgroundImage?.alt || 'DoDoShark Contact Center'
-  const showroomTitle = pageData?.showroom?.title?.trim() || 'Our Showroom'
+  const heroImageAlt = renderText(pageData?.hero?.backgroundImage?.alt) || 'DoDoShark Contact Center'
+  const showroomTitle = renderText(pageData?.showroom?.title) || 'Our Showroom'
   const showroomDescription =
-    pageData?.showroom?.description?.trim() ||
+    renderText(pageData?.showroom?.description) ||
     'Visit our facility in Nanjing to see our high-precision machinery in action and discuss your production needs with our experts.'
   const showroomImageSrc = toImageSrc(pageData?.showroom?.image, 1400) || '/assets/images/showroom-1.jpg'
-  const showroomImageAlt = pageData?.showroom?.image?.alt || 'DoDoShark Showroom'
-  const inquiryTitle = pageData?.inquiryPanel?.title?.trim() || 'Send Inquiry'
+  const showroomImageAlt = renderText(pageData?.showroom?.image?.alt) || 'DoDoShark Showroom'
+  const inquiryTitle = renderText(pageData?.inquiryPanel?.title) || 'Send Inquiry'
   const inquiryDescription =
-    pageData?.inquiryPanel?.description?.trim() ||
+    renderText(pageData?.inquiryPanel?.description) ||
     'Leave your contact details and city. Our team will respond shortly.'
 
   return (
@@ -163,7 +167,7 @@ export default async function ContactPage() {
                 </li>
                 <li className="flex items-center gap-3">
                   <span className="font-semibold text-slate-900">Web:</span>
-                  <a href="https://www.dodoshark.com" target="_blank" rel="noopener noreferrer" className="hover:text-orange-500 transition-colors">www.dodoshark.com</a>
+                  <a href={contact.websiteUrl} target="_blank" rel="noopener noreferrer" className="hover:text-orange-500 transition-colors">{contact.websiteLabel}</a>
                 </li>
               </ul>
             </div>
@@ -227,7 +231,7 @@ export default async function ContactPage() {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const pageData = await getContactPageData()
+  const pageData = await getContactPageData(false)
   return buildPageMetadata({
     seo: pageData?.seo,
     fallbackTitle: 'Contact Us | DoDoShark Machinery',

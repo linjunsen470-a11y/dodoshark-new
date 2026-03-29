@@ -1,5 +1,5 @@
 import {BulbOutlineIcon} from '@sanity/icons'
-import {defineField, defineType} from 'sanity'
+import {defineArrayMember, defineField, defineType} from 'sanity'
 import {joinPreview, pickText} from '../shared/studio'
 
 function imageField(name: string, title: string, description: string) {
@@ -9,14 +9,7 @@ function imageField(name: string, title: string, description: string) {
     type: 'image',
     description,
     options: {hotspot: true},
-    fields: [
-      defineField({
-        name: 'alt',
-        type: 'string',
-        title: 'Alt Text',
-        validation: (Rule) => Rule.required(),
-      }),
-    ],
+    fields: [defineField({name: 'alt', type: 'string', title: 'Alt Text'})],
   })
 }
 
@@ -45,6 +38,57 @@ export default defineType({
       ],
     }),
     defineField({
+      name: 'stats',
+      title: 'Stats',
+      type: 'array',
+      group: 'content',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          fields: [
+            defineField({name: 'label', title: 'Label', type: 'string'}),
+            defineField({name: 'value', title: 'Value', type: 'string'}),
+          ],
+          preview: {select: {title: 'label', subtitle: 'value'}},
+        }),
+      ],
+    }),
+    defineField({
+      name: 'serviceIntro',
+      title: 'Service Intro',
+      type: 'object',
+      group: 'content',
+      fields: [
+        defineField({name: 'eyebrow', title: 'Eyebrow', type: 'string'}),
+        defineField({name: 'title', title: 'Title', type: 'string'}),
+      ],
+    }),
+    defineField({
+      name: 'serviceStages',
+      title: 'Service Stages',
+      type: 'array',
+      group: 'content',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          fields: [
+            defineField({name: 'id', title: 'Stage ID', type: 'string'}),
+            defineField({name: 'phase', title: 'Phase', type: 'string'}),
+            defineField({name: 'title', title: 'Title', type: 'string'}),
+            defineField({name: 'description', title: 'Description', type: 'text', rows: 4}),
+            defineField({
+              name: 'features',
+              title: 'Features',
+              type: 'array',
+              of: [defineArrayMember({type: 'string'})],
+            }),
+            imageField('image', 'Image', 'Image shown beside the service stage.'),
+          ],
+          preview: {select: {title: 'title', subtitle: 'phase', media: 'image'}},
+        }),
+      ],
+    }),
+    defineField({
       name: 'urgentAssistance',
       title: 'Urgent Assistance',
       type: 'object',
@@ -52,6 +96,14 @@ export default defineType({
       fields: [
         defineField({name: 'title', title: 'Title', type: 'string'}),
         defineField({name: 'description', title: 'Description', type: 'text', rows: 4}),
+        defineField({name: 'hotlineLabel', title: 'Hotline Label', type: 'string'}),
+        defineField({name: 'hotlineValue', title: 'Hotline Value', type: 'string'}),
+        defineField({name: 'salesLabel', title: 'Sales Label', type: 'string'}),
+        defineField({name: 'salesEmail', title: 'Sales Email', type: 'string'}),
+        defineField({name: 'supportLabel', title: 'Support Label', type: 'string'}),
+        defineField({name: 'supportEmail', title: 'Support Email', type: 'string'}),
+        defineField({name: 'teamCaptionTitle', title: 'Team Caption Title', type: 'string'}),
+        defineField({name: 'teamCaptionDescription', title: 'Team Caption Description', type: 'string'}),
       ],
     }),
     defineField({
@@ -63,12 +115,7 @@ export default defineType({
         defineField({name: 'title', title: 'Title', type: 'string'}),
         defineField({name: 'description', title: 'Description', type: 'text', rows: 4}),
         defineField({name: 'buttonLabel', title: 'Button Label', type: 'string'}),
-        defineField({
-          name: 'buttonHref',
-          title: 'Button Link',
-          type: 'string',
-          description: 'Internal path like /contact or a full absolute URL.',
-        }),
+        defineField({name: 'buttonHref', title: 'Button Link', type: 'string'}),
       ],
     }),
     defineField({
@@ -78,26 +125,7 @@ export default defineType({
       group: 'images',
       fields: [
         imageField('heroBackground', 'Hero Background Image', 'Top hero background image.'),
-        imageField(
-          'preSalesStageImage',
-          'Pre-Sales Stage Image',
-          'Image shown beside the Pre-Sales service stage.',
-        ),
-        imageField(
-          'midSalesStageImage',
-          'Mid-Sales Stage Image',
-          'Image shown beside the Mid-Sales service stage.',
-        ),
-        imageField(
-          'afterSalesStageImage',
-          'After-Sales Stage Image',
-          'Image shown beside the After-Sales service stage.',
-        ),
-        imageField(
-          'supportTeamImage',
-          'Support Team Image',
-          'Image shown in the urgent assistance section.',
-        ),
+        imageField('supportTeamImage', 'Support Team Image', 'Image shown in the urgent assistance section.'),
       ],
     }),
   ],

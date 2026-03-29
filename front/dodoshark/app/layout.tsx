@@ -6,6 +6,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getGlobalSettings } from "@/app/lib/global-settings";
+import { SanityLive } from "@/app/lib/sanity.live";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -56,15 +57,17 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const draft = await draftMode();
+  const globalSettings = await getGlobalSettings();
 
   return (
     <html lang="en" className="scroll-smooth">
       <body
         className={`${inter.variable} ${outfit.variable} antialiased font-sans`}
       >
-        <Header />
+        <Header settings={globalSettings} />
         {children}
-        <Footer />
+        <Footer settings={globalSettings} />
+        <SanityLive />
         {draft.isEnabled && <VisualEditing />}
       </body>
     </html>

@@ -7,6 +7,7 @@ import type { Swiper as SwiperInstance } from 'swiper'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
 import { urlFor } from '@/app/lib/sanity'
+import { cleanText, renderText } from '@/app/lib/sanity-utils'
 import Icon from '@/components/ui/Icon'
 import {
   getSharedBackgroundTheme,
@@ -168,8 +169,8 @@ function MachineCard({
   shouldShowModelDescription: boolean
 }) {
   const variantItem = item.productVariant
-  const title = item.modelLabel?.trim() || variantItem?.modelName?.trim() || 'Unnamed Model'
-  const description = variantItem?.shortDescription?.trim()
+  const title = renderText(item.modelLabel) || renderText(variantItem?.modelName) || 'Unnamed Model'
+  const description = renderText(variantItem?.shortDescription)
   const image = variantItem?.image
   const src = resolveImageSrc(image)
 
@@ -215,7 +216,7 @@ export default function MachineSelectorBlock({ block }: { block: MachineSelector
   const groups = useMemo(
     () =>
       (block.groups ?? []).filter(
-        (group) => (group.items ?? []).some((item) => item.productVariant) && group.label?.trim(),
+        (group) => (group.items ?? []).some((item) => item.productVariant) && renderText(group.label),
       ),
     [block.groups],
   )
@@ -338,9 +339,9 @@ export default function MachineSelectorBlock({ block }: { block: MachineSelector
         </div>
       )}
 
-        {activeGroup?.description && (
+        {renderText(activeGroup?.description) && (
           <p className={`mb-8 text-center text-sm md:text-base ${groupDescriptionClass}`}>
-            {activeGroup.description}
+            {renderText(activeGroup.description)}
           </p>
         )}
 
@@ -396,7 +397,10 @@ export default function MachineSelectorBlock({ block }: { block: MachineSelector
               >
                 {activeItems.map((item, idx) => {
                   const variantItem = item.productVariant
-                  const title = item.modelLabel?.trim() || variantItem?.modelName?.trim() || 'Unnamed Model'
+                  const title =
+                    renderText(item.modelLabel) ||
+                    renderText(variantItem?.modelName) ||
+                    'Unnamed Model'
 
                   return (
                     <SwiperSlide key={item._key ?? `${title}-${idx}`} className="!h-auto">
@@ -437,8 +441,10 @@ export default function MachineSelectorBlock({ block }: { block: MachineSelector
           </div>
         )}
 
-        {block.footerText && (
-          <p className={`mt-8 text-center text-md font-semibold ${footerClass}`}>{block.footerText}</p>
+        {renderText(block.footerText) && (
+          <p className={`mt-8 text-center text-md font-semibold ${footerClass}`}>
+            {renderText(block.footerText)}
+          </p>
         )}
     </SectionShell>
   )

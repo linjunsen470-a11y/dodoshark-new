@@ -2,11 +2,12 @@ import type {Metadata} from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import {notFound} from 'next/navigation'
+import {createDataAttribute} from 'next-sanity'
+import type {ReactNode} from 'react'
 
 import dynamic from 'next/dynamic'
-import { draftMode } from 'next/headers'
-import { getClient } from '@/app/lib/sanity'
-import {toImageSrc} from '@/app/lib/sanity-utils'
+import { fetchSanityData } from '@/app/lib/sanity.live'
+import {cleanSlug, cleanText, renderText, toImageSrc} from '@/app/lib/sanity-utils'
 import {
   prepareSolutionTemplate,
   type SolutionHtmlTemplateData,
@@ -118,9 +119,10 @@ type SolutionData = {
 }
 
 function splitTitle(title?: string) {
-  if (!title) return {head: '', tail: ''}
+  const displayTitle = renderText(title)
+  if (!displayTitle) return {head: '', tail: ''}
 
-  const parts = title.trim().split(/\s+/)
+  const parts = displayTitle.split(/\s+/)
   const middle = Math.ceil(parts.length / 2)
 
   return {
@@ -129,7 +131,7 @@ function splitTitle(title?: string) {
   }
 }
 
-async function getSolution(slug: string, preview = false) {
+async function getSolution(slug: string, stega?: boolean) {
   const query = `*[_type == "solution" && slug.current == $slug][0] {
     _id,
     seo {
@@ -315,7 +317,11 @@ async function getSolution(slug: string, preview = false) {
     }
   }`
 
-  return getClient(preview).fetch<SolutionData | null>(query, {slug})
+  return fetchSanityData<SolutionData | null>({
+    query,
+    params: {slug},
+    stega,
+  })
 }
 
 async function getSolutionMetadata(slug: string) {
@@ -341,12 +347,30 @@ async function getSolutionMetadata(slug: string) {
     }
   }`
 
-  return getClient().fetch<SolutionData | null>(query, {slug})
+  return fetchSanityData<SolutionData | null>({
+    query,
+    params: {slug},
+    stega: false,
+  })
 }
 
-function renderSolutionGroup(group: PageBuilderRenderGroup<SolutionBlock>) {
+function wrapSolutionBlockForPresentation(documentId: string, blockKey: string | undefined, element: ReactNode) {
+  if (!blockKey) return element
+
+  const dataAttribute = createDataAttribute({
+    id: documentId,
+    type: 'solution',
+    path: `contentBlocks[_key=="${blockKey}"]`,
+  }).toString()
+
+  return <div data-sanity={dataAttribute}>{element}</div>
+}
+
+function renderSolutionGroup(group: PageBuilderRenderGroup<SolutionBlock>, documentId: string) {
   if (group.kind === 'mergedRichFeature') {
-    return (
+    return wrapSolutionBlockForPresentation(
+      documentId,
+      group.richBlock._key ?? group.featureBlock._key,
       <MergedRichFeatureSection
         key={group.key}
         richBlock={group.richBlock}
@@ -358,58 +382,60 @@ function renderSolutionGroup(group: PageBuilderRenderGroup<SolutionBlock>) {
   const {block, key} = group
 
   if (block._type === 'heroBlock') {
-    return <HeroBlock key={key} block={block} />
+    return wrapSolutionBlockForPresentation(documentId, block._key, <HeroBlock key={key} block={block} />)
   }
 
   if (block._type === 'richSectionBlock') {
-    return <RichSectionBlock key={key} block={block} />
+    return wrapSolutionBlockForPresentation(documentId, block._key, <RichSectionBlock key={key} block={block} />)
   }
 
   if (block._type === 'featureListBlock') {
-    return <FeatureListBlock key={key} block={block} />
+    return wrapSolutionBlockForPresentation(documentId, block._key, <FeatureListBlock key={key} block={block} />)
   }
 
   if (block._type === 'mediaGalleryBlock') {
-    return <MediaGalleryBlock key={key} block={block} />
+    return wrapSolutionBlockForPresentation(documentId, block._key, <MediaGalleryBlock key={key} block={block} />)
   }
 
   if (block._type === 'machineSelectorBlock') {
-    return <MachineSelectorBlock key={key} block={block} />
+    return wrapSolutionBlockForPresentation(documentId, block._key, <MachineSelectorBlock key={key} block={block} />)
   }
 
   if (block._type === 'cardGridBlock') {
-    return <CardGridBlock key={key} block={block} />
+    return wrapSolutionBlockForPresentation(documentId, block._key, <CardGridBlock key={key} block={block} />)
   }
 
   if (block._type === 'tableBlock') {
-    return <TableBlock key={key} block={block} />
+    return wrapSolutionBlockForPresentation(documentId, block._key, <TableBlock key={key} block={block} />)
   }
 
   if (block._type === 'metricsBlock') {
-    return <MetricsBlock key={key} block={block} />
+    return wrapSolutionBlockForPresentation(documentId, block._key, <MetricsBlock key={key} block={block} />)
   }
 
   if (block._type === 'ctaBlock') {
-    return <CtaBlock key={key} block={block} />
+    return wrapSolutionBlockForPresentation(documentId, block._key, <CtaBlock key={key} block={block} />)
   }
 
   if (block._type === 'portableTextBlock') {
-    return <PortableTextBlock key={key} block={block} />
+    return wrapSolutionBlockForPresentation(documentId, block._key, <PortableTextBlock key={key} block={block} />)
   }
 
   if (block._type === 'collectionReferenceBlock') {
-    return <CollectionReferenceBlock key={key} block={block} />
+    return wrapSolutionBlockForPresentation(documentId, block._key, <CollectionReferenceBlock key={key} block={block} />)
   }
 
   if (block._type === 'showcaseBlock') {
-    return <ShowcaseBlock key={key} block={block} />
+    return wrapSolutionBlockForPresentation(documentId, block._key, <ShowcaseBlock key={key} block={block} />)
   }
 
   if (block._type !== 'featureGridBlock' && block._type !== 'videoGalleryBlock') {
     return null
   }
 
-  return (
+  return wrapSolutionBlockForPresentation(
+    documentId,
+    block._key,
     <section key={key} className="bg-white py-16 text-slate-900 md:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {block._type === 'featureGridBlock' && (
@@ -432,7 +458,7 @@ function renderSolutionGroup(group: PageBuilderRenderGroup<SolutionBlock>) {
                     className="bg-slate-50 rounded-lg p-8 premium-card"
                   >
                     <div className="w-14 h-14 rounded-lg bg-orange-50 text-orange-600 border border-orange-100 flex items-center justify-center mb-6">
-                      <Icon icon={item.icon?.trim() || 'gear'} className="h-5 w-5" />
+                          <Icon icon={cleanText(item.icon) || 'gear'} className="h-5 w-5" />
                     </div>
                     {featureImageSrc && (
                       <div className="h-48 rounded-lg overflow-hidden mb-6 bg-white">
@@ -597,13 +623,13 @@ export async function generateMetadata({
     }
   }
 
-  const title = solution.seo?.title?.trim() || solution.title || 'DoDoShark Solution'
+  const title = cleanText(solution.seo?.title) || cleanText(solution.title) || 'DoDoShark Solution'
   const description =
-    solution.seo?.description?.trim() ||
-    solution.summary?.trim() ||
+    cleanText(solution.seo?.description) ||
+    cleanText(solution.summary) ||
     'Explore DoDoShark industrial processing solutions and deployment details.'
   const canonical =
-    solution.seo?.canonicalUrl?.trim() || `/solutions/${solution.slug?.current || slug}`
+    cleanText(solution.seo?.canonicalUrl) || `/solutions/${cleanSlug(solution.slug) || slug}`
   const ogImage = toImageSrc(solution.seo?.ogImage || solution.heroImage, 1200, {
     height: 630,
     fit: 'crop',
@@ -620,7 +646,7 @@ export async function generateMetadata({
       description,
       type: 'website',
       images: ogImage
-        ? [{url: ogImage, alt: solution.seo?.ogImage?.alt || solution.heroImage?.alt || title}]
+        ? [{url: ogImage, alt: cleanText(solution.seo?.ogImage?.alt) || cleanText(solution.heroImage?.alt) || title}]
         : undefined,
     },
     twitter: {
@@ -633,9 +659,8 @@ export async function generateMetadata({
 }
 
 export default async function SolutionPage({params}: SolutionPageProps) {
-  const draft = await draftMode()
   const {slug} = await params
-  const solution = await getSolution(slug, draft.isEnabled)
+  const solution = await getSolution(slug)
 
   if (!solution) {
     notFound()
@@ -653,7 +678,7 @@ export default async function SolutionPage({params}: SolutionPageProps) {
     return (
       <main className="bg-white text-slate-900">
         <SolutionHtmlTemplateFrame
-          title={solution.title || 'Solution template'}
+          title={cleanText(solution.title) || 'Solution template'}
           srcDoc={preparedTemplate.html}
         />
       </main>
@@ -663,7 +688,7 @@ export default async function SolutionPage({params}: SolutionPageProps) {
   return (
     <div className="bg-white text-slate-900">
       {!hasBuilderHero && renderSolutionHero(solution)}
-      <div id="solution-content">{renderGroups.map((group) => renderSolutionGroup(group))}</div>
+      <div id="solution-content">{renderGroups.map((group) => renderSolutionGroup(group, solution._id))}</div>
     </div>
   )
 }

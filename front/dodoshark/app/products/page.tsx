@@ -2,10 +2,9 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { draftMode } from 'next/headers'
-import { getClient } from '@/app/lib/sanity'
+import { fetchSanityData } from '@/app/lib/sanity.live'
 import { buildPageMetadata } from '@/app/lib/seo'
-import { firstParam, toImageSrc, type QueryParamValue } from '@/app/lib/sanity-utils'
+import { cleanSlug, cleanText, firstParam, renderText, toImageSrc, type QueryParamValue } from '@/app/lib/sanity-utils'
 import type { SeoMeta, SanityImage } from '@/app/lib/types/sanity'
 import LandingCardPager, { type LandingCardItem } from '@/components/ui/LandingCardPager'
 import Icon from '@/components/ui/Icon'
@@ -112,7 +111,10 @@ function buildHref({
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const landing = await getClient().fetch<ProductLandingData | null>(productLandingQuery)
+  const landing = await fetchSanityData<ProductLandingData | null>({
+    query: productLandingQuery,
+    stega: false,
+  })
   return buildPageMetadata({
     seo: landing?.seo,
     fallbackTitle: 'Product Catalog | DoDoShark',
@@ -121,38 +123,43 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
-  const draft = await draftMode()
   const params = await searchParams
-  const category = firstParam(params.category)?.trim() || ''
+  const category = cleanText(firstParam(params.category)) || ''
   const initialPage = parsePositiveInt(firstParam(params.page), 1)
 
-  const sanityClient = getClient(draft.isEnabled)
-  const landing = await sanityClient.fetch<ProductLandingData | null>(productLandingQuery)
+  const landing = await fetchSanityData<ProductLandingData | null>({
+    query: productLandingQuery,
+  })
 
   const [products, fallbackCategories] = await Promise.all([
-    sanityClient.fetch<ProductCard[]>(productListQuery, { category }),
-    sanityClient.fetch<CategoryItem[]>(allCategoriesQuery),
+    fetchSanityData<ProductCard[]>({
+      query: productListQuery,
+      params: { category },
+    }),
+    fetchSanityData<CategoryItem[]>({
+      query: allCategoriesQuery,
+    }),
   ])
 
-  const configuredCategories = landing?.productCategories?.filter((item) => item?.slug?.current) ?? []
+  const configuredCategories = landing?.productCategories?.filter((item) => cleanSlug(item?.slug)) ?? []
   const categories = configuredCategories.length > 0 ? configuredCategories : fallbackCategories
   const heroImageSrc = toImageSrc(landing?.hero?.image, 1800)
-  const heroBadge = landing?.hero?.badge?.trim()
-  const heroTitle = landing?.hero?.title?.trim()
+  const heroBadge = renderText(landing?.hero?.badge)
+  const heroTitle = renderText(landing?.hero?.title)
   const heroSubtitle =
-    landing?.hero?.subtitle?.trim() || 'Find the right processing machine line for your production needs.'
+    renderText(landing?.hero?.subtitle) || 'Find the right processing machine line for your production needs.'
   const productItems: LandingCardItem[] = products.map((product) => {
-    const slug = product.slug?.current?.trim()
+    const slug = cleanSlug(product.slug)
 
     return {
       id: product._id,
       href: slug ? `/products/${slug}` : '/products',
-      title: product.title?.trim() || 'Product',
+      title: renderText(product.title) || 'Product',
       description:
-        product.shortDescription?.trim() || 'High performance industrial processing equipment.',
+        renderText(product.shortDescription) || 'High performance industrial processing equipment.',
       imageSrc: toImageSrc(product.mainImage, 900),
-      imageAlt: product.mainImage?.alt || product.title || 'Product image',
-      tag: product.category?.title?.trim() || product.seriesTag?.trim() || 'Machine',
+      imageAlt: renderText(product.mainImage?.alt) || renderText(product.title) || 'Product image',
+      tag: renderText(product.category?.title) || renderText(product.seriesTag) || 'Machine',
     }
   })
 
@@ -162,7 +169,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         {heroImageSrc && (
           <Image
             src={heroImageSrc}
-            alt={landing?.hero?.image?.alt || 'Products hero'}
+            alt={renderText(landing?.hero?.image?.alt) || 'Products hero'}
             fill
             className="object-cover opacity-30"
           />
@@ -204,7 +211,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                 All Machines
               </Link>
               {categories.map((item) => {
-                const slug = item.slug?.current
+                const slug = cleanSlug(item.slug)
                 if (!slug) return null
                 const active = slug === category
                 return (
@@ -216,7 +223,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                       : 'border-slate-200 text-slate-700 hover:border-slate-300'
                       }`}
                   >
-                    {item.title || slug}
+                    {renderText(item.title) || slug}
                   </Link>
                 )
               })}

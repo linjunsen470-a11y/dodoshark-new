@@ -1,6 +1,7 @@
 import Image from 'next/image'
 
 import {urlFor} from '@/app/lib/sanity'
+import { cleanText, renderText } from '@/app/lib/sanity-utils'
 
 import AccentTitle from './AccentTitle'
 import FeatureListBlockCarousel from './FeatureListBlockCarousel'
@@ -32,7 +33,7 @@ export function hasFeatureListContent(
   const hasHeader =
     showHeader &&
     block.mergeWithPreviousRichSection !== true &&
-    Boolean(block.title?.trim())
+    Boolean(renderText(block.title))
   const items = (block.items ?? []).filter((item) => item?.title)
 
   return hasHeader || items.length > 0
@@ -135,14 +136,14 @@ export function FeatureListBlockContent({
   renderMode = 'default',
 }: FeatureListBlockContentProps) {
   const items = (block.items ?? []).filter((item) => item?.title)
-  const topAccentTitle = block.topAccentTitle?.trim()
+  const topAccentTitle = renderText(block.topAccentTitle)
   const backgroundStyle = block.backgroundStyle ?? 'white'
   const backgroundVariant = mapFeatureBackgroundStyleToVariant(backgroundStyle)
   const theme = getSharedBackgroundTheme(backgroundVariant)
   const hasHeader =
     showHeader &&
     block.mergeWithPreviousRichSection !== true &&
-    Boolean(block.title?.trim())
+    Boolean(renderText(block.title))
   const isMergedCards = renderMode === 'mergedCards'
   const useCarousel = renderMode === 'default' || renderMode === 'mergedCarousel'
 

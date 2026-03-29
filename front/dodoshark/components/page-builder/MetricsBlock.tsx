@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { urlFor } from '@/app/lib/sanity'
+import { cleanText, renderText } from '@/app/lib/sanity-utils'
 import {
   getSharedBackgroundTheme,
   type SharedBackgroundVariant,
@@ -36,7 +37,7 @@ export type MetricsBlockData = {
 export default function MetricsBlock({ block }: { block: MetricsBlockData }) {
   const variant = block.backgroundVariant ?? 'white'
   const theme = getSharedBackgroundTheme(variant)
-  const items = (block.items ?? []).filter((item) => item.value || item.label)
+  const items = (block.items ?? []).filter((item) => renderText(item.value) || renderText(item.label))
   const sectionBorderClass = theme.sectionBorder
 
   if (!block.title && items.length === 0) return null
@@ -54,7 +55,7 @@ export default function MetricsBlock({ block }: { block: MetricsBlockData }) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 lg:gap-10">
           {items.map((item, idx) => {
-            const iconClass = item.icon?.trim() || 'chart-line'
+            const iconClass = cleanText(item.icon) || 'chart-line'
 
             return (
               <article
@@ -66,7 +67,7 @@ export default function MetricsBlock({ block }: { block: MetricsBlockData }) {
                     {item.image?.asset ? (
                       <Image
                         src={urlFor(item.image).width(600).height(600).url()}
-                        alt={item.image.alt || item.label || ''}
+    alt={renderText(item.image.alt) || renderText(item.label) || ''}
                         width={144}
                         height={144}
                         className="w-full h-full object-cover"
@@ -84,16 +85,16 @@ export default function MetricsBlock({ block }: { block: MetricsBlockData }) {
                     <span className="text-xl text-slate-900 md:text-2xl transition-colors duration-300 group-hover:text-orange-600">
                       {item.value}
                     </span>
-                    {item.unit && (
-                      <span className="ml-0.5 text-[10px] text-slate-400 font-medium">
-                        {item.unit}
-                      </span>
-                    )}
+                      {renderText(item.unit) && (
+                        <span className="ml-0.5 text-[10px] text-slate-400 font-medium">
+                        {renderText(item.unit)}
+                        </span>
+                      )}
                   </div>
 
-                  {item.label && (
+                  {renderText(item.label) && (
                     <p className={`text-[9px] font-bold uppercase tracking-[0.25em] text-slate-400 group-hover:text-slate-500 transition-colors duration-300 leading-tight ${bodyTextClass}`}>
-                      {item.label}
+                      {renderText(item.label)}
                     </p>
                   )}
                 </div>

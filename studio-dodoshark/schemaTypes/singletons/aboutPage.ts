@@ -1,5 +1,5 @@
 import {InfoOutlineIcon} from '@sanity/icons'
-import {defineField, defineType} from 'sanity'
+import {defineArrayMember, defineField, defineType} from 'sanity'
 
 function imageField(name: string, title: string, description: string) {
   return defineField({
@@ -8,14 +8,7 @@ function imageField(name: string, title: string, description: string) {
     type: 'image',
     description,
     options: {hotspot: true},
-    fields: [
-      defineField({
-        name: 'alt',
-        type: 'string',
-        title: 'Alt Text',
-        validation: (Rule) => Rule.required(),
-      }),
-    ],
+    fields: [defineField({name: 'alt', type: 'string', title: 'Alt Text'})],
   })
 }
 
@@ -37,16 +30,116 @@ export default defineType({
       title: 'Hero Section',
       type: 'object',
       group: 'hero',
-      fields: [imageField('image', 'Hero Image', 'Used in the page hero and Studio preview.')],
+      fields: [
+        defineField({name: 'titleLineOne', title: 'Title Line One', type: 'string'}),
+        defineField({name: 'titleLineTwo', title: 'Title Line Two', type: 'string'}),
+        defineField({name: 'titleLineThree', title: 'Title Line Three', type: 'string'}),
+        defineField({name: 'description', title: 'Description', type: 'text', rows: 3}),
+        imageField('image', 'Hero Image', 'Used in the page hero and Studio preview.'),
+      ],
+    }),
+    defineField({
+      name: 'storyCards',
+      title: 'Story Cards',
+      type: 'array',
+      group: 'content',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          fields: [
+            defineField({name: 'title', title: 'Title', type: 'string'}),
+            defineField({name: 'subtitle', title: 'Subtitle', type: 'string'}),
+            defineField({name: 'description', title: 'Description', type: 'text', rows: 5}),
+          ],
+          preview: {select: {title: 'title', subtitle: 'subtitle'}},
+        }),
+      ],
     }),
     defineField({
       name: 'brandStoryVideoUrl',
       title: 'Brand Story Video URL',
       type: 'url',
       group: 'content',
-      description: 'YouTube or Vimeo HTTPS URL used by the brand story video card.',
-      validation: (rule) =>
-        rule.uri({scheme: ['https']}).warning('Use a valid HTTPS video URL.'),
+      validation: (rule) => rule.uri({scheme: ['https']}).warning('Use a valid HTTPS video URL.'),
+    }),
+    defineField({
+      name: 'productSystems',
+      title: 'Product Systems',
+      type: 'array',
+      group: 'content',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          fields: [
+            defineField({name: 'title', title: 'Title', type: 'string'}),
+            defineField({name: 'description', title: 'Description', type: 'text', rows: 4}),
+            defineField({
+              name: 'tags',
+              title: 'Tags',
+              type: 'array',
+              of: [defineArrayMember({type: 'string'})],
+            }),
+            imageField('image', 'Image', 'Shown on the product system card.'),
+          ],
+          preview: {select: {title: 'title', subtitle: 'description', media: 'image'}},
+        }),
+      ],
+    }),
+    defineField({
+      name: 'globalLayout',
+      title: 'Global Layout Section',
+      type: 'object',
+      group: 'content',
+      fields: [
+        defineField({name: 'title', title: 'Title', type: 'string'}),
+        defineField({name: 'badge', title: 'Badge', type: 'string'}),
+        defineField({name: 'descriptionOne', title: 'Description One', type: 'text', rows: 4}),
+        defineField({name: 'descriptionTwo', title: 'Description Two', type: 'text', rows: 4}),
+        defineField({
+          name: 'stats',
+          title: 'Stats',
+          type: 'array',
+          of: [
+            defineArrayMember({
+              type: 'object',
+              fields: [
+                defineField({name: 'value', title: 'Value', type: 'string'}),
+                defineField({name: 'label', title: 'Label', type: 'string'}),
+              ],
+              preview: {select: {title: 'label', subtitle: 'value'}},
+            }),
+          ],
+        }),
+      ],
+    }),
+    defineField({
+      name: 'timeline',
+      title: 'Timeline Items',
+      type: 'array',
+      group: 'content',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          fields: [
+            defineField({name: 'year', title: 'Year', type: 'string'}),
+            defineField({name: 'phase', title: 'Phase', type: 'string'}),
+            defineField({name: 'title', title: 'Title', type: 'string'}),
+            defineField({name: 'description', title: 'Description', type: 'text', rows: 4}),
+            imageField('image', 'Image', 'Shown beside the timeline entry.'),
+          ],
+          preview: {select: {title: 'title', subtitle: 'year', media: 'image'}},
+        }),
+      ],
+    }),
+    defineField({
+      name: 'timelineClosing',
+      title: 'Timeline Closing Copy',
+      type: 'object',
+      group: 'content',
+      fields: [
+        defineField({name: 'title', title: 'Title', type: 'string'}),
+        defineField({name: 'description', title: 'Description', type: 'text', rows: 3}),
+      ],
     }),
     defineField({
       name: 'cta',
@@ -56,19 +149,9 @@ export default defineType({
       fields: [
         defineField({name: 'eyebrow', title: 'Eyebrow', type: 'string'}),
         defineField({name: 'title', title: 'Title', type: 'string'}),
-        defineField({
-          name: 'description',
-          title: 'Description',
-          type: 'text',
-          rows: 4,
-        }),
+        defineField({name: 'description', title: 'Description', type: 'text', rows: 4}),
         defineField({name: 'buttonLabel', title: 'Button Label', type: 'string'}),
-        defineField({
-          name: 'buttonHref',
-          title: 'Button Link',
-          type: 'string',
-          description: 'Internal path like /contact or a full absolute URL.',
-        }),
+        defineField({name: 'buttonHref', title: 'Button Link', type: 'string'}),
       ],
     }),
     defineField({
@@ -77,85 +160,24 @@ export default defineType({
       type: 'object',
       group: 'images',
       fields: [
-        imageField(
-          'brandStoryThumbnail',
-          'Brand Story Video Thumbnail',
-          'Thumbnail image shown on the brand story video card.',
-        ),
-        imageField(
-          'productSystemAgricultureImage',
-          'Agriculture Product System Image',
-          'Image shown for the agricultural processing machinery card.',
-        ),
-        imageField(
-          'productSystemFoodImage',
-          'Food Product System Image',
-          'Image shown for the food processing machinery card.',
-        ),
-        imageField(
-          'globalLayoutBackgroundImage',
-          'Global Layout Background Image',
-          'Background image used in the global layout section.',
-        ),
-        imageField(
-          'teamImage',
-          'Team Image',
-          'Image shown in the elite engineering team card.',
-        ),
-        imageField(
-          'valuePropositionBackgroundImage',
-          'Value Proposition Background Image',
-          'Background image used in the value proposition section.',
-        ),
-        imageField(
-          'joinUsImage',
-          'Join Us Image',
-          'Portrait image shown in the Join Our Journey card.',
-        ),
-        imageField(
-          'timelineStateOwnedHeritageImage',
-          'Timeline: State-Owned Heritage Image',
-          'Image shown for the State-Owned Heritage timeline item.',
-        ),
-        imageField(
-          'timelineBrandFoundationImage',
-          'Timeline: Brand Foundation Image',
-          'Image shown for the Brand Foundation timeline item.',
-        ),
-        imageField(
-          'timelineMarketRootsImage',
-          'Timeline: Market Roots & Reputation Image',
-          'Image shown for the Market Roots & Reputation timeline item.',
-        ),
-        imageField(
-          'timelineDualTrackExpansionImage',
-          'Timeline: Dual-Track Expansion Image',
-          'Image shown for the Dual-Track Business Model timeline item.',
-        ),
-        imageField(
-          'timelineAutomationUpgradeImage',
-          'Timeline: Automation Upgrade Image',
-          'Image shown for the Smart Automation Upgrades timeline item.',
-        ),
-        imageField(
-          'timelineFutureOutlookImage',
-          'Timeline: Future Outlook Image',
-          'Image shown for the Industry Solution Provider timeline item.',
-        ),
+        imageField('brandStoryThumbnail', 'Brand Story Video Thumbnail', 'Thumbnail image shown on the brand story video card.'),
+        imageField('globalLayoutBackgroundImage', 'Global Layout Background Image', 'Background image used in the global layout section.'),
+        imageField('teamImage', 'Team Image', 'Image shown in the elite engineering team card.'),
+        imageField('valuePropositionBackgroundImage', 'Value Proposition Background Image', 'Background image used in the value proposition section.'),
+        imageField('joinUsImage', 'Join Us Image', 'Portrait image shown in the Join Our Journey card.'),
       ],
     }),
   ],
   preview: {
     select: {
-      ctaTitle: 'cta.title',
+      title: 'hero.titleLineOne',
       media: 'hero.image',
-      videoUrl: 'brandStoryVideoUrl',
+      ctaTitle: 'cta.title',
     },
-    prepare({ctaTitle, media, videoUrl}) {
+    prepare({title, media, ctaTitle}) {
       return {
-        title: 'About Page',
-        subtitle:
-          ctaTitle || (videoUrl ? 'Brand story video configured' : 'About page singleton'),
+        title: title || 'About Page',
+        subtitle: ctaTitle || 'About page singleton',
         media,
       }
     },

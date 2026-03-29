@@ -1,3 +1,4 @@
+import { cleanText } from '@/app/lib/sanity-utils'
 import { FeatureListBlockContent, type FeatureListBlockData } from './FeatureListBlock'
 import { getSharedBackgroundTheme } from './backgroundTheme'
 import {
@@ -17,7 +18,7 @@ export default function MergedRichFeatureSection({
 }: MergedRichFeatureSectionProps) {
   const variant = richBlock.backgroundVariant ?? 'white'
   const theme = getSharedBackgroundTheme(variant)
-  const anchorId = richBlock.anchorId?.trim() || undefined
+  const anchorId = cleanText(richBlock.anchorId) || undefined
   const featureRenderMode =
     richBlock.layout === 'centeredMediaGridBodyBelow' ? 'mergedCarousel' : 'mergedCards'
 
