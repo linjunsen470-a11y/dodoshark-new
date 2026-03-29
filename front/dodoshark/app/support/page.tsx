@@ -1,11 +1,10 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { cache } from 'react'
 
-import { client } from '@/app/lib/sanity'
+import { fetchSanityData } from '@/app/lib/sanity.live'
 import { buildPageMetadata } from '@/app/lib/seo'
-import { toImageSrc } from '@/app/lib/sanity-utils'
+import { cleanText, renderText, toImageSrc } from '@/app/lib/sanity-utils'
 import type { SanityImage, SeoMeta } from '@/app/lib/types/sanity'
 import HeroTitle from '@/components/ui/HeroTitle'
 
@@ -19,7 +18,28 @@ type SupportPageData = {
   urgentAssistance?: {
     title?: string
     description?: string
+    hotlineLabel?: string
+    hotlineValue?: string
+    salesLabel?: string
+    salesEmail?: string
+    supportLabel?: string
+    supportEmail?: string
+    teamCaptionTitle?: string
+    teamCaptionDescription?: string
   }
+  stats?: Array<{ label?: string; value?: string }>
+  serviceIntro?: {
+    eyebrow?: string
+    title?: string
+  }
+  serviceStages?: Array<{
+    id?: string
+    phase?: string
+    title?: string
+    description?: string
+    features?: string[]
+    image?: SanityImage
+  }>
   cta?: {
     title?: string
     description?: string
@@ -42,6 +62,25 @@ const SUPPORT_PAGE_QUERY = `coalesce(
   seo,
   hero,
   urgentAssistance,
+  stats[]{
+    label,
+    value
+  },
+  serviceIntro{
+    eyebrow,
+    title
+  },
+  serviceStages[]{
+    id,
+    phase,
+    title,
+    description,
+    features,
+    image{
+      alt,
+      asset
+    }
+  },
   cta,
   images{
     heroBackground{
@@ -67,7 +106,12 @@ const SUPPORT_PAGE_QUERY = `coalesce(
   }
 }`
 
-const getSupportPageData = cache(async () => client.fetch<SupportPageData | null>(SUPPORT_PAGE_QUERY))
+async function getSupportPageData(stega?: boolean) {
+  return fetchSanityData<SupportPageData | null>({
+    query: SUPPORT_PAGE_QUERY,
+    stega,
+  })
+}
 
 function resolvePageImage(
   image: SanityImage | undefined,
@@ -77,7 +121,7 @@ function resolvePageImage(
 ) {
   return {
     src: toImageSrc(image, width) || fallbackSrc,
-    alt: image?.alt?.trim() || fallbackAlt,
+    alt: cleanText(image?.alt) || fallbackAlt,
   }
 }
 
@@ -155,7 +199,7 @@ const SERVICE_STAGES = [
 ]
 
 export async function generateMetadata(): Promise<Metadata> {
-  const pageData = await getSupportPageData()
+  const pageData = await getSupportPageData(false)
   return buildPageMetadata({
     seo: pageData?.seo,
     fallbackTitle: 'Service & Support | DoDoShark Machinery',
@@ -178,22 +222,55 @@ export default async function SupportPage() {
     'DoDoShark Global Support Team',
     1400,
   )
-  const heroEyebrow = pageData?.hero?.eyebrow?.trim() || 'World-Class Service Network'
-  const heroTitle = pageData?.hero?.title?.trim() || 'Service That Powers Results'
+  const heroEyebrow = renderText(pageData?.hero?.eyebrow) || 'World-Class Service Network'
+  const heroTitle = renderText(pageData?.hero?.title) || 'Service That Powers Results'
   const heroDescription =
-    pageData?.hero?.description?.trim() ||
+    renderText(pageData?.hero?.description) ||
     'We are not just an equipment supplier, but your lifelong partner in value co-creation. We deliver measurable, continuously optimized production results.'
   const urgentAssistanceTitle =
-    pageData?.urgentAssistance?.title?.trim() || 'Need Urgent Assistance?'
+    renderText(pageData?.urgentAssistance?.title) || 'Need Urgent Assistance?'
   const urgentAssistanceDescription =
-    pageData?.urgentAssistance?.description?.trim() ||
+    renderText(pageData?.urgentAssistance?.description) ||
     'Our global technical response team is on standby to help you resolve equipment issues, order spare parts, or schedule an efficiency audit.'
-  const ctaTitle = pageData?.cta?.title?.trim() || 'Ready to Optimize Your Value Partnership?'
+  const stats = pageData?.stats?.map((stat) => {
+    const label = renderText(stat?.label)
+    const value = renderText(stat?.value)
+    if (!label || !value) return null
+    return { label, val: value }
+  }).filter((item): item is {label: string; val: string} => Boolean(item)) ?? [
+    { label: 'Core Component Warranty', val: '3 Years' },
+    { label: 'Technical Response Time', val: '24/7' },
+    { label: 'Countries Served', val: '100+' },
+    { label: 'Spare Parts Availability', val: '99%' },
+  ]
+  const serviceEyebrow = renderText(pageData?.serviceIntro?.eyebrow) || 'Value Co-Creation'
+  const serviceTitle = renderText(pageData?.serviceIntro?.title) || 'Full-Lifecycle Efficiency Empowerment'
+  const serviceStages = pageData?.serviceStages?.map((stage, index) => ({
+    id: renderText(stage?.id) || SERVICE_STAGES[index]?.id || `0${index + 1}`,
+    phase: renderText(stage?.phase) || SERVICE_STAGES[index]?.phase || 'Stage',
+    title: renderText(stage?.title) || SERVICE_STAGES[index]?.title || 'Service stage',
+    description: renderText(stage?.description) || SERVICE_STAGES[index]?.description || '',
+    features: (stage?.features ?? SERVICE_STAGES[index]?.features ?? []).map((feature) => renderText(feature)).filter((item): item is string => Boolean(item)),
+    image: stage?.image,
+    imageKey: SERVICE_STAGES[index]?.imageKey ?? 'preSalesStageImage',
+    fallbackImageSrc: SERVICE_STAGES[index]?.fallbackImageSrc ?? '/assets/images/about/support-hero.jpg',
+    icon: SERVICE_STAGES[index]?.icon ?? SERVICE_STAGES[0].icon,
+  })).filter(Boolean) ?? SERVICE_STAGES
+  const hotlineLabel = renderText(pageData?.urgentAssistance?.hotlineLabel) || '24/7 Hotline'
+  const hotlineValue = renderText(pageData?.urgentAssistance?.hotlineValue) || '+86 19941519694'
+  const salesLabel = renderText(pageData?.urgentAssistance?.salesLabel) || 'Sales'
+  const salesEmail = renderText(pageData?.urgentAssistance?.salesEmail) || 'sales@dodoshark.com'
+  const supportLabel = renderText(pageData?.urgentAssistance?.supportLabel) || 'Technical Support'
+  const supportEmail = renderText(pageData?.urgentAssistance?.supportEmail) || 'support@dodoshark.com'
+  const teamCaptionTitle = renderText(pageData?.urgentAssistance?.teamCaptionTitle) || 'Experts You Can Trust'
+  const teamCaptionDescription =
+    renderText(pageData?.urgentAssistance?.teamCaptionDescription) || 'Direct connection to senior engineers.'
+  const ctaTitle = renderText(pageData?.cta?.title) || 'Ready to Optimize Your Value Partnership?'
   const ctaDescription =
-    pageData?.cta?.description?.trim() ||
+    renderText(pageData?.cta?.description) ||
     'Experience the DoDoShark difference with a partner that accompanies your growth from equipment service to full-lifecycle empowerment.'
-  const ctaButtonLabel = pageData?.cta?.buttonLabel?.trim() || 'Request Efficiency Audit'
-  const ctaButtonHref = pageData?.cta?.buttonHref?.trim() || '/contact'
+  const ctaButtonLabel = renderText(pageData?.cta?.buttonLabel) || 'Request Efficiency Audit'
+  const ctaButtonHref = cleanText(pageData?.cta?.buttonHref) || '/contact'
 
   return (
     <main className="bg-[#fcfdfd] text-slate-900 font-sans selection:bg-orange-100 selection:text-orange-900">
@@ -231,12 +308,7 @@ export default async function SupportPage() {
       <section className="relative z-20 -mt-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            {[
-              { label: 'Core Component Warranty', val: '3 Years' },
-              { label: 'Technical Response Time', val: '24/7' },
-              { label: 'Countries Served', val: '100+' },
-              { label: 'Spare Parts Availability', val: '99%' },
-            ].map((stat) => (
+            {stats.map((stat) => (
               <div
                 key={stat.label}
                 className="rounded-2xl border border-slate-100 bg-white p-6 text-center shadow-xl"
@@ -256,18 +328,18 @@ export default async function SupportPage() {
       <section className="bg-[#fcfdfd] py-32">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-24 text-center">
-            <h2 className="mb-4 text-sm font-display font-semibold uppercase tracking-[0.3em] text-orange-500">
-              Value Co-Creation
-            </h2>
-            <h3 className="font-display text-4xl font-extrabold leading-[1.15] tracking-[-0.02em] text-slate-900 md:text-5xl">
-              Full-Lifecycle Efficiency Empowerment
-            </h3>
-          </div>
+              <h2 className="mb-4 text-sm font-display font-semibold uppercase tracking-[0.3em] text-orange-500">
+                {serviceEyebrow}
+              </h2>
+              <h3 className="font-display text-4xl font-extrabold leading-[1.15] tracking-[-0.02em] text-slate-900 md:text-5xl">
+                {serviceTitle}
+              </h3>
+            </div>
 
           <div className="space-y-32">
-            {SERVICE_STAGES.map((stage, idx) => {
+            {serviceStages.map((stage, idx) => {
               const stageImage = resolvePageImage(
-                pageData?.images?.[stage.imageKey],
+                stage.image ?? pageData?.images?.[stage.imageKey],
                 stage.fallbackImageSrc,
                 stage.title,
                 1400,
@@ -354,8 +426,8 @@ export default async function SupportPage() {
                       </svg>
                     </div>
                     <div>
-                      <div className="mb-1 font-bold text-white">24/7 Hotline</div>
-                      <div className="text-2xl font-black text-orange-400">+86 19941519694</div>
+                      <div className="mb-1 font-bold text-white">{hotlineLabel}</div>
+                      <div className="text-2xl font-black text-orange-400">{hotlineValue}</div>
                     </div>
                   </div>
                   <div className="flex items-start space-x-4">
@@ -374,18 +446,18 @@ export default async function SupportPage() {
                       <div className="flex flex-col gap-y-6 sm:flex-row sm:gap-x-12">
                         <div>
                           <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
-                            Sales
+                            {salesLabel}
                           </div>
                           <div className="text-lg font-medium tracking-tight text-white">
-                            sales@dodoshark.com
+                            {salesEmail}
                           </div>
                         </div>
                         <div>
                           <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
-                            Technical Support
+                            {supportLabel}
                           </div>
                           <div className="text-lg font-medium tracking-tight text-white">
-                            support@dodoshark.com
+                            {supportEmail}
                           </div>
                         </div>
                       </div>
@@ -403,11 +475,11 @@ export default async function SupportPage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
                   <div className="absolute bottom-8 left-8 right-8">
-                    <p className="text-xl font-display font-extrabold uppercase tracking-tight text-white">
-                      Experts You Can Trust
+                      <p className="text-xl font-display font-extrabold uppercase tracking-tight text-white">
+                      {teamCaptionTitle}
                     </p>
                     <p className="text-sm font-light text-slate-400">
-                      Direct connection to senior engineers.
+                      {teamCaptionDescription}
                     </p>
                   </div>
                 </div>

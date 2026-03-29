@@ -2,10 +2,9 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { draftMode } from 'next/headers'
-import { getClient } from '@/app/lib/sanity'
+import { fetchSanityData } from '@/app/lib/sanity.live'
 import { buildPageMetadata } from '@/app/lib/seo'
-import { firstParam, toImageSrc, type QueryParamValue } from '@/app/lib/sanity-utils'
+import { cleanSlug, cleanText, firstParam, renderText, toImageSrc, type QueryParamValue } from '@/app/lib/sanity-utils'
 import type { SeoMeta, SanityImage } from '@/app/lib/types/sanity'
 import VlogVideoGrid, { type VlogVideoCardItem } from '@/components/vlog/VlogVideoGrid'
 import Icon from '@/components/ui/Icon'
@@ -126,7 +125,10 @@ function hasSanityImageAsset(image?: SanityImage) {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const landing = await getClient().fetch<VlogLandingData | null>(blogsLandingQuery)
+  const landing = await fetchSanityData<VlogLandingData | null>({
+    query: blogsLandingQuery,
+    stega: false,
+  })
   return buildPageMetadata({
     seo: landing?.seo,
     fallbackTitle: 'Industrial Video Insights | DoDoShark',
@@ -135,17 +137,18 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function BlogsPage({ searchParams }: BlogsPageProps) {
-  const draft = await draftMode()
   const params = await searchParams
-  const tag = firstParam(params.tag)?.trim() || ''
+  const tag = cleanText(firstParam(params.tag)) || ''
   const requestedPage = parsePositiveInt(firstParam(params.page), 1)
   const tagParams: Record<string, string> = { tag }
 
-  const sanityClient = getClient(draft.isEnabled)
-  const landing = await sanityClient.fetch<VlogLandingData | null>(blogsLandingQuery)
+  const landing = await fetchSanityData<VlogLandingData | null>({
+    query: blogsLandingQuery,
+  })
 
-  const total = await sanityClient.fetch<number>(blogsCountQuery, {
-    ...tagParams,
+  const total = await fetchSanityData<number>({
+    query: blogsCountQuery,
+    params: tagParams,
   })
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
   const currentPage = Math.min(requestedPage, totalPages)
@@ -153,39 +156,44 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
   const end = start + PAGE_SIZE
 
   const [posts, fallbackTags] = await Promise.all([
-    sanityClient.fetch<VlogItemCard[]>(blogsListQuery, {
-      ...tagParams,
-      start,
-      end,
+    fetchSanityData<VlogItemCard[]>({
+      query: blogsListQuery,
+      params: {
+        ...tagParams,
+        start,
+        end,
+      },
     }),
-    sanityClient.fetch<ContentTagItem[]>(allTagsQuery),
+    fetchSanityData<ContentTagItem[]>({
+      query: allTagsQuery,
+    }),
   ])
 
-  const configuredTags = landing?.tagFilters?.filter((item) => item?.slug?.current) ?? []
+  const configuredTags = landing?.tagFilters?.filter((item) => cleanSlug(item?.slug)) ?? []
   const tags = configuredTags.length > 0 ? configuredTags : fallbackTags
   const heroImageSrc = toImageSrc(landing?.hero?.image, 1800)
-  const heroBadge = landing?.hero?.badge?.trim()
-  const heroTitle = landing?.hero?.title?.trim()
+  const heroBadge = renderText(landing?.hero?.badge)
+  const heroTitle = renderText(landing?.hero?.title)
   const heroSubtitle =
-    landing?.hero?.subtitle?.trim() || 'Product demonstrations, processing materials, integrated solutions, customer usage scenarios, etc.'
+    renderText(landing?.hero?.subtitle) || 'Product demonstrations, processing materials, integrated solutions, customer usage scenarios, etc.'
   const videoItems: VlogVideoCardItem[] = posts.map((post) => ({
     id: post._id,
-    title: post.title?.trim() || 'Video',
-    excerpt: post.excerpt?.trim() || 'Watch the full video for equipment demos and process highlights.',
+    title: renderText(post.title) || 'Video',
+    excerpt: renderText(post.excerpt) || 'Watch the full video for equipment demos and process highlights.',
     imageSrc: toImageSrc(post.coverImage, 900),
-    imageAlt: hasSanityImageAsset(post.coverImage) ? post.coverImage?.alt || post.title || 'Video cover' : post.title || 'Video cover',
-    youtubeUrl: post.youtubeUrl?.trim(),
-    tagLabel: post.tags?.[0]?.title?.trim() || 'Video',
+    imageAlt: hasSanityImageAsset(post.coverImage) ? renderText(post.coverImage?.alt) || renderText(post.title) || 'Video cover' : renderText(post.title) || 'Video cover',
+    youtubeUrl: cleanText(post.youtubeUrl),
+    tagLabel: renderText(post.tags?.[0]?.title) || 'Video',
   }))
   const tagCloudItems: TagCloudItem[] = tags.flatMap((item) => {
-    const slug = item.slug?.current
+    const slug = cleanSlug(item.slug)
     if (!slug) return []
 
     return [
       {
         key: item._id ?? slug,
         href: buildHref({ tag: slug }),
-        label: item.title || slug,
+        label: renderText(item.title) || slug,
         active: slug === tag,
       },
     ]
@@ -197,7 +205,7 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
         {heroImageSrc && (
           <Image
             src={heroImageSrc}
-            alt={landing?.hero?.image?.alt || 'Blog hero'}
+            alt={renderText(landing?.hero?.image?.alt) || 'Blog hero'}
             fill
             sizes="100vw"
             className="object-cover opacity-30"

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { toImageSrc } from '@/app/lib/sanity-utils'
+import { cleanText, toImageSrc } from '@/app/lib/sanity-utils'
 import type { SeoMeta } from '@/app/lib/types/sanity'
 
 type BuildPageMetadataOptions = {
@@ -10,12 +10,13 @@ type BuildPageMetadataOptions = {
 }
 
 function normalizeText(value?: string | null) {
-  const normalized = value?.trim()
-  return normalized || undefined
+  return cleanText(value)
 }
 
 function normalizeKeywords(keywords?: string[] | null) {
-  const items = keywords?.map((item) => item.trim()).filter(Boolean)
+  const items = keywords
+    ?.map((item) => cleanText(item))
+    .filter((item): item is string => Boolean(item))
   return items?.length ? items : undefined
 }
 

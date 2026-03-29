@@ -25,6 +25,8 @@ const sitePageSingletons = [
   {type: 'solutionsPage', title: 'Solutions Listing Page', icon: BulbOutlineIcon},
   {type: 'casesPage', title: 'Case Studies Listing Page', icon: CaseIcon},
   {type: 'productPage', title: 'Products Listing Page', icon: PackageIcon},
+  {type: 'privacyPage', title: 'Privacy Page', icon: DocumentTextIcon},
+  {type: 'termsPage', title: 'Terms Page', icon: DocumentTextIcon},
 ] as const
 
 export const structure: StructureResolver = (S) =>

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import { getSafeHref, isExternalHref } from '@/app/lib/safeHref'
+import { renderText } from '@/app/lib/sanity-utils'
 import LeadInquiryForm from '@/components/forms/LeadInquiryForm'
 
 import SectionShell from './SectionShell'
@@ -24,7 +25,7 @@ export type CtaBlockData = {
 }
 
 function CtaButtonLink({ button }: { button: CtaButton }) {
-  const label = button.label?.trim()
+  const label = renderText(button.label)
   const href = getSafeHref(button.href)
 
   if (!label || !href) return null

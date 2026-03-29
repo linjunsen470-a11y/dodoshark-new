@@ -1,3 +1,5 @@
+import {stegaClean} from 'next-sanity'
+
 import type { SanityImage } from '@/app/lib/types/sanity'
 
 import { urlFor } from '@/app/lib/sanity'
@@ -12,6 +14,30 @@ type ToImageSrcOptions = {
 export function firstParam(value: QueryParamValue) {
   if (Array.isArray(value)) return value[0]
   return value
+}
+
+export function cleanText(value?: string | null) {
+  const cleaned = stegaClean(value)?.trim()
+  return cleaned || undefined
+}
+
+export function renderText(value?: string | null) {
+  if (typeof value !== 'string') return undefined
+  const trimmed = value.trim()
+  return trimmed || undefined
+}
+
+export function cleanSlug(value?: string | { current?: string } | null) {
+  if (typeof value === 'string') return cleanText(value)
+  return cleanText(value?.current)
+}
+
+export function hasText(value?: string | null) {
+  return Boolean(cleanText(value))
+}
+
+export function hasRenderableText(value?: string | null) {
+  return Boolean(renderText(value))
 }
 
 export function toImageSrc(image?: SanityImage, width = 1200, options?: ToImageSrcOptions) {

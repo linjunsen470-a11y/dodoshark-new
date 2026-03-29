@@ -6,6 +6,7 @@ import {
 } from 'next-sanity'
 
 import { getSafeHref, isExternalHref } from '@/app/lib/safeHref'
+import { cleanText, renderText } from '@/app/lib/sanity-utils'
 import {
   getSharedBackgroundTheme,
   type SharedBackgroundTheme,
@@ -64,12 +65,12 @@ function normalizeRichSectionLayout(layout?: RichSectionLayout): RichSectionLayo
 
 function getValidRichSectionColumnItems(items?: RichSectionColumnItem[]) {
   return (items ?? []).filter(
-    (item) => Boolean(item?.title?.trim()) || Boolean(item?.description?.trim()),
+    (item) => Boolean(renderText(item?.title)) || Boolean(renderText(item?.description)),
   )
 }
 
 function hasTwoColumnPanelContent(heading?: string, items?: RichSectionColumnItem[]) {
-  return Boolean(heading?.trim()) || getValidRichSectionColumnItems(items).length > 0
+  return Boolean(renderText(heading)) || getValidRichSectionColumnItems(items).length > 0
 }
 
 function useTwoColumnContent(block: RichSectionBlockData) {
@@ -91,7 +92,7 @@ function centerHeaderInSplitLayout(block: RichSectionBlockData) {
 export function hasRichSectionContent(block: RichSectionBlockData) {
   const layout = normalizeRichSectionLayout(block.layout)
   const hasMedia = getValidRichSectionMediaItems(block.mediaItems).length > 0
-  const hasSubtitle = Boolean(block.subtitle?.trim())
+  const hasSubtitle = Boolean(renderText(block.subtitle))
   const hasTwoColumnMode =
     layout === 'centeredMediaGridBodyBelow' && block.enableTwoColumnContent === true
   const hasTwoColumnPanels =
@@ -193,7 +194,9 @@ function RichSectionTwoColumnPanel({
   variant: 'left' | 'right'
   theme: SharedBackgroundTheme
 }) {
-  if (!heading?.trim() && items.length === 0) return null
+  const resolvedHeading = renderText(heading)
+
+  if (!resolvedHeading && items.length === 0) return null
 
   const isRight = variant === 'right'
   const panelClass = isRight
@@ -211,11 +214,11 @@ function RichSectionTwoColumnPanel({
     <div
       className={`mx-auto h-full w-full max-w-[30rem] rounded-[2rem] px-5 py-6 backdrop-blur-sm md:px-7 md:py-8 ${panelClass}`}
     >
-      {heading?.trim() && (
+      {resolvedHeading && (
         <h3
           className={`mb-8 ${twoColumnPanelBaseHeadingClass} md:mb-9 ${headingClass}`}
         >
-          {heading.trim()}
+          {resolvedHeading}
         </h3>
       )}
 
@@ -226,20 +229,20 @@ function RichSectionTwoColumnPanel({
               key={item._key ?? `${variant}-${item.title ?? 'item'}-${index}`}
               className="text-center"
             >
-              {item.title?.trim() && (
+              {renderText(item.title) && (
                 <div className="mb-3.5 flex justify-center md:mb-4">
                   <span
                     className={`${twoColumnPillBaseClass} ${pillClass}`}
                   >
-                    <span className="whitespace-pre-line">{item.title.trim()}</span>
+                    <span className="whitespace-pre-line">{renderText(item.title)}</span>
                   </span>
                 </div>
               )}
-              {item.description?.trim() && (
+              {renderText(item.description) && (
                 <p
                   className={`${twoColumnDescriptionBaseClass} ${descriptionClass}`}
                 >
-                  {item.description.trim()}
+                  {renderText(item.description)}
                 </p>
               )}
             </div>
@@ -257,8 +260,8 @@ function RichSectionTwoColumnContent({
   block: RichSectionBlockData
   theme: SharedBackgroundTheme
 }) {
-  const leftColumnHeading = block.leftColumnHeading?.trim()
-  const rightColumnHeading = block.rightColumnHeading?.trim()
+  const leftColumnHeading = renderText(block.leftColumnHeading)
+  const rightColumnHeading = renderText(block.rightColumnHeading)
   const leftItems = getValidRichSectionColumnItems(block.leftColumnItems)
   const rightItems = getValidRichSectionColumnItems(block.rightColumnItems)
   const columns = [
@@ -317,12 +320,12 @@ export function RichSectionBlockContent({
   const variant = block.backgroundVariant ?? 'white'
   const theme = getSharedBackgroundTheme(variant)
   const mediaItems = getValidRichSectionMediaItems(block.mediaItems)
-  const mediaTopAccentTitle = block.mediaTopAccentTitle?.trim()
+  const mediaTopAccentTitle = renderText(block.mediaTopAccentTitle)
   const hasMedia = mediaItems.length > 0
   const hasTwoColumnMode = useTwoColumnContent(block)
   const hasCenteredSplitHeader = centerHeaderInSplitLayout(block)
   const hasBody = hasTwoColumnMode ? false : Boolean(block.body?.length)
-  const hasSubtitle = Boolean(block.subtitle?.trim())
+  const hasSubtitle = Boolean(renderText(block.subtitle))
   const centeredCaptionClassName = `mt-1.5 text-center text-[1.08rem] font-medium leading-6 md:mt-2 md:text-[1.16rem] md:leading-7 ${theme.body}`
   const centeredDescriptionClassName = `text-center text-sm leading-6 md:text-[0.95rem] md:leading-7 ${theme.subtitle}`
   const centeredDescriptionSpacingClassName = '-mt-0.5 md:-mt-1'
@@ -449,7 +452,7 @@ export default function RichSectionBlock({block}: RichSectionBlockProps) {
 
   const variant = block.backgroundVariant ?? 'white'
   const theme = getSharedBackgroundTheme(variant)
-  const anchorId = block.anchorId?.trim() || undefined
+  const anchorId = cleanText(block.anchorId) || undefined
 
   return (
     <SectionShell id={anchorId} sectionClassName={theme.section}>

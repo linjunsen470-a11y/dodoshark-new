@@ -1,36 +1,46 @@
-import { createClient } from 'next-sanity'
-import { createImageUrlBuilder } from '@sanity/image-url'
+import {createImageUrlBuilder} from '@sanity/image-url'
+import {createClient} from 'next-sanity'
+
+const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID?.trim() || 'nljl95h9'
+const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET?.trim() || 'production'
+const apiVersion = process.env.NEXT_PUBLIC_SANITY_API_VERSION?.trim() || '2024-01-01'
+const studioUrl =
+  process.env.NEXT_PUBLIC_SANITY_STUDIO_URL?.trim() || 'https://dodoshark.sanity.studio'
 
 export const client = createClient({
-    projectId: 'nljl95h9',
-    dataset: 'production',
-    apiVersion: '2024-01-01',
-    useCdn: true,
+  projectId,
+  dataset,
+  apiVersion,
+  useCdn: true,
+  stega: {
+    studioUrl,
+  },
 })
 
 const token = process.env.SANITY_API_READ_TOKEN?.trim()
 
 export const previewClient = createClient({
-    projectId: 'nljl95h9',
-    dataset: 'production',
-    apiVersion: '2024-01-01',
-    useCdn: false,
-    token: token,
-    stega: {
-        enabled: true,
-        studioUrl: process.env.NEXT_PUBLIC_SANITY_STUDIO_URL || 'https://dodoshark.sanity.studio',
-    },
+  projectId,
+  dataset,
+  apiVersion,
+  useCdn: false,
+  token,
+  stega: {
+    enabled: true,
+    studioUrl,
+  },
 })
 
 export function getClient(preview?: boolean) {
-    if (preview && token) {
-        return previewClient
-    }
-    return client
+  if (preview && token) {
+    return previewClient
+  }
+
+  return client
 }
 
 const builder = createImageUrlBuilder(client)
 
 export function urlFor(source: Parameters<typeof builder.image>[0]) {
-    return builder.image(source)
+  return builder.image(source)
 }

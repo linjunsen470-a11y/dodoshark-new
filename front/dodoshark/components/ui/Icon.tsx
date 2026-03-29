@@ -74,7 +74,7 @@ function resolveIconName(icon: SiteIconName | string): SiteIconName {
 
   const token = icon
     .split(/\s+/)
-    .map((item) => item.trim())
+    .map((item) => cleanText(item) || '')
     .find((item) => item.startsWith('fa-'))
 
   if (token && token in fontAwesomeAliases) {
@@ -390,3 +390,4 @@ export default function Icon({ icon, className, title }: IconProps) {
     </svg>
   )
 }
+import { cleanText } from '@/app/lib/sanity-utils'

@@ -1,11 +1,11 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { cache, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
-import { client } from '@/app/lib/sanity'
+import { fetchSanityData } from '@/app/lib/sanity.live'
 import { buildPageMetadata } from '@/app/lib/seo'
-import { toImageSrc } from '@/app/lib/sanity-utils'
+import { cleanText, renderText, toImageSrc } from '@/app/lib/sanity-utils'
 import type { SanityImage, SeoMeta } from '@/app/lib/types/sanity'
 import AboutVideoCard from '@/components/about/AboutVideoCard'
 
@@ -28,7 +28,40 @@ type AboutPageImages = {
 type AboutPageData = {
   seo?: SeoMeta
   hero?: {
+    titleLineOne?: string
+    titleLineTwo?: string
+    titleLineThree?: string
+    description?: string
     image?: SanityImage
+  }
+  storyCards?: Array<{
+    title?: string
+    subtitle?: string
+    description?: string
+  }>
+  productSystems?: Array<{
+    title?: string
+    description?: string
+    tags?: string[]
+    image?: SanityImage
+  }>
+  globalLayout?: {
+    title?: string
+    badge?: string
+    descriptionOne?: string
+    descriptionTwo?: string
+    stats?: Array<{ label?: string; value?: string }>
+  }
+  timeline?: Array<{
+    year?: string
+    phase?: string
+    title?: string
+    description?: string
+    image?: SanityImage
+  }>
+  timelineClosing?: {
+    title?: string
+    description?: string
   }
   images?: AboutPageImages
   brandStoryVideoUrl?: string
@@ -77,10 +110,52 @@ const ABOUT_PAGE_QUERY = `coalesce(
 ){
   seo,
   hero{
+    titleLineOne,
+    titleLineTwo,
+    titleLineThree,
+    description,
     image{
       alt,
       asset
     }
+  },
+  storyCards[]{
+    title,
+    subtitle,
+    description
+  },
+  productSystems[]{
+    title,
+    description,
+    tags,
+    image{
+      alt,
+      asset
+    }
+  },
+  globalLayout{
+    title,
+    badge,
+    descriptionOne,
+    descriptionTwo,
+    stats[]{
+      label,
+      value
+    }
+  },
+  timeline[]{
+    year,
+    phase,
+    title,
+    description,
+    image{
+      alt,
+      asset
+    }
+  },
+  timelineClosing{
+    title,
+    description
   },
   images{
     brandStoryThumbnail{
@@ -146,7 +221,12 @@ const ABOUT_PAGE_QUERY = `coalesce(
   }
 }`
 
-const getAboutPageData = cache(async () => client.fetch<AboutPageData | null>(ABOUT_PAGE_QUERY))
+async function getAboutPageData(stega?: boolean) {
+  return fetchSanityData<AboutPageData | null>({
+    query: ABOUT_PAGE_QUERY,
+    stega,
+  })
+}
 
 function resolvePageImage(
   image: SanityImage | undefined,
@@ -156,7 +236,7 @@ function resolvePageImage(
 ) {
   return {
     src: toImageSrc(image, width) || fallbackSrc,
-    alt: image?.alt?.trim() || fallbackAlt,
+    alt: cleanText(image?.alt) || fallbackAlt,
   }
 }
 
@@ -275,7 +355,7 @@ export default async function AboutPage() {
     900,
   )
   const brandStoryVideoUrl =
-    pageData?.brandStoryVideoUrl?.trim() || 'https://www.youtube.com/shorts/C_JWSMn42eA'
+    cleanText(pageData?.brandStoryVideoUrl) || 'https://www.youtube.com/shorts/C_JWSMn42eA'
   const globalLayoutImage = resolvePageImage(
     pageData?.images?.globalLayoutBackgroundImage,
     '/assets/images/about/global-layout.jpg',
@@ -300,13 +380,111 @@ export default async function AboutPage() {
     'Join DoDoShark Team',
     1200,
   )
-  const ctaEyebrow = pageData?.cta?.eyebrow?.trim() || 'Value Proposition'
-  const ctaTitle = pageData?.cta?.title?.trim() || 'Partnerships Beyond Equipment'
+  const heroTitleLineOne = renderText(pageData?.hero?.titleLineOne) || 'DoDoShark Machinery'
+  const heroTitleLineTwo = renderText(pageData?.hero?.titleLineTwo) || 'Rooted in China'
+  const heroTitleLineThree = renderText(pageData?.hero?.titleLineThree) || 'Empowering the World'
+  const heroDescription =
+    renderText(pageData?.hero?.description) || 'We provide stable, efficient, and worry-free DoDoShark machinery.'
+  const storyCards =
+    pageData?.storyCards
+      ?.map((card) => {
+        const title = renderText(card?.title)
+        const description = renderText(card?.description)
+        if (!title || !description) return null
+        return {
+          title,
+          subtitle: renderText(card?.subtitle),
+          description,
+        }
+      })
+      .filter((item): item is { title: string; subtitle?: string; description: string } => Boolean(item)) ?? []
+  const resolvedStoryCards = storyCards.length > 0 ? storyCards : [
+    {
+      title: 'Our slogan',
+      subtitle: '"Work with Confidence, Reap in Joy"',
+      description:
+        'We aim to build partnerships that transcend equipment, serving every workshop globally with the philosophy of "Work with Confidence, Reap in Joy".',
+    },
+    {
+      title: 'Corporate DNA',
+      description:
+        'With a heritage stemming from a state-owned factory founded in 1970, we carry half a century of engineering depth. DoDoShark Machinery was established in Nanjing in 2019, anchoring our core mission as "Empowering Productivity."',
+    },
+    {
+      title: 'Technical Strength',
+      description:
+        'Our products significantly outperform peers. For instance, our stainless steel crushers were the first to achieve 150-mesh fineness at 1 ton/hour, supporting 12 hours continuous operation, multiplying standard industry efficiency.',
+    },
+  ]
+  const cmsProductSystems =
+    pageData?.productSystems
+      ?.map((sys, index) => {
+        const title = renderText(sys?.title)
+        const description = renderText(sys?.description)
+        if (!title || !description) return null
+        return {
+          title,
+          description,
+          tags: (sys?.tags ?? []).map((tag) => renderText(tag)).filter(Boolean) as string[],
+          icon: PRODUCT_SYSTEMS[index]?.icon ?? PRODUCT_SYSTEMS[0].icon,
+          image: sys?.image,
+          fallbackImageSrc: PRODUCT_SYSTEMS[index]?.fallbackImageSrc ?? '/assets/images/about/dual-track-agri.jpg',
+        }
+      })
+      .filter((item) => Boolean(item)) ?? []
+  const aboutProductSystems = cmsProductSystems.length > 0 ? cmsProductSystems : PRODUCT_SYSTEMS
+  const globalLayoutTitle = renderText(pageData?.globalLayout?.title) || 'High-End Talent & Global Layout'
+  const globalLayoutBadge = renderText(pageData?.globalLayout?.badge) || 'Our Elite Engineering Team'
+  const globalLayoutDescriptionOne =
+    renderText(pageData?.globalLayout?.descriptionOne) ||
+    'Integrating foundational physics, mechanical automation, and IT technology to produce intellectual property. We operate 3 major production bases in Shandong (Jinan, Liaocheng, Weifang) with advanced laser cutting and static pressure casting technologies.'
+  const globalLayoutDescriptionTwo =
+    renderText(pageData?.globalLayout?.descriptionTwo) ||
+    'From serving every major city in China to expanding into over a dozen countries globally. DoDoShark stands as a new name card for Intelligent Manufacturing in China.'
+  const globalLayoutStats =
+    pageData?.globalLayout?.stats
+      ?.map((stat) => {
+        const label = renderText(stat?.label)
+        const value = renderText(stat?.value)
+        if (!label || !value) return null
+        return { label, value }
+      })
+      .filter((item): item is {label: string; value: string} => Boolean(item)) ?? [
+      { value: '10+', label: 'Senior Engineers' },
+      { value: '3', label: 'Production Bases' },
+      { value: '60+', label: 'Skilled Technicians' },
+      { value: '10+', label: 'Countries Served' },
+    ]
+  const cmsTimeline =
+    pageData?.timeline
+      ?.map((item, index) => {
+        const title = renderText(item?.title)
+        const year = renderText(item?.year)
+        if (!title || !year) return null
+        return {
+          year,
+          phase: renderText(item?.phase) || '',
+          title,
+          desc: renderText(item?.description) || '',
+          image: item?.image,
+          imageKey: TIMELINE[index]?.imageKey ?? 'timelineStateOwnedHeritageImage',
+          fallbackImageSrc: TIMELINE[index]?.fallbackImageSrc ?? '/assets/images/about/history-1.jpg',
+        }
+      })
+      .filter(Boolean) ?? []
+  const resolvedTimeline = cmsTimeline.length > 0 ? cmsTimeline : TIMELINE
+  const timelineClosingTitle =
+    renderText(pageData?.timelineClosing?.title) || 'Settling in Reliability, Innovating in Evolution.'
+  const timelineClosingDescription =
+    renderText(pageData?.timelineClosing?.description) ||
+    'From a single machine to a diverse ecosystem. We invite you to co-create the future of intelligent manufacturing.'
+  const ctaEyebrow = renderText(pageData?.cta?.eyebrow) || 'Value Proposition'
+  const ctaTitle = renderText(pageData?.cta?.title) || 'Partnerships Beyond Equipment'
   const ctaDescription =
-    pageData?.cta?.description?.trim() ||
+    renderText(pageData?.cta?.description) ||
     'We have moved beyond simple equipment sales to an "Effect-based Sales" model, providing full life-cycle solutions from process planning to technical implementation. With an industry-leading 10-year warranty on core components, we upgrade short-term cooperation into long-term strategic partnerships.'
-  const ctaButtonLabel = pageData?.cta?.buttonLabel?.trim() || 'Connect With Us Today'
-  const ctaButtonHref = pageData?.cta?.buttonHref?.trim() || '/contact'
+  const ctaButtonLabel = renderText(pageData?.cta?.buttonLabel) || 'Connect With Us Today'
+  const ctaButtonHref = cleanText(pageData?.cta?.buttonHref) || '/contact'
 
   return (
     <main className="bg-[#fcfdfd] text-slate-900 font-sans selection:bg-orange-100 selection:text-orange-900">
@@ -327,16 +505,16 @@ export default async function AboutPage() {
         <div className="relative z-10 mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
           <h1 className="mb-6 font-display font-extrabold text-5xl md:text-7xl leading-[1.1] tracking-[-0.02em] text-white">
             <span className="bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent">
-              DoDoShark Machinery
+              {heroTitleLineOne}
             </span>
             <br />
-            Rooted in China <br />{' '}
+            {heroTitleLineTwo} <br />{' '}
             <span className="bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent">
-              Empowering the World
+              {heroTitleLineThree}
             </span>
           </h1>
           <p className="mx-auto max-w-3xl text-lg md:text-xl leading-relaxed font-normal text-slate-300">
-            We provide stable, efficient, and worry-free DoDoShark machinery.
+            {heroDescription}
           </p>
         </div>
       </section>
@@ -356,38 +534,23 @@ export default async function AboutPage() {
             </div>
 
             <div className="w-full space-y-8 lg:w-7/12">
-              <div className="group rounded-xl border border-slate-200 bg-white p-10 shadow-xl transition-all duration-300 hover:border-orange-500 hover:shadow-2xl md:p-12">
-                <h2 className="mb-6 font-display text-3xl font-extrabold uppercase tracking-tight text-slate-900 transition-colors group-hover:text-orange-500">
-                  Our slogan
-                </h2>
-                <p className="mb-6 font-serif text-xl font-bold italic leading-relaxed text-orange-600 md:text-2xl">
-                  "Work with Confidence, Reap in Joy"
-                </p>
-                <p className="text-lg leading-relaxed font-light text-slate-600">
-                  We aim to build partnerships that transcend equipment, serving every workshop globally with the philosophy of "Work with Confidence, Reap in Joy".
-                </p>
-              </div>
-
-              <div className="group rounded-xl border border-slate-200 bg-white p-10 shadow-xl transition-all duration-300 hover:border-orange-500 hover:shadow-2xl md:p-12">
-                <h2 className="mb-6 font-display text-3xl font-extrabold uppercase tracking-tight text-slate-900 transition-colors group-hover:text-orange-500">
-                  Corporate <span className="text-orange-500">DNA</span>
-                </h2>
-                <p className="mb-6 text-lg leading-relaxed font-light text-slate-600">
-                  With a heritage stemming from a state-owned factory founded in 1970, we carry half a century of engineering depth. DoDoShark Machinery was established in Nanjing in 2019, anchoring our core mission as <strong>"Empowering Productivity."</strong>
-                </p>
-                <p className="text-lg leading-relaxed font-light text-slate-600">
-                  We prioritize a "Technology-led Development" model, rejecting homogenization to build a three-dimensional ecosystem: <strong>R&D as the core, Manufacturing as the base, and Service as the wings.</strong>
-                </p>
-              </div>
-
-              <div className="group rounded-xl border border-slate-200 bg-white p-10 shadow-xl transition-all duration-300 hover:border-orange-500 hover:shadow-2xl md:p-12">
-                <h2 className="mb-6 font-display text-3xl font-extrabold uppercase tracking-tight text-slate-900 transition-colors group-hover:text-orange-500">
-                  Technical <span className="text-orange-500">Strength</span>
-                </h2>
-                <p className="text-lg leading-relaxed font-light text-slate-600">
-                  Our products significantly outperform peers. For instance, our stainless steel crushers were the first to achieve <strong>150-mesh fineness at 1 ton/hour</strong>, supporting 12 hours continuous operation, multiplying standard industry efficiency.
-                </p>
-              </div>
+              {resolvedStoryCards.map((card, index) => (
+                <div key={`${card.title}-${index}`} className="group rounded-xl border border-slate-200 bg-white p-10 shadow-xl transition-all duration-300 hover:border-orange-500 hover:shadow-2xl md:p-12">
+                  <h2 className="mb-6 font-display text-3xl font-extrabold uppercase tracking-tight text-slate-900 transition-colors group-hover:text-orange-500">
+                    {card.title}
+                    {card.title === 'Corporate DNA' ? <span className="text-orange-500"> DNA</span> : null}
+                    {card.title === 'Technical Strength' ? <span className="text-orange-500"> Strength</span> : null}
+                  </h2>
+                  {card.subtitle ? (
+                    <p className="mb-6 font-serif text-xl font-bold italic leading-relaxed text-orange-600 md:text-2xl">
+                      {card.subtitle}
+                    </p>
+                  ) : null}
+                  <p className="text-lg leading-relaxed font-light text-slate-600">
+                    {card.description}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -415,9 +578,9 @@ export default async function AboutPage() {
           </div>
 
           <div className="grid gap-8 md:grid-cols-2">
-            {PRODUCT_SYSTEMS.map((sys) => {
+            {aboutProductSystems.map((sys) => {
               const systemImage = resolvePageImage(
-                pageData?.images?.[sys.imageKey],
+                'image' in sys ? sys.image : pageData?.images?.[sys.imageKey],
                 sys.fallbackImageSrc,
                 sys.title,
                 1400,
@@ -475,10 +638,10 @@ export default async function AboutPage() {
           <div className="grid items-center gap-12 md:grid-cols-2">
             <div>
               <h2 className="mb-6 font-display text-3xl font-extrabold uppercase tracking-tight md:text-4xl">
-                High-End Talent & <br /> Global Layout
+                {globalLayoutTitle}
               </h2>
               <p className="mb-4 inline-block rounded bg-white/90 px-3 py-1 text-sm font-bold text-orange-500">
-                Our Elite Engineering Team
+                {globalLayoutBadge}
               </p>
               <div className="relative mb-6 aspect-video overflow-hidden rounded-xl border-4 border-white/20 shadow-2xl">
                 <Image
@@ -489,30 +652,20 @@ export default async function AboutPage() {
                 />
               </div>
               <p className="mb-6 font-light leading-relaxed text-orange-100">
-                Integrating foundational physics, mechanical automation, and IT technology to produce intellectual property. We operate 3 major production bases in Shandong (Jinan, Liaocheng, Weifang) with advanced laser cutting and static pressure casting technologies.
+                {globalLayoutDescriptionOne}
               </p>
               <p className="font-light leading-relaxed text-orange-100">
-                From serving every major city in China to expanding into over a dozen countries globally. DoDoShark stands as a new name card for <strong>Intelligent Manufacturing in China</strong>.
+                {globalLayoutDescriptionTwo}
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-xl border border-white/20 bg-white/10 p-6 text-center backdrop-blur transition-colors hover:bg-white/20">
-                <div className="mb-2 text-4xl font-black">10+</div>
-                <div className="text-xs uppercase tracking-widest text-orange-200">Senior Engineers</div>
-              </div>
-              <div className="rounded-xl border border-white/20 bg-white/10 p-6 text-center backdrop-blur transition-colors hover:bg-white/20">
-                <div className="mb-2 text-4xl font-black">3</div>
-                <div className="text-xs uppercase tracking-widest text-orange-200">Production Bases</div>
-              </div>
-              <div className="rounded-xl border border-white/20 bg-white/10 p-6 text-center backdrop-blur transition-colors hover:bg-white/20">
-                <div className="mb-2 text-4xl font-black">60+</div>
-                <div className="text-xs uppercase tracking-widest text-orange-200">Skilled Technicians</div>
-              </div>
-              <div className="rounded-xl border border-white/20 bg-white/10 p-6 text-center backdrop-blur transition-colors hover:bg-white/20">
-                <div className="mb-2 text-4xl font-black">10+</div>
-                <div className="text-xs uppercase tracking-widest text-orange-200">Countries Served</div>
-              </div>
+              {globalLayoutStats.map((stat) => (
+                <div key={`${stat.label}-${stat.value}`} className="rounded-xl border border-white/20 bg-white/10 p-6 text-center backdrop-blur transition-colors hover:bg-white/20">
+                  <div className="mb-2 text-4xl font-black">{stat.value}</div>
+                  <div className="text-xs uppercase tracking-widest text-orange-200">{stat.label}</div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -531,9 +684,9 @@ export default async function AboutPage() {
           </div>
 
           <div className="relative mx-auto max-w-5xl space-y-24 before:absolute before:inset-y-0 before:left-[24px] before:w-0.5 before:bg-slate-200 md:before:left-1/2 md:before:-translate-x-1/2">
-            {TIMELINE.map((item, idx) => {
+            {resolvedTimeline.map((item, idx) => {
               const timelineImage = resolvePageImage(
-                pageData?.images?.[item.imageKey],
+                'image' in item ? item.image : pageData?.images?.[item.imageKey],
                 item.fallbackImageSrc,
                 item.title,
                 1200,
@@ -594,12 +747,8 @@ export default async function AboutPage() {
           </div>
 
           <div className="mx-auto mt-24 max-w-3xl border-t border-slate-200 pt-16 text-center">
-            <p className="mb-4 text-2xl font-black uppercase tracking-tighter text-slate-900">
-              Settling in Reliability, Innovating in Evolution.
-            </p>
-            <p className="font-light text-slate-500">
-              From a single machine to a diverse ecosystem. We invite you to co-create the future of intelligent manufacturing.
-            </p>
+            <p className="mb-4 text-2xl font-black uppercase tracking-tighter text-slate-900">{timelineClosingTitle}</p>
+            <p className="font-light text-slate-500">{timelineClosingDescription}</p>
           </div>
         </div>
       </section>
@@ -667,7 +816,7 @@ export default async function AboutPage() {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const pageData = await getAboutPageData()
+  const pageData = await getAboutPageData(false)
   return buildPageMetadata({
     seo: pageData?.seo,
     fallbackTitle: 'About Us | DoDoShark Machinery',

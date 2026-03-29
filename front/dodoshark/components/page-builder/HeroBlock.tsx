@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
+import { cleanText, renderText } from '@/app/lib/sanity-utils'
 import { getSafeHref, isExternalHref } from '@/app/lib/safeHref'
 import { urlFor } from '@/app/lib/sanity'
 import {
@@ -95,7 +96,7 @@ function resolveMediaLayout(value?: string): 'textLeftImageRight' | 'imageLeftTe
 }
 
 function CtaButton({ button }: { button: HeroCtaButton }) {
-  const label = button.label?.trim()
+  const label = renderText(button.label)
   const href = getSafeHref(button.href)
 
   if (!label || !href) return null
@@ -158,9 +159,9 @@ function HeroTextContent({
   accentAlignClass?: string
   actionsClassName?: string
 }) {
-  const title = block.title?.trim()
-  const subtitle = block.subtitle?.trim()
-  const description = block.description?.trim()
+  const title = renderText(block.title)
+  const subtitle = renderText(block.subtitle)
+  const description = renderText(block.description)
 
   return (
     <>

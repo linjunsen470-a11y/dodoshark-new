@@ -4,10 +4,9 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { PortableText, type PortableTextBlock, type PortableTextComponents } from 'next-sanity'
 
-import { draftMode } from 'next/headers'
 import { getSafeHref, isExternalHref } from '@/app/lib/safeHref'
-import { getClient } from '@/app/lib/sanity'
-import { toImageSrc } from '@/app/lib/sanity-utils'
+import { fetchSanityData } from '@/app/lib/sanity.live'
+import { cleanSlug, cleanText, renderText, toImageSrc } from '@/app/lib/sanity-utils'
 import type { SanityAsset, SanityImage, SeoMeta } from '@/app/lib/types/sanity'
 import Icon from '@/components/ui/Icon'
 
@@ -129,9 +128,13 @@ const caseBySlugQuery = `*[_type == "caseStudy" && slug.current == $slug][0]{
   }
 }`
 
-async function getCaseBySlug(slug: string, preview = false) {
+async function getCaseBySlug(slug: string, stega?: boolean) {
   try {
-    return await getClient(preview).fetch<CaseStudyData | null>(caseBySlugQuery, { slug })
+    return await fetchSanityData<CaseStudyData | null>({
+      query: caseBySlugQuery,
+      params: { slug },
+      stega,
+    })
   } catch (error) {
     console.error('Error fetching case study:', error)
     return null
@@ -231,8 +234,10 @@ function buildPortableTextComponents(): PortableTextComponents {
                 blurDataURL={image.asset.metadata?.lqip}
               />
             </div>
-            {image.caption?.trim() && (
-              <figcaption className="mt-3 text-center text-xs text-slate-500">{image.caption}</figcaption>
+            {renderText(image.caption) && (
+              <figcaption className="mt-3 text-center text-xs text-slate-500">
+                {renderText(image.caption)}
+              </figcaption>
             )}
           </figure>
         )
@@ -243,7 +248,7 @@ function buildPortableTextComponents(): PortableTextComponents {
 
 export async function generateMetadata({ params }: CaseDetailPageProps): Promise<Metadata> {
   const { slug } = await params
-  const caseStudy = await getCaseBySlug(slug)
+  const caseStudy = await getCaseBySlug(slug, false)
 
   if (!caseStudy) {
     return {
@@ -253,12 +258,12 @@ export async function generateMetadata({ params }: CaseDetailPageProps): Promise
     }
   }
 
-  const title = caseStudy.seo?.title?.trim() || caseStudy.title || 'DoDoShark Case Study'
+  const title = cleanText(caseStudy.seo?.title) || cleanText(caseStudy.title) || 'DoDoShark Case Study'
   const description =
-    caseStudy.seo?.description?.trim() ||
-    caseStudy.excerpt?.trim() ||
+    cleanText(caseStudy.seo?.description) ||
+    cleanText(caseStudy.excerpt) ||
     'Discover how DoDoShark delivers measurable industrial processing outcomes.'
-  const canonical = caseStudy.seo?.canonicalUrl?.trim() || `/cases/${caseStudy.slug?.current || slug}`
+  const canonical = cleanText(caseStudy.seo?.canonicalUrl) || `/cases/${cleanSlug(caseStudy.slug) || slug}`
   const ogImage = toImageSrc(caseStudy.seo?.ogImage || caseStudy.coverImage, 1200)
 
   return {
@@ -271,7 +276,7 @@ export async function generateMetadata({ params }: CaseDetailPageProps): Promise
       title,
       description,
       type: 'article',
-      images: ogImage ? [{ url: ogImage, alt: caseStudy.seo?.ogImage?.alt || caseStudy.coverImage?.alt || title }] : undefined,
+      images: ogImage ? [{ url: ogImage, alt: cleanText(caseStudy.seo?.ogImage?.alt) || cleanText(caseStudy.coverImage?.alt) || title }] : undefined,
     },
     twitter: {
       card: 'summary_large_image',
@@ -283,9 +288,8 @@ export async function generateMetadata({ params }: CaseDetailPageProps): Promise
 }
 
 export default async function CaseDetailPage({ params }: CaseDetailPageProps) {
-  const draft = await draftMode()
   const { slug } = await params
-  const caseStudy = await getCaseBySlug(slug, draft.isEnabled)
+  const caseStudy = await getCaseBySlug(slug)
 
   if (!caseStudy) {
     notFound()
@@ -297,7 +301,7 @@ export default async function CaseDetailPage({ params }: CaseDetailPageProps) {
     (item) => item?._id && (item?.title || item?.modelName),
   )
   const components = buildPortableTextComponents()
-  const caseTags = (caseStudy.tags ?? []).filter((item) => item?.title?.trim() && item?.slug?.current?.trim())
+  const caseTags = (caseStudy.tags ?? []).filter((item) => cleanText(item?.title) && cleanSlug(item?.slug))
   const tagMetaClassName =
     'inline-flex items-center gap-2 rounded-full border border-white/16 bg-white/6 px-3.5 py-1.5 text-[11px] font-medium tracking-[0.08em] text-slate-200 transition sm:text-xs'
 
@@ -308,7 +312,7 @@ export default async function CaseDetailPage({ params }: CaseDetailPageProps) {
           <div className="absolute inset-0 opacity-30">
             <Image
               src={coverImageSrc}
-              alt={caseStudy.coverImage?.alt || caseStudy.title || 'Case cover image'}
+              alt={renderText(caseStudy.coverImage?.alt) || renderText(caseStudy.title) || 'Case cover image'}
               fill
               sizes="100vw"
               priority
@@ -326,7 +330,7 @@ export default async function CaseDetailPage({ params }: CaseDetailPageProps) {
             <div className="mx-auto mt-8 w-full max-w-[220px] rounded-[1.5rem] border border-white/20 bg-white/92 px-4 py-3 shadow-[0_20px_45px_-24px_rgba(15,23,42,0.95)] backdrop-blur-sm">
               <Image
                 src={clientLogoSrc}
-                alt={caseStudy.clientLogo?.alt || caseStudy.title || 'Client logo'}
+                alt={renderText(caseStudy.clientLogo?.alt) || renderText(caseStudy.title) || 'Client logo'}
                 width={176}
                 height={56}
                 sizes="176px"
@@ -335,28 +339,28 @@ export default async function CaseDetailPage({ params }: CaseDetailPageProps) {
               />
             </div>
           ) : null}
-          {caseStudy.title && (
+          {renderText(caseStudy.title) && (
             <h1 className="mb-8 mt-8 text-4xl font-display font-black leading-tight tracking-tight md:text-6xl">
-              {caseStudy.title}
+              {renderText(caseStudy.title)}
             </h1>
           )}
 
-          {(caseTags.length > 0 || caseStudy.location) && (
+          {(caseTags.length > 0 || renderText(caseStudy.location)) && (
             <div className="mb-8 flex flex-wrap justify-center gap-4">
               {caseTags.map((tag) => (
                 <Link
                   key={tag._id || tag.slug?.current}
-                  href={`/cases?${new URLSearchParams({ tag: tag.slug?.current ?? '' }).toString()}`}
+                  href={`/cases?${new URLSearchParams({ tag: cleanSlug(tag.slug) ?? '' }).toString()}`}
                   className={`${tagMetaClassName} hover:border-orange-400/35 hover:bg-white/10 hover:text-white`}
                 >
                   <span className="h-2 w-2 rounded-full bg-orange-400" />
-                  <span>{toSentenceCase(tag.title ?? '')}</span>
+                  <span>{toSentenceCase(renderText(tag.title) ?? '')}</span>
                 </Link>
               ))}
-              {caseStudy.location && (
+              {renderText(caseStudy.location) && (
                 <div className={tagMetaClassName}>
                   <Icon icon="location" className="h-4 w-4 text-orange-400" />
-                  <span>{caseStudy.location}</span>
+                  <span>{renderText(caseStudy.location)}</span>
                 </div>
               )}
             </div>
@@ -382,10 +386,10 @@ export default async function CaseDetailPage({ params }: CaseDetailPageProps) {
 
             <div className="grid gap-8 md:grid-cols-2">
               {usedEquipment.map((item, idx) => {
-                const href = item.slug?.current ? `/products/${item.slug.current}` : undefined
+                const href = cleanSlug(item.slug) ? `/products/${cleanSlug(item.slug)}` : undefined
                 const imageSrc = toImageSrc(item.image, 900)
-                const title = item.title || item.modelName || 'Equipment'
-                const description = item.shortDescription || item.description || item.excerpt
+                const title = renderText(item.title) || renderText(item.modelName) || 'Equipment'
+                const description = renderText(item.shortDescription) || renderText(item.description) || renderText(item.excerpt)
                 const cardContent = (
                   <>
                     <div className="w-full flex-shrink-0 rounded-lg bg-slate-50 p-4 sm:w-1/3">
