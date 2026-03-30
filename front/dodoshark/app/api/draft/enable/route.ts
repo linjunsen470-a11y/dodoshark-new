@@ -1,6 +1,8 @@
 import {defineEnableDraftMode} from 'next-sanity/draft-mode'
 import {client} from '@/app/lib/sanity'
 
+export const dynamic = 'force-dynamic'
+
 export const GET = async (request: Request) => {
   const token = process.env['SANITY_API_READ_TOKEN']?.trim()
   if (!token) {
