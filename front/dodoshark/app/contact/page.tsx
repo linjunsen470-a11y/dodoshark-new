@@ -32,6 +32,13 @@ type ContactPageData = {
     description?: string
     cities?: string[]
   }
+  directContact?: {
+    title?: string
+    phone?: string
+    email?: string
+    websiteLabel?: string
+    websiteUrl?: string
+  }
   inquiryPanel?: {
     title?: string
     description?: string
@@ -69,6 +76,13 @@ const CONTACT_PAGE_QUERY = `coalesce(
     description,
     cities
   },
+  directContact{
+    title,
+    phone,
+    email,
+    websiteLabel,
+    websiteUrl
+  },
   inquiryPanel{
     title,
     description
@@ -99,6 +113,12 @@ export default async function ContactPage() {
   const pbCities = (pageData?.productionBases?.cities && pageData.productionBases.cities.length > 0) 
     ? pageData.productionBases.cities 
     : ['Jinan', 'Liaocheng', 'Weifang']
+
+  const dcTitle = renderText(pageData?.directContact?.title) || 'Direct Contact'
+  const dcPhone = renderText(pageData?.directContact?.phone) || contact.phone || '+86 18251999196'
+  const dcEmail = renderText(pageData?.directContact?.email) || contact.email || 'sales@dodoshark.com'
+  const dcWebLabel = renderText(pageData?.directContact?.websiteLabel) || contact.websiteLabel || 'www.dodoshark.com'
+  const dcWebUrl = renderText(pageData?.directContact?.websiteUrl) || contact.websiteUrl || 'https://www.dodoshark.com'
 
   const showroomTitle = renderText(pageData?.showroom?.title) || 'Our Showroom'
   const showroomDescription = renderText(pageData?.showroom?.description) || 'Visit our facility in Nanjing to see our high-precision machinery in action and discuss your production needs with our experts.'
@@ -189,19 +209,19 @@ export default async function ContactPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
               </div>
-              <h2 className="text-2xl font-display font-extrabold text-slate-900 mb-4 uppercase tracking-tight">Direct Contact</h2>
+              <h2 className="text-2xl font-display font-extrabold text-slate-900 mb-4 uppercase tracking-tight">{dcTitle}</h2>
               <ul className="space-y-4 text-slate-600 font-light">
                 <li className="flex items-center gap-3">
                   <span className="font-semibold text-slate-900">Phone:</span>
-                  <a href={`tel:${contact.phone || '+86 18251999196'}`} className="hover:text-orange-500 transition-colors">{contact.phone || '+86 18251999196'}</a>
+                  <a href={`tel:${dcPhone}`} className="hover:text-orange-500 transition-colors">{dcPhone}</a>
                 </li>
                 <li className="flex items-center gap-3">
                   <span className="font-semibold text-slate-900">Email:</span>
-                  <a href={`mailto:${contact.email || 'sales@dodoshark.com'}`} className="hover:text-orange-500 transition-colors">{contact.email || 'sales@dodoshark.com'}</a>
+                  <a href={`mailto:${dcEmail}`} className="hover:text-orange-500 transition-colors">{dcEmail}</a>
                 </li>
                 <li className="flex items-center gap-3">
                   <span className="font-semibold text-slate-900">Web:</span>
-                  <a href={contact.websiteUrl} target="_blank" rel="noopener noreferrer" className="hover:text-orange-500 transition-colors">{contact.websiteLabel}</a>
+                  <a href={dcWebUrl} target="_blank" rel="noopener noreferrer" className="hover:text-orange-500 transition-colors">{dcWebLabel}</a>
                 </li>
               </ul>
             </div>

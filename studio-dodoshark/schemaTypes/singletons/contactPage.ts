@@ -89,6 +89,19 @@ export default defineType({
       ],
     }),
     defineField({
+      name: 'directContact',
+      title: 'Direct Contact Card',
+      type: 'object',
+      group: 'content',
+      fields: [
+        defineField({name: 'title', title: 'Title', type: 'string'}),
+        defineField({name: 'phone', title: 'Phone Number', type: 'string'}),
+        defineField({name: 'email', title: 'Email Address', type: 'string'}),
+        defineField({name: 'websiteLabel', title: 'Website Label', type: 'string'}),
+        defineField({name: 'websiteUrl', title: 'Website URL', type: 'string'}),
+      ],
+    }),
+    defineField({
       name: 'inquiryPanel',
       title: 'Inquiry Panel',
       type: 'object',
