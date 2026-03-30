@@ -3,7 +3,7 @@ import { basename, join } from 'path';
 import { readFileSync } from 'fs';
 import dotenv from 'dotenv';
 
-dotenv.config({ path: 'front/dodoshark/.env.local' });
+dotenv.config({ path: '../front/dodoshark/.env.local' });
 
 const client = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
@@ -15,7 +15,7 @@ const client = createClient({
 
 async function uploadImage(filePath) {
   try {
-    const fullPath = join(process.cwd(), 'front/dodoshark/public', filePath);
+    const fullPath = join(process.cwd(), '../front/dodoshark/public', filePath);
     console.log(`Uploading ${fullPath}...`);
     const buffer = readFileSync(fullPath);
     const asset = await client.assets.upload('image', buffer, {
@@ -80,7 +80,15 @@ async function runMigration() {
         description: 'Our products significantly outperform peers. For instance, our stainless steel crushers were the first to achieve 150-mesh fineness at 1 ton/hour, supporting 12 hours continuous operation, multiplying standard industry efficiency.',
       },
     ],
+    brandStoryTitle: 'DoDoShark Brand Story',
     brandStoryVideoUrl: 'https://www.youtube.com/shorts/C_JWSMn42eA',
+    productSystemIntro: {
+      titleLineOne: 'Dual-Track',
+      titleLineTwo: 'Product System',
+      description: 'Exceeding industry standards to meet diverse production needs with full-process customized solutions. Seamlessly connecting production segments for maximum efficiency.',
+      buttonLabel: 'View Product Matrices',
+      buttonHref: '/products',
+    },
     productSystems: [
       {
         title: 'Agricultural Processing Machinery',
@@ -106,6 +114,11 @@ async function runMigration() {
         { value: '60+', label: 'Skilled Technicians' },
         { value: '100+', label: 'Global Clients' },
       ],
+    },
+    timelineIntro: {
+      titleLineOne: 'The Journey of',
+      titleLineTwo: 'DoDoShark',
+      description: 'From our state-owned origins to a modern global enterprise. Constantly evolving in reliability and innovation.',
     },
     timeline: [
       {
@@ -161,6 +174,8 @@ async function runMigration() {
       description: 'We have moved beyond simple equipment sales to an "Effect-based Sales" model, providing full life-cycle solutions from process planning to technical implementation. With an industry-leading 10-year warranty on core components, we upgrade short-term cooperation into long-term strategic partnerships.',
       buttonLabel: 'Connect With Us Today',
       buttonHref: '/contact',
+      joinUsTitle: 'Join Our Journey',
+      joinUsDescription: 'Become part of the global DoDoShark ecosystem.',
     },
     images: {
       brandStoryThumbnail: brandStoryThumbnail,

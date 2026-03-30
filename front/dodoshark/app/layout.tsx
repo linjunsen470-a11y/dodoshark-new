@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getGlobalSettings } from "@/app/lib/global-settings";
 import { SanityLive } from "@/app/lib/sanity.live";
+import { studioUrl } from "@/app/lib/sanity";
 
 const inter = Inter({
   variable: "--font-inter",
