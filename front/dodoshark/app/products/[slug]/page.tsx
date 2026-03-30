@@ -385,7 +385,12 @@ function renderLegacyVideoGallery(block: VideoGalleryBlockData, key: string | nu
   )
 }
 
-function wrapBlockForPresentation(documentId: string, blockKey: string | undefined, element: ReactNode) {
+function wrapBlockForPresentation(
+  documentId: string,
+  blockKey: string | undefined,
+  renderKey: string,
+  element: ReactNode
+) {
   if (!blockKey) return element
 
   const dataAttribute = createDataAttribute({
@@ -394,7 +399,11 @@ function wrapBlockForPresentation(documentId: string, blockKey: string | undefin
     path: `contentBlocks[_key=="${blockKey}"]`,
   }).toString()
 
-  return <div data-sanity={dataAttribute}>{element}</div>
+  return (
+    <div key={renderKey} data-sanity={dataAttribute}>
+      {element}
+    </div>
+  )
 }
 
 function renderPageBuilderGroup(group: PageBuilderRenderGroup<ProductBlock>, documentId: string) {
@@ -402,6 +411,7 @@ function renderPageBuilderGroup(group: PageBuilderRenderGroup<ProductBlock>, doc
     return wrapBlockForPresentation(
       documentId,
       group.richBlock._key ?? group.featureBlock._key,
+      group.key,
       <MergedRichFeatureSection
         key={group.key}
         richBlock={group.richBlock}
@@ -414,44 +424,46 @@ function renderPageBuilderGroup(group: PageBuilderRenderGroup<ProductBlock>, doc
 
   switch (block._type) {
     case 'heroBlock':
-      return wrapBlockForPresentation(documentId, block._key, <HeroBlock key={key} block={block as HeroBlockData} />)
+      return wrapBlockForPresentation(documentId, block._key, key, <HeroBlock key={key} block={block as HeroBlockData} />)
     case 'richSectionBlock':
-      return wrapBlockForPresentation(documentId, block._key, <RichSectionBlock key={key} block={block as RichSectionBlockData} />)
+      return wrapBlockForPresentation(documentId, block._key, key, <RichSectionBlock key={key} block={block as RichSectionBlockData} />)
     case 'featureListBlock':
-      return wrapBlockForPresentation(documentId, block._key, <FeatureListBlock key={key} block={block as FeatureListBlockData} />)
+      return wrapBlockForPresentation(documentId, block._key, key, <FeatureListBlock key={key} block={block as FeatureListBlockData} />)
     case 'mediaGalleryBlock':
-      return wrapBlockForPresentation(documentId, block._key, <MediaGalleryBlock key={key} block={block as MediaGalleryBlockData} />)
+      return wrapBlockForPresentation(documentId, block._key, key, <MediaGalleryBlock key={key} block={block as MediaGalleryBlockData} />)
     case 'machineSelectorBlock':
       return wrapBlockForPresentation(
         documentId,
         block._key,
+        key,
         <MachineSelectorBlock key={key} block={block as MachineSelectorBlockData} />
       )
     case 'cardGridBlock':
-      return wrapBlockForPresentation(documentId, block._key, <CardGridBlock key={key} block={block as CardGridBlockData} />)
+      return wrapBlockForPresentation(documentId, block._key, key, <CardGridBlock key={key} block={block as CardGridBlockData} />)
     case 'tableBlock':
-      return wrapBlockForPresentation(documentId, block._key, <TableBlock key={key} block={block as TableBlockData} />)
+      return wrapBlockForPresentation(documentId, block._key, key, <TableBlock key={key} block={block as TableBlockData} />)
     case 'metricsBlock':
-      return wrapBlockForPresentation(documentId, block._key, <MetricsBlock key={key} block={block as MetricsBlockData} />)
+      return wrapBlockForPresentation(documentId, block._key, key, <MetricsBlock key={key} block={block as MetricsBlockData} />)
     case 'ctaBlock':
-      return wrapBlockForPresentation(documentId, block._key, <CtaBlock key={key} block={block as CtaBlockData} />)
+      return wrapBlockForPresentation(documentId, block._key, key, <CtaBlock key={key} block={block as CtaBlockData} />)
     case 'portableTextBlock':
-      return wrapBlockForPresentation(documentId, block._key, <PortableTextBlock key={key} block={block as PortableTextBlockData} />)
+      return wrapBlockForPresentation(documentId, block._key, key, <PortableTextBlock key={key} block={block as PortableTextBlockData} />)
     case 'collectionReferenceBlock':
       return wrapBlockForPresentation(
         documentId,
         block._key,
+        key,
         <CollectionReferenceBlock
           key={key}
           block={block as CollectionReferenceBlockData}
         />
       )
     case 'showcaseBlock':
-      return wrapBlockForPresentation(documentId, block._key, <ShowcaseBlock key={key} block={block as ShowcaseBlockData} />)
+      return wrapBlockForPresentation(documentId, block._key, key, <ShowcaseBlock key={key} block={block as ShowcaseBlockData} />)
     case 'featureGridBlock':
-      return wrapBlockForPresentation(documentId, block._key, renderLegacyFeatureGrid(block as FeatureGridBlockData, key))
+      return wrapBlockForPresentation(documentId, block._key, key, renderLegacyFeatureGrid(block as FeatureGridBlockData, key))
     case 'videoGalleryBlock':
-      return wrapBlockForPresentation(documentId, block._key, renderLegacyVideoGallery(block as VideoGalleryBlockData, key))
+      return wrapBlockForPresentation(documentId, block._key, key, renderLegacyVideoGallery(block as VideoGalleryBlockData, key))
     default:
       return null
   }
