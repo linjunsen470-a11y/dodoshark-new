@@ -170,10 +170,11 @@ export default function Footer({settings}: FooterProps) {
   const getSanityDataAttr = (path: string) => {
     if (!settings?._id) return undefined
     return createDataAttribute({
-      id: settings._id,
+      id: settings._id.replace('drafts.', ''), // Ensure clean ID for the intent
       type: 'globalSettings',
       path,
-      studioUrl,
+      projectId: 'nljl95h9',
+      dataset: 'production',
     }).toString()
   }
 
