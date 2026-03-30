@@ -77,6 +77,7 @@ type HomeProductCard = {
   title: string
   description: string
   image: string
+  sanityImage?: HomeSanityImage
   badge?: { label: string; className: string }
   href?: string
 }
@@ -85,6 +86,7 @@ type HomeSolutionCard = {
   title: string
   description: string
   image: string
+  sanityImage?: HomeSanityImage
   href?: string
 }
 
@@ -92,7 +94,9 @@ type HomeCaseCard = {
   title: string
   description: string
   image: string
+  sanityImage?: HomeSanityImage
   logo?: string | null
+  logoImage?: HomeSanityImage
   href: string
 }
 
@@ -569,19 +573,31 @@ function ProductCard({
   title,
   description,
   image,
+  sanityImage,
   badge,
   href,
 }: {
   title: string
   description: string
   image: string
+  sanityImage?: HomeSanityImage
   badge?: { label: string; className: string }
   href?: string
 }) {
   return (
     <article className="home-product-card flex h-full flex-col overflow-hidden rounded-[1rem] bg-white">
       <div className="relative aspect-square overflow-hidden bg-slate-100">
-        <Image src={image} alt={title} fill sizes="(max-width: 1023px) 100vw, 33vw" className="object-cover" />
+        {sanityImage?.asset ? (
+          <CMSImage
+            image={sanityImage}
+            alt={title}
+            fill
+            sizes="(max-width: 1023px) 100vw, 33vw"
+            className="object-cover"
+          />
+        ) : (
+          <Image src={image} alt={title} fill sizes="(max-width: 1023px) 100vw, 33vw" className="object-cover" />
+        )}
         {badge ? <div className={`absolute right-4 top-4 rounded-full px-3 py-1 text-xs font-bold text-white ${badge.className}`}>{badge.label}</div> : null}
       </div>
       <div className="flex flex-1 flex-col p-6">
@@ -595,11 +611,39 @@ function ProductCard({
   )
 }
 
-function SolutionCard({ title, description, image, href }: { title: string; description: string; image: string; href?: string }) {
+function SolutionCard({
+  title,
+  description,
+  image,
+  sanityImage,
+  href
+}: {
+  title: string
+  description: string
+  image: string
+  sanityImage?: HomeSanityImage
+  href?: string
+}) {
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-lg border border-slate-100 bg-white transition hover:shadow-lg">
       <div className="relative aspect-square overflow-hidden bg-slate-100">
-        <Image src={image} alt={title} fill sizes="(max-width: 1023px) 100vw, 33vw" className="object-cover transition-transform duration-500 hover:scale-105" />
+        {sanityImage?.asset ? (
+          <CMSImage
+            image={sanityImage}
+            alt={title}
+            fill
+            sizes="(max-width: 1023px) 100vw, 33vw"
+            className="object-cover transition-transform duration-500 hover:scale-105"
+          />
+        ) : (
+          <Image
+            src={image}
+            alt={title}
+            fill
+            sizes="(max-width: 1023px) 100vw, 33vw"
+            className="object-cover transition-transform duration-500 hover:scale-105"
+          />
+        )}
       </div>
       <div className="flex flex-1 flex-col p-6">
         <h4 className="relative inline-block text-lg font-bold text-slate-900">
@@ -639,15 +683,16 @@ export default async function HomePage() {
   const data = await getHomePageData(true)
 
   const heroSlides: HeroCarouselImage[] = (data?.heroBackgrounds ?? [])
-    .map((image, index) => {
+    .map((image, index): HeroCarouselImage | null => {
       const src = getSanityImageUrl(image, { width: 1920 })
       if (!src) return null
       return {
         src,
         alt: image.alt || `DoDoShark hero ${index + 1}`,
-      }
+        sanityImage: image,
+      } as HeroCarouselImage
     })
-    .filter((item): item is HeroCarouselImage => Boolean(item))
+    .filter((item): item is HeroCarouselImage => item !== null)
 
   const fallbackHeroSlides =
     heroSlides.length > 0
@@ -717,6 +762,7 @@ export default async function HomePage() {
           description:
             renderText(product.shortDescription) || 'High performance industrial processing equipment.',
           image,
+          sanityImage: product.mainImage,
           href: buildDetailHref('/products', product.slug),
           badge: renderText(product.seriesTag)
             ? { label: renderText(product.seriesTag)!, className: 'bg-orange-500' }
@@ -735,6 +781,7 @@ export default async function HomePage() {
           description:
             renderText(product.shortDescription) || 'High performance industrial processing equipment.',
           image,
+          sanityImage: product.mainImage,
           href: buildDetailHref('/products', product.slug),
           badge: renderText(product.seriesTag)
             ? { label: renderText(product.seriesTag)!, className: 'bg-orange-500' }
@@ -753,13 +800,14 @@ export default async function HomePage() {
           description:
             renderText(solution.summary) || 'High-efficiency and stable industrial process design.',
           image,
+          sanityImage: solution.heroImage,
           href: buildDetailHref('/solutions', solution.slug),
         }
       })
       .filter(isDefined) ?? []
   const featuredCases: HomeCaseCard[] =
     data?.featuredCases
-      ?.map((caseItem) => {
+      ?.map((caseItem, index) => {
         const image = getSanityImageUrl(caseItem.coverImage, { width: 1200, height: 600 })
         if (!image) return null
 
@@ -768,7 +816,9 @@ export default async function HomePage() {
           description:
             renderText(caseItem.excerpt) || 'Detailed case study content is available in the full project report.',
           image,
-          logo: getSanityImageUrl(caseItem.clientLogo, { width: 264 }),
+          sanityImage: caseItem.coverImage,
+          logo: getSanityImageUrl(caseItem.clientLogo, { width: 264 }) || projectCaseItems[index]?.logo,
+          logoImage: caseItem.clientLogo,
           href: buildDetailHref('/cases', caseItem.slug),
         }
       })
@@ -913,6 +963,7 @@ export default async function HomePage() {
                 title="DoDoShark Factory Video"
                 youtubeUrl={heroVideoUrl}
                 imageSrc={whyChooseUsCoverImageSrc}
+                sanityImage={data?.whyChooseUsVideoCoverImage}
                 imageAlt={whyChooseUsCoverImageAlt}
                 className="group"
                 mediaClassName="aspect-video rounded-[1rem]"

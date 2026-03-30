@@ -6,6 +6,7 @@ import type { SanityImage } from '@/app/lib/types/sanity'
 
 type CMSImageProps = Omit<ComponentProps<typeof Image>, 'src' | 'alt'> & {
   image?: SanityImage
+  alt?: string
   fallbackAlt?: string
   width?: number
   height?: number
@@ -23,10 +24,11 @@ export default function CMSImage({
   height,
   fill,
   className,
+  alt: altOverride,
   ...props
 }: CMSImageProps) {
   const src = toImageSrc(image, width || 1200)
-  const alt = renderText(image?.alt) || fallbackAlt
+  const alt = altOverride || renderText(image?.alt) || fallbackAlt
 
   if (!src) return null
 
