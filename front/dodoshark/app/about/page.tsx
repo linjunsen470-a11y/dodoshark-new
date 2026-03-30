@@ -46,6 +46,13 @@ type AboutPageData = {
     tags?: string[]
     image?: SanityImage
   }>
+  productSystemIntro?: {
+    titleLineOne?: string
+    titleLineTwo?: string
+    description?: string
+    buttonLabel?: string
+    buttonHref?: string
+  }
   globalLayout?: {
     title?: string
     badge?: string
@@ -60,11 +67,17 @@ type AboutPageData = {
     description?: string
     image?: SanityImage
   }>
+  timelineIntro?: {
+    titleLineOne?: string
+    titleLineTwo?: string
+    description?: string
+  }
   timelineClosing?: {
     title?: string
     description?: string
   }
   images?: AboutPageImages
+  brandStoryTitle?: string
   brandStoryVideoUrl?: string
   cta?: {
     eyebrow?: string
@@ -72,6 +85,8 @@ type AboutPageData = {
     description?: string
     buttonLabel?: string
     buttonHref?: string
+    joinUsTitle?: string
+    joinUsDescription?: string
   }
 }
 
@@ -142,6 +157,13 @@ const ABOUT_PAGE_QUERY = `coalesce(
       asset
     }
   },
+  productSystemIntro{
+    titleLineOne,
+    titleLineTwo,
+    description,
+    buttonLabel,
+    buttonHref
+  },
   globalLayout{
     title,
     badge,
@@ -161,6 +183,11 @@ const ABOUT_PAGE_QUERY = `coalesce(
       alt,
       asset
     }
+  },
+  timelineIntro{
+    titleLineOne,
+    titleLineTwo,
+    description
   },
   timelineClosing{
     title,
@@ -188,13 +215,16 @@ const ABOUT_PAGE_QUERY = `coalesce(
       asset
     }
   },
+  brandStoryTitle,
   brandStoryVideoUrl,
   cta{
     eyebrow,
     title,
     description,
     buttonLabel,
-    buttonHref
+    buttonHref,
+    joinUsTitle,
+    joinUsDescription
   }
 }`
 
@@ -248,8 +278,16 @@ export default async function AboutPage() {
     renderText(pageData?.hero?.description) || 'We provide stable, efficient, and worry-free DoDoShark machinery.'
   
   const storyCards = (pageData?.storyCards && pageData.storyCards.length > 0) ? pageData.storyCards : []
+  const brandStoryTitle = renderText(pageData?.brandStoryTitle) || 'DoDoShark Brand Story'
   const brandStoryThumbnail = pageData?.images?.brandStoryThumbnail
   const brandStoryVideoUrl = cleanText(pageData?.brandStoryVideoUrl) || 'https://www.youtube.com/shorts/C_JWSMn42eA'
+
+  const productSystemIntro = pageData?.productSystemIntro
+  const productSystemTitleLineOne = renderText(productSystemIntro?.titleLineOne) || 'Dual-Track'
+  const productSystemTitleLineTwo = renderText(productSystemIntro?.titleLineTwo) || 'Product System'
+  const productSystemDescription = renderText(productSystemIntro?.description) || 'Exceeding industry standards to meet diverse production needs with full-process customized solutions. Seamlessly connecting production segments for maximum efficiency.'
+  const productSystemButtonLabel = renderText(productSystemIntro?.buttonLabel) || 'View Product Matrices'
+  const productSystemButtonHref = cleanText(productSystemIntro?.buttonHref) || '/products'
 
   const aboutProductSystems = (pageData?.productSystems && pageData.productSystems.length > 0) ? pageData.productSystems : []
   
@@ -262,6 +300,11 @@ export default async function AboutPage() {
   const globalLayoutBackgroundImage = pageData?.images?.globalLayoutBackgroundImage
   const teamImage = pageData?.images?.teamImage
 
+  const timelineIntro = pageData?.timelineIntro
+  const timelineTitleLineOne = renderText(timelineIntro?.titleLineOne) || 'The Journey of'
+  const timelineTitleLineTwo = renderText(timelineIntro?.titleLineTwo) || 'DoDoShark'
+  const timelineDescription = renderText(timelineIntro?.description) || 'From our state-owned origins to a modern global enterprise. Constantly evolving in reliability and innovation.'
+
   const resolvedTimeline = (pageData?.timeline && pageData.timeline.length > 0) ? pageData.timeline : []
   const timelineClosingTitle = renderText(pageData?.timelineClosing?.title)
   const timelineClosingDescription = renderText(pageData?.timelineClosing?.description)
@@ -272,6 +315,8 @@ export default async function AboutPage() {
   const ctaDescription = renderText(cta?.description)
   const ctaButtonLabel = renderText(cta?.buttonLabel) || 'Connect With Us Today'
   const ctaButtonHref = cleanText(cta?.buttonHref) || '/contact'
+  const joinUsTitle = renderText(cta?.joinUsTitle) || 'Join Our Journey'
+  const joinUsDescription = renderText(cta?.joinUsDescription) || 'Become part of the global DoDoShark ecosystem.'
   
   const valuePropositionBackgroundImage = pageData?.images?.valuePropositionBackgroundImage
   const joinUsImage = pageData?.images?.joinUsImage
@@ -318,9 +363,9 @@ export default async function AboutPage() {
             <div className="w-full lg:sticky lg:top-32 lg:w-5/12">
               <AboutVideoCard
                 youtubeUrl={brandStoryVideoUrl}
-                title="DoDoShark Brand Story"
+                title={brandStoryTitle}
                 thumbnailUrl={toImageSrc(brandStoryThumbnail, 1000) || '/assets/images/brand/DoDoShark-Brand-cover.jpg'}
-                thumbnailAlt={cleanText(brandStoryThumbnail?.alt) || 'DoDoShark Brand Story'}
+                thumbnailAlt={cleanText(brandStoryThumbnail?.alt) || brandStoryTitle}
                 aspectRatio="aspect-[9/16]"
               />
             </div>
@@ -353,18 +398,18 @@ export default async function AboutPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-16 text-center">
             <h2 className="font-display text-3xl font-extrabold uppercase tracking-tight text-slate-900 md:text-4xl lg:text-5xl">
-              Dual-Track <br />
-              <span className="text-orange-500">Product System</span>
+              {productSystemTitleLineOne} <br />
+              <span className="text-orange-500">{productSystemTitleLineTwo}</span>
             </h2>
             <p className="mx-auto mt-4 max-w-2xl font-light text-slate-500">
-              Exceeding industry standards to meet diverse production needs with full-process customized solutions. Seamlessly connecting production segments for maximum efficiency.
+              {productSystemDescription}
             </p>
             <div className="mt-10 flex flex-wrap justify-center gap-4">
               <Link
-                href="/products"
+                href={productSystemButtonHref}
                 className="rounded-full bg-orange-500 px-8 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-orange-500/30 transition-colors hover:bg-orange-600"
               >
-                View Product Matrices
+                {productSystemButtonLabel}
               </Link>
             </div>
           </div>
@@ -459,10 +504,10 @@ export default async function AboutPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-24 text-center">
             <h2 className="font-display text-4xl font-extrabold uppercase tracking-tight text-slate-900 md:text-5xl">
-              The Journey of <span className="text-orange-500">DoDoShark</span>
+              {timelineTitleLineOne} <span className="text-orange-500">{timelineTitleLineTwo}</span>
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-lg font-light text-slate-500">
-              From our state-owned origins to a modern global enterprise. Constantly evolving in reliability and innovation.
+              {timelineDescription}
             </p>
           </div>
 
@@ -573,10 +618,10 @@ export default async function AboutPage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent" />
                   <div className="absolute bottom-6 left-6 right-6">
                     <p className="mb-2 text-sm font-black uppercase tracking-widest text-white">
-                      Join Our Journey
+                      {joinUsTitle}
                     </p>
                     <p className="text-xs font-light text-slate-300">
-                      Become part of the global DoDoShark ecosystem.
+                      {joinUsDescription}
                     </p>
                   </div>
                 </div>
