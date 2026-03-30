@@ -462,12 +462,12 @@ export default async function AboutPage() {
         if (!label || !value) return null
         return { label, value }
       })
-      .filter((item): item is {label: string; value: string} => Boolean(item))
-  const globalLayoutStats = parsedGlobalStats && parsedGlobalStats.length > 0 ? parsedGlobalStats : [
+      .filter((item): item is { label: string; value: string } => Boolean(item)) ?? []
+  const globalLayoutStats = (parsedGlobalStats && parsedGlobalStats.length > 0) ? parsedGlobalStats : [
       { value: '10+', label: 'Senior Engineers' },
       { value: '3', label: 'Production Bases' },
       { value: '60+', label: 'Skilled Technicians' },
-      { value: '10+', label: 'Countries Served' },
+      { value: '100+', label: 'Global Clients' },
     ]
   const cmsTimeline: TimelineItem[] =
     pageData?.timeline

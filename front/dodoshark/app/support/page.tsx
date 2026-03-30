@@ -255,8 +255,8 @@ export default async function SupportPage() {
     const value = renderText(stat?.value)
     if (!label || !value) return null
     return { label, val: value }
-  }).filter((item): item is {label: string; val: string} => Boolean(item))
-  const stats = parsedStats && parsedStats.length > 0 ? parsedStats : [
+  }).filter((item): item is { label: string; val: string } => Boolean(item)) ?? []
+  const stats = (parsedStats && parsedStats.length > 0) ? parsedStats : [
     { label: 'Core Component Warranty', val: '3 Years' },
     { label: 'Technical Response Time', val: '24/7' },
     { label: 'Countries Served', val: '100+' },
@@ -264,25 +264,21 @@ export default async function SupportPage() {
   ]
   const serviceEyebrow = renderText(pageData?.serviceIntro?.eyebrow) || 'Value Co-Creation'
   const serviceTitle = renderText(pageData?.serviceIntro?.title) || 'Full-Lifecycle Efficiency Empowerment'
-  const serviceStages: ServiceStage[] = SERVICE_STAGES.map((defaultStage, index) => {
-    const stage = pageData?.serviceStages?.[index]
-    if (!stage || (!renderText(stage?.phase) && !renderText(stage?.title) && !renderText(stage?.id))) {
-      return defaultStage
-    }
-    return {
-      id: renderText(stage?.id) || defaultStage.id,
-      phase: renderText(stage?.phase) || defaultStage.phase,
-      title: renderText(stage?.title) || defaultStage.title,
-      description: renderText(stage?.description) || defaultStage.description,
-      features: stage?.features && stage.features.length > 0
-        ? stage.features.map(f => renderText(f)).filter((f): f is string => Boolean(f))
-        : defaultStage.features,
+  const parsedServiceStages =
+    pageData?.serviceStages?.map((stage, index) => ({
+      id: renderText(stage?.id) || SERVICE_STAGES[index]?.id || `0${index + 1}`,
+      phase: renderText(stage?.phase) || SERVICE_STAGES[index]?.phase || 'Stage',
+      title: renderText(stage?.title) || SERVICE_STAGES[index]?.title || 'Service stage',
+      description: renderText(stage?.description) || SERVICE_STAGES[index]?.description || '',
+      features: (stage?.features ?? SERVICE_STAGES[index]?.features ?? [])
+        .map((feature) => renderText(feature))
+        .filter((item): item is string => Boolean(item)),
       image: stage?.image,
-      imageKey: defaultStage.imageKey,
-      fallbackImageSrc: defaultStage.fallbackImageSrc,
-      icon: defaultStage.icon,
-    }
-  })
+      imageKey: SERVICE_STAGES[index]?.imageKey ?? 'preSalesStageImage',
+      fallbackImageSrc: SERVICE_STAGES[index]?.fallbackImageSrc ?? '/assets/images/about/support-hero.jpg',
+      icon: SERVICE_STAGES[index]?.icon ?? SERVICE_STAGES[0].icon,
+    })) ?? []
+  const serviceStages: ServiceStage[] = (parsedServiceStages && parsedServiceStages.length > 0) ? parsedServiceStages : SERVICE_STAGES
   const hotlineLabel = renderText(pageData?.urgentAssistance?.hotlineLabel) || '24/7 Hotline'
   const hotlineValue = renderText(pageData?.urgentAssistance?.hotlineValue) || '+86 19941519694'
   const salesLabel = renderText(pageData?.urgentAssistance?.salesLabel) || 'Sales'
@@ -355,13 +351,13 @@ export default async function SupportPage() {
       <section className="bg-[#fcfdfd] py-32">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-24 text-center">
-              <h2 className="mb-4 text-sm font-display font-semibold uppercase tracking-[0.3em] text-orange-500">
-                {serviceEyebrow}
-              </h2>
-              <h3 className="font-display text-4xl font-extrabold leading-[1.15] tracking-[-0.02em] text-slate-900 md:text-5xl">
-                {serviceTitle}
-              </h3>
-            </div>
+            <h2 className="mb-4 text-sm font-display font-semibold uppercase tracking-[0.3em] text-orange-500">
+              {serviceEyebrow}
+            </h2>
+            <h3 className="font-display text-4xl font-extrabold leading-[1.15] tracking-[-0.02em] text-slate-900 md:text-5xl">
+              {serviceTitle}
+            </h3>
+          </div>
 
           <div className="space-y-32">
             {serviceStages.map((stage, idx) => {
@@ -375,9 +371,8 @@ export default async function SupportPage() {
               return (
                 <div
                   key={stage.id}
-                  className={`flex flex-col items-center gap-16 lg:flex-row lg:gap-24 ${
-                    idx % 2 !== 0 ? 'lg:flex-row-reverse' : ''
-                  }`}
+                  className={`flex flex-col items-center gap-16 lg:flex-row lg:gap-24 ${idx % 2 !== 0 ? 'lg:flex-row-reverse' : ''
+                    }`}
                 >
                   <div className="w-full lg:w-1/2">
                     <div className="mb-6 flex items-center space-x-4">
@@ -502,7 +497,7 @@ export default async function SupportPage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
                   <div className="absolute bottom-8 left-8 right-8">
-                      <p className="text-xl font-display font-extrabold uppercase tracking-tight text-white">
+                    <p className="text-xl font-display font-extrabold uppercase tracking-tight text-white">
                       {teamCaptionTitle}
                     </p>
                     <p className="text-sm font-light text-slate-400">
