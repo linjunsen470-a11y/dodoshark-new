@@ -1,10 +1,9 @@
 import {defineEnableDraftMode} from 'next-sanity/draft-mode'
-
 import {client} from '@/app/lib/sanity'
-import {sanityReadToken} from '@/app/lib/sanity.token'
 
 export const GET = async (request: Request) => {
-  if (!sanityReadToken) {
+  const token = process.env['SANITY_API_READ_TOKEN']?.trim()
+  if (!token) {
     return new Response(
       'Visual editing is disabled: Missing SANITY_API_READ_TOKEN environment variable in production. Configure it on the deployed frontend as a Cloudflare Worker secret.',
       {status: 401}
@@ -13,7 +12,7 @@ export const GET = async (request: Request) => {
 
   const {GET: enableDraftMode} = defineEnableDraftMode({
     client: client.withConfig({
-      token: sanityReadToken,
+      token: token,
       useCdn: false,
     }),
   })
