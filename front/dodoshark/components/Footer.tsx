@@ -190,7 +190,7 @@ export default function Footer({settings}: FooterProps) {
               {headquartersTitle}
             </h2>
             <div className="footer-rule" />
-            <p className="footer-copy whitespace-pre-line">{headquartersBody}</p>
+            <p className="footer-copy whitespace-pre-line" data-sanity={getSanityDataAttr('footer.headquartersBody')}>{headquartersBody}</p>
 
             <ul className="footer-contact-list" data-sanity={getSanityDataAttr('contact')}>
               {[
@@ -227,6 +227,7 @@ export default function Footer({settings}: FooterProps) {
                             href={value.href}
                             target={value.href.startsWith('https') ? '_blank' : undefined}
                             rel={value.href.startsWith('https') ? 'noreferrer' : undefined}
+                            data-sanity={getSanityDataAttr(`contact.${item.sanityPath.replace('Label', '')}`)}
                           >
                             {value.label}
                           </a>
@@ -247,7 +248,7 @@ export default function Footer({settings}: FooterProps) {
             <div className="footer-rule" />
 
             <ul className="footer-network-list">
-              {resolvedNetworkItems.map((item) => (
+              {resolvedNetworkItems.map((item, index) => (
                 <li key={item} className="footer-network-item">
                   <span className="footer-icon-chip">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -268,7 +269,7 @@ export default function Footer({settings}: FooterProps) {
                     </svg>
                   </span>
                   <div>
-                    <p className="footer-network-title">{item}</p>
+                    <p className="footer-network-title" data-sanity={getSanityDataAttr(`footer.networkItems[${index}]`)}>{item}</p>
                   </div>
                 </li>
               ))}
@@ -283,15 +284,15 @@ export default function Footer({settings}: FooterProps) {
             <div className="footer-rule" />
 
             <div className="footer-social-grid">
-              {socialLinks.map((item) => (
-                <Link key={item.label} className="footer-social-link" href={item.href || '/'} aria-label={item.label}>
+              {socialLinks.map((item, index) => (
+                <Link key={item.label} className="footer-social-link" href={item.href || '/'} aria-label={item.label} data-sanity={getSanityDataAttr(`footer.socialLinks[${index}]`)}>
                   <span className="footer-social-badge">
                     <SocialIcon icon={item.icon} />
                   </span>
                 </Link>
               ))}
             </div>
-            <div className="footer-map-wrap" aria-label={footerMapAria}>
+            <div className="footer-map-wrap" aria-label={footerMapAria} data-sanity={getSanityDataAttr('footer.footerMap')}>
               {footerMapImage?.asset ? (
                 <CMSImage
                   image={footerMapImage}
@@ -315,7 +316,7 @@ export default function Footer({settings}: FooterProps) {
         </div>
 
         <div className="footer-bottom">
-          <div className="footer-copyright">{copyrightText}</div>
+          <div className="footer-copyright" data-sanity={getSanityDataAttr('footer.copyrightText')}>{copyrightText}</div>
           <div className="footer-legal" data-sanity={footerLinksDataAttribute}>
             {resolvedFooterLinks.map((item, index) => (
               <span key={`${item.label}-${item.href}`} className="contents">
