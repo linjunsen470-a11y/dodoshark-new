@@ -18,6 +18,7 @@ const VideoPreviewTrigger = dynamic(() => import('@/components/ui/VideoPreviewTr
 import { type HeroCarouselImage } from '@/components/home/HeroCarousel'
 import HeroTitle from '@/components/ui/HeroTitle'
 import ViewDetailsLink from '@/components/ui/ViewDetailsLink'
+import CMSImage from '@/components/ui/CMSImage'
 
 type HomeSanityImage = SanityImage & {
   imageUrl?: string
@@ -111,6 +112,7 @@ type HomePageData = {
     title?: string
     description?: string
     image?: HomeSanityImage
+    sanityImage?: HomeSanityImage
   }>
   confidenceSection?: {
     titleLineOne?: string
@@ -121,6 +123,7 @@ type HomePageData = {
       subtitle?: string
       points?: string[]
       image?: HomeSanityImage
+      sanityImage?: HomeSanityImage
     }>
   }
   featuredAgriProducts?: FeaturedHomeProduct[]
@@ -133,11 +136,37 @@ type HomePageData = {
       title?: string
       description?: string
       image?: HomeSanityImage
+      sanityImage?: HomeSanityImage
     }>
   }
   featuredHomeVideos?: FeaturedHomeVideo[]
   whyChooseUsVideoUrl?: string
   whyChooseUsVideoCoverImage?: HomeSanityImage
+  productsBannerImage?: HomeSanityImage
+  solutionsBackgroundImage?: HomeSanityImage
+  aboutUsLogoImage?: HomeSanityImage
+}
+
+type HomeAboutFeature = {
+  title: string
+  description: string
+  image: string
+  sanityImage?: HomeSanityImage
+}
+
+type HomeConfidenceCard = {
+  title: string
+  subtitle: string
+  points: string[]
+  image: string
+  sanityImage?: HomeSanityImage
+}
+
+type HomeAdvantage = {
+  title: string
+  description: string
+  image: string
+  sanityImage?: HomeSanityImage
 }
 
 const homeQuery = `coalesce(
@@ -279,6 +308,21 @@ const homeQuery = `coalesce(
   },
   whyChooseUsVideoUrl,
   whyChooseUsVideoCoverImage{
+    asset,
+    alt,
+    "imageUrl": asset->url
+  },
+  productsBannerImage {
+    asset,
+    alt,
+    "imageUrl": asset->url
+  },
+  solutionsBackgroundImage {
+    asset,
+    alt,
+    "imageUrl": asset->url
+  },
+  aboutUsLogoImage {
     asset,
     alt,
     "imageUrl": asset->url
@@ -629,42 +673,39 @@ export default async function HomePage() {
         suffix: renderText(item?.suffix) || '',
       }
     })
-    .filter(isDefined)
-  const homeStats = parsedStats && parsedStats.length > 0 ? parsedStats : stats
-  
+    .filter(isDefined) ?? []
+  const homeStats = (parsedStats && parsedStats.length > 0) ? parsedStats : stats
   const parsedAboutFeatures = data?.aboutFeatures
-      ?.map((item, index) => {
-        const title = renderText(item?.title)
-        const description = renderText(item?.description)
-        const image = getSanityImageUrl(item?.image, { width: 256 }) || aboutFeatures[index]?.image
-        if (!title || !description || !image) return null
-        return { title, description, image }
-      })
-      .filter(isDefined)
-  const homeAboutFeatures = parsedAboutFeatures && parsedAboutFeatures.length > 0 ? parsedAboutFeatures : aboutFeatures
-
+    ?.map((item, index) => {
+      const title = renderText(item?.title)
+      const description = renderText(item?.description)
+      const image = getSanityImageUrl(item?.image, { width: 256 }) || aboutFeatures[index]?.image
+      if (!title || !description || !image) return null
+      return { title, description, image, sanityImage: item.image }
+    })
+    .filter(isDefined) ?? []
+  const homeAboutFeatures: HomeAboutFeature[] = (parsedAboutFeatures && parsedAboutFeatures.length > 0) ? parsedAboutFeatures : aboutFeatures
   const confidenceTitleLineOne = renderText(data?.confidenceSection?.titleLineOne) || 'Choose DodoShark'
   const confidenceTitleLineTwo = renderText(data?.confidenceSection?.titleLineTwo) || 'Choose Confidence'
   const confidenceDescription =
     renderText(data?.confidenceSection?.description) ||
     'DoDoShark practices "Carefree Production, Joyful Harvest" through innovation and high quality.'
-  const parsedConfidenceCards =
-    data?.confidenceSection?.cards
-      ?.map((card, index) => {
-        const title = renderText(card?.title)
-        const subtitle = renderText(card?.subtitle)
-        const image = getSanityImageUrl(card?.image, { width: 1200 }) || confidenceCards[index]?.image
-        if (!title || !subtitle || !image) return null
-        return {
-          title,
-          subtitle,
-          points: (card?.points ?? []).map((point) => renderText(point)).filter(isDefined),
-          image,
-        }
-      })
-      .filter(isDefined)
-  const homeConfidenceCards = parsedConfidenceCards && parsedConfidenceCards.length > 0 ? parsedConfidenceCards : confidenceCards
-
+  const parsedConfidenceCards = data?.confidenceSection?.cards
+    ?.map((card, index) => {
+      const title = renderText(card?.title)
+      const subtitle = renderText(card?.subtitle)
+      const image = getSanityImageUrl(card?.image, { width: 1200 }) || confidenceCards[index]?.image
+      if (!title || !subtitle || !image) return null
+      return {
+        title,
+        subtitle,
+        points: (card?.points ?? []).map((point) => renderText(point)).filter(isDefined),
+        image,
+        sanityImage: card.image,
+      }
+    })
+    .filter(isDefined) ?? []
+  const homeConfidenceCards: HomeConfidenceCard[] = (parsedConfidenceCards && parsedConfidenceCards.length > 0) ? parsedConfidenceCards : confidenceCards
   const featuredAgriProducts: HomeProductCard[] =
     data?.featuredAgriProducts
       ?.map((product) => {
@@ -736,17 +777,16 @@ export default async function HomePage() {
   const homeFoodProducts = featuredFoodProducts.length > 0 ? featuredFoodProducts : foodProducts
   const homeSolutions = featuredSolutions.length > 0 ? featuredSolutions : grindingSolutions
   const homeCaseItems = featuredCases.length > 0 ? featuredCases : projectCaseItems
-  const parsedAdvantages =
-    data?.advantagesSection?.items
-      ?.map((item, index) => {
-        const title = renderText(item?.title)
-        const description = renderText(item?.description)
-        const image = getSanityImageUrl(item?.image, { width: 256 }) || advantages[index]?.image
-        if (!title || !description || !image) return null
-        return { title, description, image }
-      })
-      .filter(isDefined)
-  const homeAdvantages = parsedAdvantages && parsedAdvantages.length > 0 ? parsedAdvantages : advantages
+  const parsedAdvantages = data?.advantagesSection?.items
+    ?.map((item, index) => {
+      const title = renderText(item?.title)
+      const description = renderText(item?.description)
+      const image = getSanityImageUrl(item?.image, { width: 256 }) || advantages[index]?.image
+      if (!title || !description || !image) return null
+      return { title, description, image, sanityImage: item.image }
+    })
+    .filter(isDefined) ?? []
+  const homeAdvantages: HomeAdvantage[] = (parsedAdvantages && parsedAdvantages.length > 0) ? parsedAdvantages : advantages
   const homeVideoItems =
     data?.featuredHomeVideos
       ?.filter((video) => cleanText(video?.status) === 'published')
@@ -833,7 +873,11 @@ export default async function HomePage() {
             {homeAboutFeatures.map((item) => (
               <article key={item.title} className="text-center">
                 <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-white/5">
-                  <Image src={item.image} alt={item.title} width={48} height={48} className="h-12 w-12 object-contain" />
+                  {item.sanityImage?.asset ? (
+                    <CMSImage image={item.sanityImage} width={48} height={48} className="h-12 w-12 object-contain" />
+                  ) : (
+                    <Image src={item.image} alt={item.title} width={48} height={48} className="h-12 w-12 object-contain" />
+                  )}
                 </div>
                 <h3 className="text-xl font-bold text-white">{item.title}</h3>
                 <p className="mt-3 text-sm leading-7 text-white/60">{item.description}</p>
@@ -842,7 +886,11 @@ export default async function HomePage() {
           </div>
           <div className="text-center">
             <div className="mx-auto mb-4 inline-flex h-40 w-60 items-center justify-center backdrop-blur-sm">
-              <Image src="/assets/images/dodoshark-logo-04.png" alt="DoDoShark" width={160} height={110} className="h-60 w-auto object-contain brightness-110" />
+              {data?.aboutUsLogoImage?.asset ? (
+                <CMSImage image={data.aboutUsLogoImage} width={160} height={110} className="h-60 w-auto object-contain brightness-110" />
+              ) : (
+                <Image src="/assets/images/dodoshark-logo-04.png" alt="DoDoShark" width={160} height={110} className="h-60 w-auto object-contain brightness-110" />
+              )}
             </div>
 
           </div>
@@ -889,7 +937,11 @@ export default async function HomePage() {
                   </div>
                 </div>
                 <div className="relative h-56 overflow-hidden">
-                  <Image src={card.image} alt={card.title} fill sizes="(max-width: 1279px) 100vw, 33vw" className="object-cover transition-transform duration-500 hover:scale-105" />
+                  {card.sanityImage?.asset ? (
+                    <CMSImage image={card.sanityImage} fill sizes="(max-width: 1279px) 100vw, 33vw" className="object-cover transition-transform duration-500 hover:scale-105" />
+                  ) : (
+                    <Image src={card.image} alt={card.title} fill sizes="(max-width: 1279px) 100vw, 33vw" className="object-cover transition-transform duration-500 hover:scale-105" />
+                  )}
                 </div>
               </article>
             ))}
@@ -899,7 +951,11 @@ export default async function HomePage() {
 
       <section id="products" className="bg-slate-100 pb-16 sm:pb-20">
         <div className="relative h-[300px] overflow-hidden sm:h-[360px] lg:h-[420px]">
-          <Image src="/assets/images/banner.png" alt="Industrial Background" fill sizes="100vw" className="object-cover" />
+          {data?.productsBannerImage?.asset ? (
+            <CMSImage image={data.productsBannerImage} fill sizes="100vw" className="object-cover" />
+          ) : (
+            <Image src="/assets/images/banner.png" alt="Industrial Background" fill sizes="100vw" className="object-cover" />
+          )}
           <div className="relative z-10 mx-auto px-4 pt-16 text-center sm:px-6 sm:pt-20 lg:max-w-7xl lg:px-8">
             <h2 className="font-display text-3xl font-bold tracking-wide text-white sm:text-4xl md:text-5xl">Wonderful Products</h2>
             <div className="mx-auto mt-4 h-1.5 w-20 rounded-full bg-orange-500" />
@@ -949,7 +1005,11 @@ export default async function HomePage() {
 
       <section className="bg-slate-100">
         <div className="relative h-[300px] overflow-hidden sm:h-[360px] lg:h-[420px]">
-          <Image src="/assets/images/factory.jpg" alt="Factory Solution Background" fill sizes="100vw" className="object-cover" />
+          {data?.solutionsBackgroundImage?.asset ? (
+            <CMSImage image={data.solutionsBackgroundImage} fill sizes="100vw" className="object-cover" />
+          ) : (
+            <Image src="/assets/images/factory.jpg" alt="Factory Solution Background" fill sizes="100vw" className="object-cover" />
+          )}
           <div className="absolute inset-0 bg-gradient-to-r from-blue-950/70 via-blue-900/60 to-blue-950/70" />
           <div className="relative z-10 mx-auto px-4 pt-16 text-center sm:px-6 sm:pt-20 lg:max-w-7xl lg:px-8">
             <h2 className="font-display text-3xl font-bold tracking-wide text-white sm:text-4xl md:text-5xl">Efficient Solutions</h2>
@@ -1006,14 +1066,22 @@ export default async function HomePage() {
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="mx-auto mb-6 inline-flex h-24 w-40 items-center justify-center backdrop-blur-sm">
-              <Image src="/assets/images/dodoshark-logo-04.png" alt="DoDoShark" width={160} height={110} className="h-40 w-auto object-contain brightness-110" />
+              {data?.aboutUsLogoImage?.asset ? (
+                <CMSImage image={data.aboutUsLogoImage} width={160} height={110} className="h-40 w-auto object-contain brightness-110" />
+              ) : (
+                <Image src="/assets/images/dodoshark-logo-04.png" alt="DoDoShark" width={160} height={110} className="h-40 w-auto object-contain brightness-110" />
+              )}
             </div>
             <h2 className="font-display text-3xl font-bold text-white sm:text-4xl">Right Choice, Lifelong Performance</h2>
             <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
               {homeAdvantages.map((item) => (
                 <article key={item.title} className="home-advantage-item rounded-[1rem] border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
                   <div className="home-advantage-icon">
-                    <Image src={item.image} alt={item.title} width={56} height={56} className="h-14 w-14 object-contain" />
+                    {item.sanityImage?.asset ? (
+                      <CMSImage image={item.sanityImage} width={56} height={56} className="h-14 w-14 object-contain" />
+                    ) : (
+                      <Image src={item.image} alt={item.title} width={56} height={56} className="h-14 w-14 object-contain" />
+                    )}
                   </div>
                   <h3 className="text-lg font-bold text-white">{item.title}</h3>
                   <p className="mt-2 text-sm leading-7 text-white/60">{item.description}</p>
