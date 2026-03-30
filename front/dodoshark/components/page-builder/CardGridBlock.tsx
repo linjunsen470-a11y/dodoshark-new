@@ -10,6 +10,7 @@ import {Swiper, SwiperSlide} from 'swiper/react'
 
 import {getSafeHref, isExternalHref} from '@/app/lib/safeHref'
 import {urlFor} from '@/app/lib/sanity'
+import {cleanSlug, cleanText, renderText} from '@/app/lib/sanity-utils'
 import Icon from '@/components/ui/Icon'
 import {
   getSharedBackgroundTheme,
@@ -143,7 +144,7 @@ function hasCardData(item?: CardItem) {
 }
 
 function getReferenceHref(reference?: CardReference) {
-  const slug = reference?.slug?.current?.trim()
+  const slug = cleanSlug(reference?.slug)
   if (!slug) return ''
 
   if (reference?._type === 'product') return `/products/${slug}`
@@ -155,48 +156,48 @@ function getReferenceHref(reference?: CardReference) {
 }
 
 function resolveCard(item: CardItem) {
-  const title = item.title?.trim() || ''
-  const description = item.description?.trim() || ''
+  const title = renderText(item.title) || ''
+  const description = renderText(item.description) || ''
   const clickable = item.clickable !== false
 
   if (item.cardType === 'inline') {
     const href = clickable ? getSafeHref(item.inlineCard?.cta?.href) || '' : ''
-    const legacyTitle = item.inlineCard?.title?.trim() || ''
-    const legacyDescription = item.inlineCard?.description?.trim() || ''
+    const legacyTitle = renderText(item.inlineCard?.title) || ''
+    const legacyDescription = renderText(item.inlineCard?.description) || ''
     const isInteractive = Boolean(href)
 
     return {
       title: title || legacyTitle,
       description: description || legacyDescription,
       image: item.inlineCard?.image,
-      ctaLabel: isInteractive ? item.inlineCard?.cta?.label?.trim() || '' : '',
+      ctaLabel: isInteractive ? cleanText(item.inlineCard?.cta?.label) || '' : '',
       href,
       isInteractive,
     }
   }
 
-	  const reference = item.reference
-	  const resolvedTitle = title || reference?.title?.trim() || ''
-	  const resolvedDescription =
-	    description ||
-	    reference?.shortDescription?.trim() ||
-	    reference?.description?.trim() ||
-	    reference?.excerpt?.trim() ||
-	    ''
-	  const href = clickable ? getSafeHref(reference?.cta?.href) || getReferenceHref(reference) : ''
-	  const isInteractive = Boolean(href)
+  const reference = item.reference
+  const resolvedTitle = title || renderText(reference?.title) || ''
+  const resolvedDescription =
+    description ||
+    renderText(reference?.shortDescription) ||
+    renderText(reference?.description) ||
+    renderText(reference?.excerpt) ||
+    ''
+  const href = clickable ? getSafeHref(reference?.cta?.href) || getReferenceHref(reference) : ''
+  const isInteractive = Boolean(href)
 
-	  return {
-	    title: resolvedTitle,
-	    description: resolvedDescription,
-	    image:
-	      reference?.mainImage ||
-	      reference?.image ||
-	      reference?.coverImage ||
-	      reference?.heroImage,
-	    ctaLabel: isInteractive ? reference?.cta?.label?.trim() || 'View Details' : '',
-	    href,
-	    isInteractive,
+  return {
+    title: resolvedTitle,
+    description: resolvedDescription,
+    image:
+      reference?.mainImage ||
+      reference?.image ||
+      reference?.coverImage ||
+      reference?.heroImage,
+    ctaLabel: isInteractive ? cleanText(reference?.cta?.label) || 'View Details' : '',
+    href,
+    isInteractive,
   }
 }
 
@@ -401,7 +402,7 @@ function SectionTitle({
   title?: string
   theme: SharedBackgroundTheme
 }) {
-  const resolvedTitle = title?.trim()
+  const resolvedTitle = renderText(title)
 
   if (!resolvedTitle) return null
 
@@ -653,7 +654,7 @@ export default function CardGridBlock({block}: {block: CardGridBlockData}) {
   const hasRows = rows.length > 0
   const disableCardFrameEffect = Boolean(block.disableCardFrameEffect)
   const bannerImageSrc = resolveImageSrc(block.bannerImage, {width: 2000, height: 900, fit: 'crop'})
-  const bannerOverlayColor = block.bannerOverlayColor?.trim() || theme.overlay
+  const bannerOverlayColor = cleanText(block.bannerOverlayColor) || theme.overlay
   const headerSubtitle = block.subtitle
   const subtitleClass = theme.body
 

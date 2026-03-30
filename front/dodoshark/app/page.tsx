@@ -802,14 +802,14 @@ export default async function HomePage() {
 
       <section className="border-b border-slate-100 bg-white py-14 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 gap-x-8 gap-y-10 md:grid-cols-4 md:gap-y-12">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-8 md:grid-cols-4 md:gap-y-12">
             {homeStats.map((item) => (
-              <div key={item.label} className="text-center">
-                <div className="inline-flex items-baseline justify-center gap-1">
-                  <span className="text-4xl font-extrabold leading-none text-orange-500 sm:text-5xl md:text-6xl">{item.value}</span>
-                  <span className="text-base font-bold uppercase tracking-tight text-slate-400 md:text-xl">{item.suffix}</span>
+              <div key={item.label} className="text-center px-1">
+                <div className="inline-flex flex-wrap items-baseline justify-center gap-1">
+                  <span className="text-3xl font-extrabold leading-none text-orange-500 sm:text-5xl md:text-6xl">{item.value}</span>
+                  <span className="text-xs font-bold uppercase tracking-tight text-slate-400 sm:text-base md:text-xl">{item.suffix}</span>
                 </div>
-                <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500 sm:text-xs">{item.label}</p>
+                <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 sm:text-xs sm:tracking-[0.22em]">{item.label}</p>
               </div>
             ))}
           </div>

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { renderSentenceCase } from '@/app/lib/sanity-utils'
 
 export type TagCloudItem = {
   key: string
@@ -16,13 +17,6 @@ type TagCloudPanelProps = {
   items: TagCloudItem[]
 }
 
-function toSentenceCase(value: string) {
-  const normalized = value.trim().replace(/\s+/g, ' ').toLowerCase()
-  if (!normalized) return ''
-
-  return normalized.charAt(0).toUpperCase() + normalized.slice(1)
-}
-
 export default function TagCloudPanel({
   title,
   description,
@@ -35,7 +29,7 @@ export default function TagCloudPanel({
     <div className="rounded-2xl border border-slate-200 bg-slate-50/85 p-6 shadow-sm sm:p-7">
       <div className="mb-5 text-center">
         <h2 className="text-[1.65rem] font-display font-black tracking-tight text-slate-900 sm:text-[1.85rem]">
-          {toSentenceCase(title)}
+          {renderSentenceCase(title)}
         </h2>
         {description ? (
           <p className="mt-2 text-sm leading-relaxed text-slate-500">{description}</p>
@@ -51,7 +45,7 @@ export default function TagCloudPanel({
               : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-800'
           }`}
         >
-          {toSentenceCase(allLabel)}
+          {renderSentenceCase(allLabel)}
         </Link>
 
         {items.map((item) => (
@@ -63,8 +57,8 @@ export default function TagCloudPanel({
                 ? 'border-slate-900 bg-slate-800 text-white'
                 : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-800'
             }`}
-          >
-            {toSentenceCase(item.label)}
+            >
+            {renderSentenceCase(item.label)}
           </Link>
         ))}
       </div>

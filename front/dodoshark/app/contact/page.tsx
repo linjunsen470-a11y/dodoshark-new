@@ -7,6 +7,7 @@ import { buildPageMetadata } from '@/app/lib/seo'
 import { renderText, toImageSrc } from '@/app/lib/sanity-utils'
 import type { SanityImage, SeoMeta } from '@/app/lib/types/sanity'
 import LeadInquiryForm from '@/components/forms/LeadInquiryForm'
+import HeroTitle from '@/components/ui/HeroTitle'
 
 type ContactPageData = {
   seo?: SeoMeta
@@ -98,7 +99,14 @@ export default async function ContactPage() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           <h1 className="font-display font-extrabold text-5xl md:text-7xl text-white mb-6 leading-[1.1] tracking-[-0.02em]">
-            {heroTitle || 'Get In Touch'}
+            <HeroTitle
+              title={heroTitle}
+              fallback={
+                <>
+                  Get In <span className="accent-gradient-text">Touch</span>
+                </>
+              }
+            />
           </h1>
           <p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto font-normal leading-relaxed">
             {heroSubtitle}

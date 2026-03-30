@@ -7,7 +7,7 @@ import type {ReactNode} from 'react'
 
 import dynamic from 'next/dynamic'
 import { fetchSanityData } from '@/app/lib/sanity.live'
-import {cleanSlug, cleanText, renderText, toImageSrc} from '@/app/lib/sanity-utils'
+import {cleanSlug, cleanText, hasStegaMetadata, renderText, toImageSrc} from '@/app/lib/sanity-utils'
 import {
   prepareSolutionTemplate,
   type SolutionHtmlTemplateData,
@@ -121,6 +121,9 @@ type SolutionData = {
 function splitTitle(title?: string) {
   const displayTitle = renderText(title)
   if (!displayTitle) return {head: '', tail: ''}
+  if (hasStegaMetadata(displayTitle)) {
+    return {head: displayTitle, tail: ''}
+  }
 
   const parts = displayTitle.split(/\s+/)
   const middle = Math.ceil(parts.length / 2)

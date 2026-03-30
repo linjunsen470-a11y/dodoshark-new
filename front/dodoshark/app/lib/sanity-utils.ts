@@ -29,10 +29,31 @@ export function cleanText(value?: string | null) {
   }
 }
 
+export function hasStegaMetadata(value?: string | null) {
+  if (typeof value !== 'string' || value === '') return false
+
+  try {
+    return stegaClean(value) !== value
+  } catch {
+    return true
+  }
+}
+
 export function renderText(value?: string | null) {
   if (typeof value !== 'string') return undefined
   if (value.trim() === '') return undefined
   return value
+}
+
+export function renderSentenceCase(value?: string | null) {
+  const rendered = renderText(value)
+  if (!rendered) return ''
+  if (hasStegaMetadata(rendered)) return rendered
+
+  const normalized = rendered.trim().replace(/\s+/g, ' ').toLowerCase()
+  if (!normalized) return ''
+
+  return normalized.charAt(0).toUpperCase() + normalized.slice(1)
 }
 
 export function cleanSlug(value?: string | { current?: string } | null) {

@@ -19,6 +19,7 @@
     "@sanity/icons": "3.7.4",
     "@sanity/table": "^2.0.1",
     "@sanity/vision": "^5.18.0",
+    "@sanity/visual-editing": "^5.3.3",
     "react": "^19.1",
     "react-dom": "^19.1",
     "sanity": "^5.18.0",

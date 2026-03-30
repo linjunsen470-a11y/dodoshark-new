@@ -9,6 +9,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 
 import { getSafeHref, isExternalHref } from '@/app/lib/safeHref'
 import { urlFor } from '@/app/lib/sanity'
+import { cleanText, renderText } from '@/app/lib/sanity-utils'
 import {
   getSharedBackgroundTheme,
   type ShowcaseCssVars,
@@ -105,8 +106,8 @@ function resolveImageSrc(
 }
 
 function ShowcaseCard({ item }: { item: ShowcaseItem }) {
-  const title = item.title?.trim() || 'Untitled Showcase'
-  const description = item.description?.trim()
+  const title = renderText(item.title) || 'Untitled Showcase'
+  const description = renderText(item.description)
   const href = getSafeHref(item.href)
   const imageSrc = resolveImageSrc(item.image, { width: 1200, height: 900, fit: 'crop' })
   const className = `${styles.cardLink} ${href ? '' : styles.cardStatic}`.trim()
@@ -167,7 +168,7 @@ function SplitCarousel({
   const titleClass = theme.heading
   const bodyClass = theme.body
   const footerHref = getSafeHref(footerCta?.href)
-  const footerLabel = footerCta?.label?.trim() || ''
+  const footerLabel = cleanText(footerCta?.label) || ''
 
   if (items.length === 0) return null
 
@@ -204,12 +205,12 @@ function SplitCarousel({
         onSlideChange={(instance) => setCurrentIndex(instance.realIndex)}
       >
         {items.map((item, index) => {
-          const title = item.title?.trim() || 'Untitled Showcase'
-          const description = item.description?.trim()
+          const title = renderText(item.title) || 'Untitled Showcase'
+          const description = renderText(item.description)
           const imageSrc = resolveImageSrc(item.image, { width: 1600, height: 1100, fit: 'crop' })
 
           return (
-            <SwiperSlide key={item._key ?? `${title}-${index}`} className="!h-auto">
+            <SwiperSlide key={item._key ?? `split-showcase-${index}`} className="!h-auto">
               <article className={`relative grid h-full gap-8 md:items-start md:px-12 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-16 lg:px-14 ${styles.splitSlide}`}>
                 {items.length > 1 && (
                   <div className={styles.splitDesktopNav}>
@@ -349,7 +350,7 @@ function SplitCarousel({
 }
 
 export default function ShowcaseBlock({ block }: { block: ShowcaseBlockData }) {
-  const items = (block.items ?? []).filter((item) => item?.title?.trim() && item?.image?.asset)
+  const items = (block.items ?? []).filter((item) => renderText(item?.title) && item?.image?.asset)
   const layout = block.layout === 'splitCarousel' ? 'splitCarousel' : 'cardCarousel'
   const [swiper, setSwiper] = useState<SwiperInstance | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -357,6 +358,7 @@ export default function ShowcaseBlock({ block }: { block: ShowcaseBlockData }) {
   const [canNext, setCanNext] = useState(items.length > 1)
   const variant = block.backgroundVariant ?? 'lightGray'
   const theme = getSharedBackgroundTheme(variant)
+  const footerHref = getSafeHref(block.footerCta?.href)
   const cardCarouselVars: ShowcaseCssVars = {
     ...theme.showcaseVars,
     '--showcase-card-bg': '#ffffff',
@@ -423,7 +425,7 @@ export default function ShowcaseBlock({ block }: { block: ShowcaseBlockData }) {
                 onResize={syncControls}
               >
                 {items.map((item, index) => (
-                  <SwiperSlide key={item._key ?? `${item.title}-${index}`} className={styles.slide}>
+                  <SwiperSlide key={item._key ?? `showcase-${index}`} className={styles.slide}>
                     <ShowcaseCard item={item} />
                   </SwiperSlide>
                 ))}
@@ -460,14 +462,14 @@ export default function ShowcaseBlock({ block }: { block: ShowcaseBlockData }) {
                 </p>
               </div>
 
-              {block.footerCta?.label?.trim() && block.footerCta?.href?.trim() ? (
+              {cleanText(block.footerCta?.label) && footerHref ? (
                 <a
-                  href={block.footerCta.href.trim()}
+                  href={footerHref}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#fbbf24] px-8 py-3 font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-[#f59e0b] sm:w-auto"
                 >
-                  {block.footerCta.label.trim()}
+                  {renderText(block.footerCta?.label)}
                   <ArrowRightIcon className={styles.footerCtaIcon} />
                 </a>
               ) : null}

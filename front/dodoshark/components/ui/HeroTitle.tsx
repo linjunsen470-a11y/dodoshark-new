@@ -1,5 +1,5 @@
 import React from 'react'
-import { renderText } from '@/app/lib/sanity-utils'
+import { hasStegaMetadata, renderText } from '@/app/lib/sanity-utils'
 
 interface HeroTitleProps {
   title?: string
@@ -19,6 +19,10 @@ const HeroTitle: React.FC<HeroTitleProps> = ({ title, fallback }) => {
 
   if (!cleanTitle) {
     return <>{fallback}</>
+  }
+
+  if (hasStegaMetadata(cleanTitle)) {
+    return <>{cleanTitle}</>
   }
 
   // Check for explicit newline
