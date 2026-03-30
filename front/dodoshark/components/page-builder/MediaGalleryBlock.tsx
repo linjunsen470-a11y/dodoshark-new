@@ -9,6 +9,7 @@ import type { Swiper as SwiperInstance } from 'swiper'
 
 import { getSafeHref, isExternalHref } from '@/app/lib/safeHref'
 import { urlFor } from '@/app/lib/sanity'
+import { cleanText, renderText } from '@/app/lib/sanity-utils'
 import Icon from '@/components/ui/Icon'
 import {
   getSharedSurfaceClasses,
@@ -128,7 +129,7 @@ function getGalleryItemBlurDataUrl(item: GalleryItem) {
 }
 
 function getGalleryItemLabel(item: GalleryItem, index: number) {
-  const baseLabel = item.caption?.trim() || (item.type === 'videoUrl' ? 'Video item' : 'Image item')
+  const baseLabel = renderText(item.caption) || (item.type === 'videoUrl' ? 'Video item' : 'Image item')
   return `${baseLabel} ${index + 1}`
 }
 
@@ -250,7 +251,7 @@ function MediaGalleryCtaLink({
   cta?: MediaGalleryCta
   className?: string
 }) {
-  const label = cta?.label?.trim()
+  const label = cleanText(cta?.label)
   const href = getSafeHref(cta?.href)
 
   if (!label || !href) return null
@@ -604,7 +605,7 @@ function ThumbnailGallery({
         }}
       >
         {items.map((item, index) => (
-          <SwiperSlide key={item._key ?? `${item.caption}-${index}`}>
+            <SwiperSlide key={item._key ?? `gallery-item-${index}`}>
             <ThumbnailGalleryStage item={item} onOpenVideo={onOpenVideo} />
           </SwiperSlide>
         ))}
@@ -621,7 +622,7 @@ function ThumbnailGallery({
           <div className={`flex min-w-full gap-3 ${desktopTrackClassName}`}>
             {items.map((item, index) => (
               <div
-                key={`${item._key ?? item.caption ?? 'thumb'}-${index}`}
+              key={`${item._key ?? `thumb-${index}`}-${index}`}
                 className="w-[96px] shrink-0 sm:w-[112px] md:w-[136px] lg:w-[calc((100%-48px)/5)]"
               >
                 <ThumbnailGalleryThumb
@@ -660,8 +661,8 @@ function HomeStyleVideoCard({
   const blurDataURL = getGalleryItemBlurDataUrl(item)
   const hasLqip = Boolean(blurDataURL)
   const isVideo = item.type === 'videoUrl'
-  const title = item.caption?.trim() || (isVideo ? 'Video item' : 'Gallery image')
-  const metaText = item.metaText?.trim()
+  const title = renderText(item.caption) || (isVideo ? 'Video item' : 'Gallery image')
+  const metaText = renderText(item.metaText)
 
   const cardBody = (
     <>
@@ -838,7 +839,7 @@ export default function MediaGalleryBlock({ block }: { block: MediaGalleryBlockD
       ? block.layout
       : 'thumbnailGallery'
   const [activeVideo, setActiveVideo] = useState<ActiveVideo | null>(null)
-  const hasCta = Boolean(block.cta?.label?.trim() && getSafeHref(block.cta?.href))
+  const hasCta = Boolean(cleanText(block.cta?.label) && getSafeHref(block.cta?.href))
   const showInlineSectionCta = hasCta && layout !== 'videoCardCarousel'
   const items = (block.items ?? []).filter(
     (item) =>
@@ -851,7 +852,7 @@ export default function MediaGalleryBlock({ block }: { block: MediaGalleryBlockD
     if (!src) return
     setActiveVideo({
       src,
-      title: caption?.trim() || 'Video',
+      title: renderText(caption) || 'Video',
     })
   }
 
@@ -911,7 +912,7 @@ export default function MediaGalleryBlock({ block }: { block: MediaGalleryBlockD
           <div className="flex snap-x snap-mandatory gap-6 overflow-x-auto pb-2">
             {items.map((item, index) => (
               <div
-                key={item._key ?? `${item.caption}-${index}`}
+                key={item._key ?? `carousel-item-${index}`}
                 className="max-w-[500px] min-w-[280px] snap-start md:min-w-[420px]"
               >
                 <GalleryTile item={item} theme={theme} onOpenVideo={openVideo} />

@@ -6,7 +6,7 @@ import { PortableText, type PortableTextBlock, type PortableTextComponents } fro
 
 import { getSafeHref, isExternalHref } from '@/app/lib/safeHref'
 import { fetchSanityData } from '@/app/lib/sanity.live'
-import { cleanSlug, cleanText, renderText, toImageSrc } from '@/app/lib/sanity-utils'
+import { cleanSlug, cleanText, renderSentenceCase, renderText, toImageSrc } from '@/app/lib/sanity-utils'
 import type { SanityAsset, SanityImage, SeoMeta } from '@/app/lib/types/sanity'
 import Icon from '@/components/ui/Icon'
 
@@ -139,13 +139,6 @@ async function getCaseBySlug(slug: string, stega?: boolean) {
     console.error('Error fetching case study:', error)
     return null
   }
-}
-
-function toSentenceCase(value: string) {
-  const normalized = value.trim().replace(/\s+/g, ' ').toLowerCase()
-  if (!normalized) return ''
-
-  return normalized.charAt(0).toUpperCase() + normalized.slice(1)
 }
 
 function buildPortableTextComponents(): PortableTextComponents {
@@ -354,7 +347,7 @@ export default async function CaseDetailPage({ params }: CaseDetailPageProps) {
                   className={`${tagMetaClassName} hover:border-orange-400/35 hover:bg-white/10 hover:text-white`}
                 >
                   <span className="h-2 w-2 rounded-full bg-orange-400" />
-                  <span>{toSentenceCase(renderText(tag.title) ?? '')}</span>
+                  <span>{renderSentenceCase(tag.title)}</span>
                 </Link>
               ))}
               {renderText(caseStudy.location) && (

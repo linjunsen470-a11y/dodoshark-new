@@ -1,5 +1,6 @@
 'use client'
 
+import { renderSentenceCase } from '@/app/lib/sanity-utils'
 import { normalizeYouTubeEmbedUrl } from '@/app/lib/video'
 import VideoPreviewTrigger from '@/components/ui/VideoPreviewTrigger'
 import Icon from '@/components/ui/Icon'
@@ -16,13 +17,6 @@ export type VlogVideoCardItem = {
 
 type VlogVideoGridProps = {
   items: VlogVideoCardItem[]
-}
-
-function toSentenceCase(value: string) {
-  const normalized = value.trim().replace(/\s+/g, ' ').toLowerCase()
-  if (!normalized) return ''
-
-  return normalized.charAt(0).toUpperCase() + normalized.slice(1)
 }
 
 export default function VlogVideoGrid({ items }: VlogVideoGridProps) {
@@ -46,11 +40,11 @@ export default function VlogVideoGrid({ items }: VlogVideoGridProps) {
                 <div className="mb-4 flex justify-center">
                   <div
                     className="inline-flex max-w-full items-center gap-2 whitespace-nowrap rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-[13px] font-semibold leading-none text-orange-600 shadow-[0_8px_24px_rgba(249,115,22,0.08)]"
-                    title={toSentenceCase(item.tagLabel)}
+                    title={renderSentenceCase(item.tagLabel)}
                   >
                     <span className="h-2 w-2 shrink-0 rounded-full bg-orange-400" />
                     <span className="block truncate max-w-[180px]">
-                      {toSentenceCase(item.tagLabel)}
+                      {renderSentenceCase(item.tagLabel)}
                     </span>
                   </div>
                 </div>
