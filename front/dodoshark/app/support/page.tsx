@@ -8,6 +8,7 @@ import { buildPageMetadata } from '@/app/lib/seo'
 import { cleanText, renderText, toImageSrc } from '@/app/lib/sanity-utils'
 import type { SanityImage, SeoMeta } from '@/app/lib/types/sanity'
 import HeroTitle from '@/components/ui/HeroTitle'
+import CMSImage from '@/components/ui/CMSImage'
 
 type ServiceStageImageKey =
   | 'preSalesStageImage'
@@ -131,17 +132,6 @@ async function getSupportPageData(stega?: boolean) {
   })
 }
 
-function resolvePageImage(
-  image: SanityImage | undefined,
-  fallbackSrc: string,
-  fallbackAlt: string,
-  width: number,
-) {
-  return {
-    src: toImageSrc(image, width) || fallbackSrc,
-    alt: cleanText(image?.alt) || fallbackAlt,
-  }
-}
 
 const SERVICE_STAGES: ServiceStage[] = [
   {
@@ -228,18 +218,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function SupportPage() {
   const pageData = await getSupportPageData()
-  const heroImage = resolvePageImage(
-    pageData?.images?.heroBackground,
-    '/assets/images/about/support-hero.jpg',
-    'DoDoShark Global Service',
-    1800,
-  )
-  const supportTeamImage = resolvePageImage(
-    pageData?.images?.supportTeamImage,
-    '/assets/images/about/team.jpg',
-    'DoDoShark Global Support Team',
-    1400,
-  )
   const heroEyebrow = renderText(pageData?.hero?.eyebrow) || 'World-Class Service Network'
   const heroTitle = renderText(pageData?.hero?.title) || 'Service That Powers Results'
   const heroDescription =
@@ -264,21 +242,22 @@ export default async function SupportPage() {
   ]
   const serviceEyebrow = renderText(pageData?.serviceIntro?.eyebrow) || 'Value Co-Creation'
   const serviceTitle = renderText(pageData?.serviceIntro?.title) || 'Full-Lifecycle Efficiency Empowerment'
-  const parsedServiceStages =
-    pageData?.serviceStages?.map((stage, index) => ({
-      id: renderText(stage?.id) || SERVICE_STAGES[index]?.id || `0${index + 1}`,
-      phase: renderText(stage?.phase) || SERVICE_STAGES[index]?.phase || 'Stage',
-      title: renderText(stage?.title) || SERVICE_STAGES[index]?.title || 'Service stage',
-      description: renderText(stage?.description) || SERVICE_STAGES[index]?.description || '',
-      features: (stage?.features ?? SERVICE_STAGES[index]?.features ?? [])
-        .map((feature) => renderText(feature))
-        .filter((item): item is string => Boolean(item)),
-      image: stage?.image,
-      imageKey: SERVICE_STAGES[index]?.imageKey ?? 'preSalesStageImage',
-      fallbackImageSrc: SERVICE_STAGES[index]?.fallbackImageSrc ?? '/assets/images/about/support-hero.jpg',
-      icon: SERVICE_STAGES[index]?.icon ?? SERVICE_STAGES[0].icon,
-    })) ?? []
-  const serviceStages: ServiceStage[] = (parsedServiceStages && parsedServiceStages.length > 0) ? parsedServiceStages : SERVICE_STAGES
+  const serviceStages: ServiceStage[] = SERVICE_STAGES.map((fallback, index) => {
+    const cmsStage = pageData?.serviceStages?.[index]
+    if (!cmsStage) return fallback
+
+    return {
+      ...fallback,
+      id: renderText(cmsStage.id) || fallback.id,
+      phase: renderText(cmsStage.phase) || fallback.phase,
+      title: renderText(cmsStage.title) || fallback.title,
+      description: renderText(cmsStage.description) || fallback.description,
+      features: (cmsStage.features && cmsStage.features.length > 0)
+        ? cmsStage.features.map(f => renderText(f)).filter((f): f is string => Boolean(f))
+        : fallback.features,
+      image: cmsStage.image
+    }
+  })
   const hotlineLabel = renderText(pageData?.urgentAssistance?.hotlineLabel) || '24/7 Hotline'
   const hotlineValue = renderText(pageData?.urgentAssistance?.hotlineValue) || '+86 19941519694'
   const salesLabel = renderText(pageData?.urgentAssistance?.salesLabel) || 'Sales'
@@ -299,14 +278,23 @@ export default async function SupportPage() {
     <main className="bg-[#fcfdfd] text-slate-900 font-sans selection:bg-orange-100 selection:text-orange-900">
       <section className="relative overflow-hidden bg-slate-800 pb-32 pt-24">
         <div className="absolute inset-0 z-0">
-          <Image
-            src={heroImage.src}
-            alt={heroImage.alt}
-            fill
-            sizes="100vw"
-            className="object-cover opacity-40"
-            priority
-          />
+          {pageData?.images?.heroBackground?.asset ? (
+            <CMSImage
+              image={pageData.images.heroBackground}
+              fill
+              priority
+              className="object-cover opacity-40"
+            />
+          ) : (
+            <Image
+              src="/assets/images/about/support-hero.jpg"
+              alt="DoDoShark Global Service"
+              fill
+              sizes="100vw"
+              className="object-cover opacity-40"
+              priority
+            />
+          )}
           <div className="absolute inset-0 bg-gradient-to-b from-slate-800/90 via-slate-800/40 to-slate-800" />
         </div>
 
@@ -360,63 +348,62 @@ export default async function SupportPage() {
           </div>
 
           <div className="space-y-32">
-            {serviceStages.map((stage, idx) => {
-              const stageImage = resolvePageImage(
-                stage.image ?? pageData?.images?.[stage.imageKey],
-                stage.fallbackImageSrc,
-                stage.title,
-                1400,
-              )
-
-              return (
-                <div
-                  key={stage.id}
-                  className={`flex flex-col items-center gap-16 lg:flex-row lg:gap-24 ${idx % 2 !== 0 ? 'lg:flex-row-reverse' : ''
-                    }`}
-                >
-                  <div className="w-full lg:w-1/2">
-                    <div className="mb-6 flex items-center space-x-4">
-                      <span className="text-6xl font-display font-black leading-none text-orange-500/80">
-                        {stage.id}
+            {serviceStages.map((stage, idx) => (
+              <div
+                key={stage.id}
+                className={`flex flex-col items-center gap-16 lg:flex-row lg:gap-24 ${idx % 2 !== 0 ? 'lg:flex-row-reverse' : ''
+                  }`}
+              >
+                <div className="w-full lg:w-1/2">
+                  <div className="mb-6 flex items-center space-x-4">
+                    <span className="text-6xl font-display font-black leading-none text-orange-500/80">
+                      {stage.id}
+                    </span>
+                    <div>
+                      <span className="mb-1 block text-xs font-display font-semibold uppercase tracking-widest text-orange-500">
+                        {stage.phase}
                       </span>
-                      <div>
-                        <span className="mb-1 block text-xs font-display font-semibold uppercase tracking-widest text-orange-500">
-                          {stage.phase}
-                        </span>
-                        <h4 className="text-3xl font-display font-extrabold leading-tight tracking-[-0.02em] text-slate-900">
-                          {stage.title}
-                        </h4>
-                      </div>
+                      <h4 className="text-3xl font-display font-extrabold leading-tight tracking-[-0.02em] text-slate-900">
+                        {stage.title}
+                      </h4>
                     </div>
-                    <p className="mb-8 text-lg font-light leading-relaxed text-slate-600">
-                      {stage.description}
-                    </p>
-                    <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                      {stage.features.map((feat) => (
-                        <li
-                          key={feat}
-                          className="flex items-center space-x-3 text-sm font-medium text-slate-700"
-                        >
-                          <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-orange-500" />
-                          <span>{feat}</span>
-                        </li>
-                      ))}
-                    </ul>
                   </div>
-                  <div className="w-full lg:w-1/2">
-                    <div className="group relative aspect-[4/3] overflow-hidden rounded-3xl shadow-2xl">
-                      <Image
-                        src={stageImage.src}
-                        alt={stageImage.alt}
+                  <p className="mb-8 text-lg font-light leading-relaxed text-slate-600">
+                    {stage.description}
+                  </p>
+                  <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {stage.features.map((feat) => (
+                      <li
+                        key={feat}
+                        className="flex items-center space-x-3 text-sm font-medium text-slate-700"
+                      >
+                        <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-orange-500" />
+                        <span>{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="w-full lg:w-1/2">
+                  <div className="group relative aspect-[4/3] overflow-hidden rounded-3xl shadow-2xl">
+                    {stage.image?.asset ? (
+                      <CMSImage
+                        image={stage.image}
                         fill
                         className="object-cover transition-transform duration-700 group-hover:scale-105"
                       />
-                      <div className="absolute inset-0 bg-orange-500/10 transition-colors duration-500 group-hover:bg-transparent" />
-                    </div>
+                    ) : (
+                      <Image
+                        src={stage.fallbackImageSrc}
+                        alt={stage.title}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                    )}
+                    <div className="absolute inset-0 bg-orange-500/10 transition-colors duration-500 group-hover:bg-transparent" />
                   </div>
                 </div>
-              )
-            })}
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -489,12 +476,20 @@ export default async function SupportPage() {
               </div>
               <div className="relative">
                 <div className="group flex aspect-square flex-col items-center justify-center overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-2 text-center">
-                  <Image
-                    src={supportTeamImage.src}
-                    alt={supportTeamImage.alt}
-                    fill
-                    className="object-cover transition-transform duration-1000 group-hover:scale-110"
-                  />
+                  {pageData?.images?.supportTeamImage?.asset ? (
+                    <CMSImage
+                      image={pageData.images.supportTeamImage}
+                      fill
+                      className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                    />
+                  ) : (
+                    <Image
+                      src="/assets/images/about/team.jpg"
+                      alt="DoDoShark Global Support Team"
+                      fill
+                      className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                    />
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
                   <div className="absolute bottom-8 left-8 right-8">
                     <p className="text-xl font-display font-extrabold uppercase tracking-tight text-white">
