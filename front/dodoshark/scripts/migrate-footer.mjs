@@ -10,7 +10,7 @@ const DOC_ID = "globalSettings";
 const API_VERSION = "v2025-01-01";
 
 async function run() {
-  console.log("Starting footer content migration...");
+  console.log("Starting comprehensive footer/contact content migration...");
 
   try {
     // 1. Upload Map Image
@@ -36,26 +36,36 @@ async function run() {
     console.log(`Image uploaded successfully! Asset ID: ${assetId}`);
 
     // 2. Patch globalSettings document
-    console.log(`Patching ${DOC_ID} with hardcoded content...`);
+    console.log(`Patching ${DOC_ID} with all footer and contact fields...`);
     const patchPayload = {
       mutations: [
         {
           patch: {
             id: DOC_ID,
             setIfMissing: {
-              footer: {}
+              footer: {},
+              contact: {}
             },
             set: {
+              // Footer Text
               "footer.headquartersKicker": "Headquarters",
+              "footer.headquartersTitle": "DoDoShark",
               "footer.headquartersBody": "Located in Nanjing, Jiangsu, China.\nDoDoShark is a brand of Nanjing Heici Machinery Co., Ltd.",
               "footer.phoneLabel": "Phone",
               "footer.emailLabel": "Email",
               "footer.websiteLabelTitle": "Website",
               "footer.networkKicker": "Regional Coverage",
               "footer.networkTitle": "Our Network",
+              "footer.networkItems": [
+                "Customers cover 1,000+ cities across China",
+                "Business operations cover 12+ countries worldwide",
+                "Three major production bases: Jinan / Liaocheng / Weifang"
+              ],
               "footer.socialKicker": "Stay Connected",
               "footer.socialTitle": "Follow Us",
               "footer.copyrightText": "© 2026 DoDoShark. All rights reserved.",
+              
+              // Footer Map
               "footer.footerMap": {
                 "_type": "object",
                 "ariaLabel": "Worldwide customer distribution map",
@@ -67,7 +77,14 @@ async function run() {
                     "_ref": assetId
                   }
                 }
-              }
+              },
+
+              // Contact Details (Synced with Footer contact list)
+              "contact.phone": "+86 19941519694",
+              "contact.email": "sales@dodoshark.com",
+              "contact.supportEmail": "support@dodoshark.com",
+              "contact.websiteLabel": "www.dodoshark.com",
+              "contact.websiteUrl": "https://www.dodoshark.com"
             }
           }
         }

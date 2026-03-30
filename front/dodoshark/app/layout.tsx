@@ -60,6 +60,8 @@ export default async function RootLayout({
   const draft = await draftMode();
   const globalSettings = await getGlobalSettings();
 
+  const VisualEditingAny = VisualEditing as any;
+
   return (
     <html lang="en" className="scroll-smooth">
       <body
@@ -69,7 +71,7 @@ export default async function RootLayout({
         {children}
         <Footer settings={globalSettings} />
         <SanityLive />
-        {draft.isEnabled && <VisualEditing />}
+        {draft.isEnabled && <VisualEditingAny studioUrl={studioUrl} />}
       </body>
     </html>
   );
