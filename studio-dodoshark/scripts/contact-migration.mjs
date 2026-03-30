@@ -66,6 +66,13 @@ async function migrate() {
       description: 'Three major manufacturing facilities located in Shandong Province.',
       cities: ['Jinan', 'Liaocheng', 'Weifang'],
     },
+    directContact: {
+      title: 'Direct Contact',
+      phone: '+86 18251999196',
+      email: 'sales@dodoshark.com',
+      websiteLabel: 'www.dodoshark.com',
+      websiteUrl: 'https://www.dodoshark.com',
+    },
     inquiryPanel: {
       title: 'Send Inquiry',
       description: 'Leave your contact details and city. Our team will respond shortly.',
