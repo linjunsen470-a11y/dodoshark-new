@@ -248,13 +248,17 @@ export default async function RecruitDistributorPage() {
         </div>
 
         <div className="relative z-10 mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-          <h1 className="mb-6 text-4xl font-black leading-tight tracking-tight text-white md:text-6xl">
-            <HeroTitle title={heroTitle} fallback="Partner with DoDoShark Explore Global Blue Oceans" />
-          </h1>
-          <p className="mb-8 font-serif text-xl font-bold italic text-orange-400">{heroEyebrow}</p>
-          <p className="mx-auto max-w-4xl text-lg font-light leading-relaxed text-slate-300">
-            {heroSubtitle}
-          </p>
+          <div className="mx-auto max-w-4xl">
+            <div className="mb-8 inline-flex items-center gap-3 rounded-md border border-orange-500/20 bg-orange-500/10 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-orange-400">
+              <span>{heroEyebrow}</span>
+            </div>
+            <h1 className="mb-8 text-5xl font-display font-black leading-tight tracking-tight text-white md:text-6xl">
+              <HeroTitle title={heroTitle} fallback="Partner with DoDoShark Explore Global Blue Oceans" />
+            </h1>
+            <p className="mx-auto max-w-3xl text-xl font-light leading-relaxed text-slate-400">
+              {heroSubtitle}
+            </p>
+          </div>
           <div className="mt-12">
             <Link
               href={heroCtaHref}
@@ -269,10 +273,10 @@ export default async function RecruitDistributorPage() {
       <section className="relative z-20 -mt-16 bg-white py-24 md:rounded-t-[1rem]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-20 text-center">
-            <h2 className="text-3xl font-black tracking-tight text-slate-900 md:text-4xl">
-              Choice is Greater Than <span className="text-orange-500">Effort</span>
+            <h2 className="text-3xl font-display font-black tracking-tighter text-slate-900 md:text-5xl">
+              Choice is Greater Than <span className="accent-gradient-text">Effort</span>
             </h2>
-            <div className="mx-auto mt-4 h-1.5 w-24 rounded-full bg-orange-500" />
+            <div className="mx-auto mt-6 h-1.5 w-24 rounded-full bg-orange-500" />
           </div>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             {whyChooseUs.map((item) => (
@@ -283,7 +287,7 @@ export default async function RecruitDistributorPage() {
                 <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-slate-900 text-white shadow-lg transition-colors group-hover:bg-orange-500">
                   {item.icon}
                 </div>
-                <h3 className="mb-4 text-xl font-black tracking-tight text-slate-900">
+                <h3 className="mb-4 text-lg font-display font-black tracking-tight text-slate-900 md:text-xl">
                   {item.title}
                 </h3>
                 <p className="text-sm font-light leading-relaxed text-slate-600">
@@ -299,7 +303,7 @@ export default async function RecruitDistributorPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center gap-16 lg:flex-row">
             <div className="w-full lg:w-1/2">
-              <h2 className="mb-6 text-3xl font-black tracking-tight">{scopeTitle}</h2>
+              <h2 className="mb-6 text-3xl font-display font-black tracking-tight md:text-4xl">{scopeTitle}</h2>
               <p className="mb-10 text-lg font-light leading-relaxed text-slate-600">
                 {scopeDescription}
               </p>
@@ -348,8 +352,8 @@ export default async function RecruitDistributorPage() {
 
       <section className="bg-white py-24">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-          <h2 className="mb-4 text-3xl font-black tracking-tight">
-            One Mind, <span className="text-orange-500">One Journey</span>
+          <h2 className="mb-4 text-3xl font-display font-black tracking-tight md:text-4xl">
+            One Mind, <span className="accent-gradient-text">One Journey</span>
           </h2>
           <p className="mx-auto mb-16 max-w-2xl font-light text-slate-500">
             Successful cooperation stems from shared philosophy and strength.
@@ -378,8 +382,8 @@ export default async function RecruitDistributorPage() {
         </div>
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-20 text-center">
-            <h2 className="text-3xl font-black tracking-tight md:text-4xl">
-              Your Success, <span className="text-orange-500">Our Promise</span>
+            <h2 className="text-3xl font-display font-black tracking-tight md:text-5xl">
+              Your Success, <span className="accent-gradient-text">Our Promise</span>
             </h2>
             <p className="mt-4 font-light text-slate-400">
               Empowering Partners, Achieving Shared Value.
@@ -412,10 +416,10 @@ export default async function RecruitDistributorPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="relative overflow-hidden rounded-[1rem] border border-slate-200 bg-slate-50 p-12 text-center shadow-2xl lg:p-16">
             <div className="pointer-events-none absolute right-0 top-0 h-80 w-80 rounded-full bg-orange-500/10 blur-[100px]" />
-            <h2 className="mb-8 text-3xl font-black tracking-tight text-slate-900">
+            <h2 className="mb-8 text-3xl font-display font-black tracking-tight text-slate-900 md:text-5xl">
               {ctaTitle}
             </h2>
-            <p className="mx-auto mb-10 max-w-3xl text-lg font-light leading-relaxed text-slate-600">
+            <p className="mx-auto mb-10 max-w-3xl text-lg font-light leading-relaxed text-slate-600 md:text-xl">
               {ctaDescription}
             </p>
           </div>
