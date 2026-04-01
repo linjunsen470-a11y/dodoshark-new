@@ -425,14 +425,14 @@ export default async function AboutPage() {
                     sizes="(min-width: 768px) 50vw, 100vw"
                     fallbackAlt={renderText(sys.title)}
                   />
-                  <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-slate-900 p-8">
-                    <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-500 text-white shadow-lg shadow-orange-500/30">
+                  <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-slate-900 px-8 pt-8 pb-1">
+                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-500 text-white shadow-lg shadow-orange-500/30">
                       {PRODUCT_SYSTEMS_ICONS[index] || PRODUCT_SYSTEMS_ICONS[0]}
                     </div>
                     <h3 className="mb-2 font-display text-2xl font-extrabold capitalize tracking-tight">{renderText(sys.title)}</h3>
                   </div>
                 </div>
-                <div className="p-8 pt-2">
+                <div className="p-8 pt-1">
                   <p className="mb-6 font-light leading-relaxed text-slate-300">{renderText(sys.description)}</p>
                   <div className="flex flex-wrap gap-2">
                     {sys.tags?.map((tag) => (
