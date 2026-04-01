@@ -10,7 +10,7 @@
 - `front/dodoshark/app`: Next.js app routes and page entrypoints
 - `front/dodoshark/components/page-builder`: page builder rendering components and shared block logic
 - `front/dodoshark/components/ui`: shared UI building blocks
-- `front/dodoshark/app/lib`: Sanity client helpers and data access
+- `front/dodoshark/lib`: Sanity client helpers and data access
 - `studio-dodoshark/schemaTypes`: Sanity document/object schemas
 - `studio-dodoshark/schemaTypes/objects/pageBuilder`: schema definitions for page builder blocks
 

@@ -113,7 +113,7 @@ export default function SoakedRiceSolutionPage() {
               </div>
               <h3 className="text-xl font-display font-bold mb-3">Rice Flour Quality</h3>
               <p className="text-slate-500 font-light leading-relaxed">
-                Selectable mesh sizes (0.4–0.8 mm) produce delicate 80–120 mesh flour for premium rice products.
+                Selectable mesh sizes (0.4鈥?.8 mm) produce delicate 80鈥?20 mesh flour for premium rice products.
               </p>
             </div>
             {/* Efficiency */}
@@ -259,7 +259,7 @@ export default function SoakedRiceSolutionPage() {
               <p className="text-sm text-slate-600 mb-3">Overheating during milling ruins the rice flour quality and texture.</p>
               <div className="pt-3 border-t border-slate-200 mt-auto">
                 <span className="text-xs font-black text-green-600 uppercase tracking-wider"><i className="fas fa-check mr-1" /> DoDoShark solves:</span>
-                <p className="text-sm mt-1">Active cooling keeps temp &lt; 40°C</p>
+                <p className="text-sm mt-1">Active cooling keeps temp &lt; 40掳C</p>
               </div>
             </div>
             <div className="rounded-xl bg-slate-50 p-6 flex flex-col">

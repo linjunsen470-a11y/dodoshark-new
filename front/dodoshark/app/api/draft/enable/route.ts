@@ -1,12 +1,12 @@
 import {defineEnableDraftMode} from 'next-sanity/draft-mode'
-import {client} from '@/app/lib/sanity'
+import {client} from '@/lib/sanity'
 
 export const dynamic = 'force-dynamic'
 
 export const GET = async (request: Request) => {
   const url = new URL(request.url)
 
-  // Temporary debug endpoint — visit /api/draft/enable?debug=1
+  // Temporary debug endpoint 鈥?visit /api/draft/enable?debug=1
   if (url.searchParams.get('debug') === '1') {
     const allKeys = Object.keys(process.env || {})
     const sanityKeys = allKeys.filter(

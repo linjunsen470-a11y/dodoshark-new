@@ -9,8 +9,8 @@ interface LiteYouTubeProps {
   className?: string
 }
 
-// 轻量级 YouTube 嵌入组件 - 使用 Intersection Observer 实现懒加载
-// 避免页面加载时就加载 YouTube 的全部脚本，大幅提升性能
+// 杞婚噺绾?YouTube 宓屽叆缁勪欢 - 浣跨敤 Intersection Observer 瀹炵幇鎳掑姞杞?
+// 閬垮厤椤甸潰鍔犺浇鏃跺氨鍔犺浇 YouTube 鐨勫叏閮ㄨ剼鏈紝澶у箙鎻愬崌鎬ц兘
 export default function LiteYouTube({
   videoId,
   title = 'YouTube video',
@@ -22,7 +22,7 @@ export default function LiteYouTube({
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    // 使用 Intersection Observer 检测视频是否进入视口
+    // 浣跨敤 Intersection Observer 妫€娴嬭棰戞槸鍚﹁繘鍏ヨ鍙?
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -31,7 +31,7 @@ export default function LiteYouTube({
         }
       },
       {
-        rootMargin: '100px', // 提前 100px 开始加载
+        rootMargin: '100px', // 鎻愬墠 100px 寮€濮嬪姞杞?
         threshold: 0,
       }
     )
@@ -43,7 +43,7 @@ export default function LiteYouTube({
     return () => observer.disconnect()
   }, [])
 
-  // 点击后加载真正的 iframe
+  // 鐐瑰嚮鍚庡姞杞界湡姝ｇ殑 iframe
   const handleLoad = () => {
     setIsLoaded(true)
   }
@@ -70,7 +70,7 @@ export default function LiteYouTube({
           className="group absolute inset-0 flex items-center justify-center"
           aria-label={`Play ${title}`}
         >
-          {/* 缩略图 */}
+          {/* 缂╃暐鍥?*/}
           {isIntersecting && (
             <img
               src={posterUrl}
@@ -79,9 +79,9 @@ export default function LiteYouTube({
               loading="lazy"
             />
           )}
-          {/* 渐变遮罩 */}
+          {/* 娓愬彉閬僵 */}
           <div className="absolute inset-0 bg-slate-900/20 transition-colors group-hover:bg-slate-900/10" />
-          {/* 播放按钮 */}
+          {/* 鎾斁鎸夐挳 */}
           <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-red-600 shadow-lg transition-transform group-hover:scale-110 group-active:scale-95">
             <svg
               className="ml-1 h-8 w-8 text-white"

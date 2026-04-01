@@ -4,9 +4,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
-import { cleanText, renderText } from '@/app/lib/sanity-utils'
-import { getSafeHref, isExternalHref } from '@/app/lib/safeHref'
-import { urlFor } from '@/app/lib/sanity'
+import { cleanText, renderText } from '@/lib/sanity-utils'
+import { getSafeHref, isExternalHref } from '@/lib/safeHref'
+import { urlFor } from '@/lib/sanity'
 import {
   getSectionToneClasses,
   heroDescriptionClass,

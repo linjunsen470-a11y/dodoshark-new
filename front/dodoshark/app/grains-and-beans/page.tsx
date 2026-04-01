@@ -350,7 +350,7 @@ export default function GrainsBeansSolutionPage() {
               <div className="text-3xl text-orange-500 mb-4"><i className="fas fa-wind" /></div>
               <h4 className="text-xl font-bold mb-3">Air-Vortex Cooling</h4>
               <p className="text-slate-400 font-light text-sm leading-relaxed">
-                Proprietary air-vortex design combined with water-cooling jackets ensures temperature stays below 40°C even during peak production.
+                Proprietary air-vortex design combined with water-cooling jackets ensures temperature stays below 40掳C even during peak production.
               </p>
             </div>
             <div className="bg-slate-800/50 p-8 rounded-2xl border border-slate-700">

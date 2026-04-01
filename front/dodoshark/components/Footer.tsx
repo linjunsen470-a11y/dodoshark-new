@@ -2,11 +2,11 @@ import Image from 'next/image'
 import Link from 'next/link'
 import {createDataAttribute} from 'next-sanity'
 
-import type {GlobalSettingsData} from '@/app/lib/global-settings'
-import {cleanText, renderText, toImageSrc} from '@/app/lib/sanity-utils'
+import type {GlobalSettingsData} from '@/lib/global-settings'
+import {cleanText, renderText, toImageSrc} from '@/lib/sanity-utils'
 import CMSImage from '@/components/ui/CMSImage'
-import {SANITY_DATASET, SANITY_PROJECT_ID} from '@/app/lib/env'
-import {studioUrl} from '@/app/lib/sanity'
+import {SANITY_DATASET, SANITY_PROJECT_ID} from '@/lib/env'
+import {studioUrl} from '@/lib/sanity'
 
 type FooterProps = {
   settings?: GlobalSettingsData | null

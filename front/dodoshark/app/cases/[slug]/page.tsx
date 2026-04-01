@@ -4,10 +4,10 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { PortableText, type PortableTextBlock, type PortableTextComponents } from 'next-sanity'
 
-import { getSafeHref, isExternalHref } from '@/app/lib/safeHref'
-import { fetchSanityData } from '@/app/lib/sanity.live'
-import { cleanSlug, cleanText, renderSentenceCase, renderText, toImageSrc } from '@/app/lib/sanity-utils'
-import type { SanityAsset, SanityImage, SeoMeta } from '@/app/lib/types/sanity'
+import { getSafeHref, isExternalHref } from '@/lib/safeHref'
+import { fetchSanityData } from '@/lib/sanity.live'
+import { cleanSlug, cleanText, renderSentenceCase, renderText, toImageSrc } from '@/lib/sanity-utils'
+import type { SanityAsset, SanityImage, SeoMeta } from '@/lib/types/sanity'
 import Icon from '@/components/ui/Icon'
 
 interface CaseDetailPageProps {
@@ -172,7 +172,7 @@ function buildPortableTextComponents(): PortableTextComponents {
     },
     listItem: {
       bullet: ({ children }) => (
-        <li className="relative ps-6 text-slate-600 leading-relaxed before:content-['•'] before:absolute before:left-0 before:text-orange-500 before:font-black">
+        <li className="relative ps-6 text-slate-600 leading-relaxed before:content-['–'] before:absolute before:left-0 before:text-orange-500 before:font-black">
           {children}
         </li>
       ),

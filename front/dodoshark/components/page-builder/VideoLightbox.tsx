@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 
-import type { VideoOrientation } from '@/app/lib/video'
+import type { VideoOrientation } from '@/lib/video'
 
 type VideoLightboxProps = {
   src: string

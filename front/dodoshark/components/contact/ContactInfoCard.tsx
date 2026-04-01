@@ -1,4 +1,4 @@
-import type { GlobalContact } from '@/app/lib/global-contact'
+import type { GlobalContact } from '@/lib/global-contact'
 import Icon from '@/components/ui/Icon'
 
 type ContactInfoCardProps = {

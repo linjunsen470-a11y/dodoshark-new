@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useState } from 'react'
-import { getVideoOrientation, normalizeYouTubeEmbedUrl, resolveYouTubeThumbnailUrl } from '@/app/lib/video'
+import { getVideoOrientation, normalizeYouTubeEmbedUrl, resolveYouTubeThumbnailUrl } from '@/lib/video'
 import VideoLightbox from '@/components/page-builder/VideoLightbox'
 
 interface AboutVideoCardProps {

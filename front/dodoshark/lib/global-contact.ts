@@ -1,5 +1,5 @@
-import { getGlobalSettings } from '@/app/lib/global-settings'
-import { renderText } from '@/app/lib/sanity-utils'
+import { getGlobalSettings } from '@/lib/global-settings'
+import { renderText } from '@/lib/sanity-utils'
 
 export type GlobalContact = {
   email: string

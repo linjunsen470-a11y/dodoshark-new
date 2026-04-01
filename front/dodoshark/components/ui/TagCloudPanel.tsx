@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { renderSentenceCase } from '@/app/lib/sanity-utils'
+import { renderSentenceCase } from '@/lib/sanity-utils'
 
 export type TagCloudItem = {
   key: string

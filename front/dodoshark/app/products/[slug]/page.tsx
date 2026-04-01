@@ -5,9 +5,9 @@ import dynamic from 'next/dynamic'
 import { createDataAttribute } from 'next-sanity'
 import type { ReactNode } from 'react'
 
-import { fetchSanityData } from '@/app/lib/sanity.live'
-import { cleanSlug, cleanText, renderText, toImageSrc } from '@/app/lib/sanity-utils'
-import type { SanityImage, SeoMeta } from '@/app/lib/types/sanity'
+import { fetchSanityData } from '@/lib/sanity.live'
+import { cleanSlug, cleanText, renderText, toImageSrc } from '@/lib/sanity-utils'
+import type { SanityImage, SeoMeta } from '@/lib/types/sanity'
 
 const CardGridBlock = dynamic(() => import('@/components/page-builder/CardGridBlock'))
 const CollectionReferenceBlock = dynamic(() => import('@/components/page-builder/CollectionReferenceBlock'))

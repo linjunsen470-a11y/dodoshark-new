@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic'
 import { useEffect, useRef, useState } from 'react'
 
-import type { InquiryType } from '@/app/lib/mvp-data'
+import type { InquiryType } from '@/lib/mvp-data'
 
 const LeadInquiryForm = dynamic(() => import('@/components/forms/LeadInquiryForm'), {
   ssr: false,

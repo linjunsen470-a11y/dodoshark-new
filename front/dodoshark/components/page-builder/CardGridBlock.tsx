@@ -8,9 +8,9 @@ import {A11y, Keyboard} from 'swiper/modules'
 import type {Swiper as SwiperInstance} from 'swiper'
 import {Swiper, SwiperSlide} from 'swiper/react'
 
-import {getSafeHref, isExternalHref} from '@/app/lib/safeHref'
-import {urlFor} from '@/app/lib/sanity'
-import {cleanSlug, cleanText, renderText} from '@/app/lib/sanity-utils'
+import {getSafeHref, isExternalHref} from '@/lib/safeHref'
+import {urlFor} from '@/lib/sanity'
+import {cleanSlug, cleanText, renderText} from '@/lib/sanity-utils'
 import Icon from '@/components/ui/Icon'
 import {
   getSharedBackgroundTheme,

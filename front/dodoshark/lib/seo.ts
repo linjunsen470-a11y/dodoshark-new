@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
-import { cleanText, toImageSrc } from '@/app/lib/sanity-utils'
-import type { SeoMeta } from '@/app/lib/types/sanity'
+import { cleanText, toImageSrc } from '@/lib/sanity-utils'
+import type { SeoMeta } from '@/lib/types/sanity'
 
 type BuildPageMetadataOptions = {
   seo?: SeoMeta | null

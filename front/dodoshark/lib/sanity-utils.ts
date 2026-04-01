@@ -1,8 +1,8 @@
 import {stegaClean} from 'next-sanity'
 
-import type { SanityImage } from '@/app/lib/types/sanity'
+import type { SanityImage } from '@/lib/types/sanity'
 
-import { urlFor } from '@/app/lib/sanity'
+import { urlFor } from '@/lib/sanity'
 
 export type QueryParamValue = string | string[] | undefined
 

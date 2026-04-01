@@ -1,6 +1,6 @@
 import Image from 'next/image'
 
-import {urlFor} from '@/app/lib/sanity'
+import {urlFor} from '@/lib/sanity'
 import Icon from '@/components/ui/Icon'
 
 import type {SharedBackgroundTheme} from './backgroundTheme'

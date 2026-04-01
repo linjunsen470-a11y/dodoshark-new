@@ -4,9 +4,9 @@ import Image from 'next/image'
 
 import { useState, type ReactNode } from 'react'
 import CMSImage from '@/components/ui/CMSImage'
-import type { SanityImage } from '@/app/lib/types/sanity'
+import type { SanityImage } from '@/lib/types/sanity'
 
-import { getVideoOrientation, normalizeYouTubeEmbedUrl, resolveYouTubeThumbnailUrl, type VideoOrientation } from '@/app/lib/video'
+import { getVideoOrientation, normalizeYouTubeEmbedUrl, resolveYouTubeThumbnailUrl, type VideoOrientation } from '@/lib/video'
 import VideoLightbox from '@/components/page-builder/VideoLightbox'
 import Icon from '@/components/ui/Icon'
 

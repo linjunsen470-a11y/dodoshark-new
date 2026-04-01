@@ -402,14 +402,14 @@ export default function CornMillingSolutionPage() {
               <div className="text-3xl text-orange-500 mb-4"><i className="fas fa-cogs" /></div>
               <h4 className="text-xl font-bold mb-3">A. High-Efficiency Milling</h4>
               <p className="text-slate-400 font-light text-sm leading-relaxed">
-                Adopts 4 major milling structures (Roller, Hammer, Claw, Ultrafine) ensuring high capacity at various fineness levels (e.g., 150 mesh capacity ≥1.5 t/h).
+                Adopts 4 major milling structures (Roller, Hammer, Claw, Ultrafine) ensuring high capacity at various fineness levels (e.g., 150 mesh capacity ≥ 0.5 t/h).
               </p>
             </div>
             <div className="bg-slate-800/50 p-8 rounded-2xl border border-slate-700">
               <div className="text-3xl text-orange-500 mb-4"><i className="fas fa-fan" /></div>
               <h4 className="text-xl font-bold mb-3">B. Patented Dust-Free Collection</h4>
               <p className="text-slate-400 font-light text-sm leading-relaxed">
-                Various configurations including pulse bag dust collectors and cyclone separation. Dust removal efficiency ≥99.9%, recovering powder directly into production.
+                Various configurations including pulse bag dust collectors and cyclone separation. Dust removal efficiency ≥ 99.9%, recovering powder directly into production.
               </p>
             </div>
             <div className="bg-slate-800/50 p-8 rounded-2xl border border-slate-700">

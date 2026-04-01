@@ -8,10 +8,10 @@ import {createDataAttribute} from 'next-sanity'
 
 import MobileNavToggle from '@/components/header/MobileNavToggle'
 import {isNavItemActive, type NavItem} from '@/components/header/nav-utils'
-import {SANITY_DATASET, SANITY_PROJECT_ID} from '@/app/lib/env'
-import {studioUrl} from '@/app/lib/sanity'
-import type {GlobalSettingsData} from '@/app/lib/global-settings'
-import {cleanText, renderText, toImageSrc} from '@/app/lib/sanity-utils'
+import {SANITY_DATASET, SANITY_PROJECT_ID} from '@/lib/env'
+import {studioUrl} from '@/lib/sanity'
+import type {GlobalSettingsData} from '@/lib/global-settings'
+import {cleanText, renderText, toImageSrc} from '@/lib/sanity-utils'
 
 type HeaderProps = {
   settings?: GlobalSettingsData | null
