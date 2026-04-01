@@ -167,7 +167,7 @@ export default async function ContactPage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* HQ Card */}
-            <div className="bg-white border border-slate-200 rounded-xl p-10 hover:border-orange-500 transition-all duration-300 shadow-xl hover:shadow-2xl group">
+            <div className="bg-white border border-slate-200 rounded-xl p-10 hover:border-orange-500 transition-all duration-300 shadow-xl hover:shadow-2xl group flex flex-col items-center text-center">
               <div className="w-14 h-14 bg-slate-900 text-white rounded-2xl flex items-center justify-center mb-8 shadow-lg group-hover:bg-orange-500 transition-colors">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -183,7 +183,7 @@ export default async function ContactPage() {
             </div>
 
             {/* Production Bases */}
-            <div className="bg-white border border-slate-200 rounded-xl p-10 hover:border-orange-500 transition-all duration-300 shadow-xl hover:shadow-2xl group">
+            <div className="bg-white border border-slate-200 rounded-xl p-10 hover:border-orange-500 transition-all duration-300 shadow-xl hover:shadow-2xl group flex flex-col items-center text-center">
               <div className="w-14 h-14 bg-slate-900 text-white rounded-2xl flex items-center justify-center mb-8 shadow-lg group-hover:bg-orange-500 transition-colors">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -193,7 +193,7 @@ export default async function ContactPage() {
               <p className="text-slate-600 font-light leading-relaxed mb-4">
                 {pbDesc}
               </p>
-              <div className="flex flex-wrap gap-2 mt-auto">
+              <div className="flex flex-wrap justify-center gap-2 mt-auto">
                 {pbCities.map((city) => (
                   <span key={city} className="px-3 py-1 bg-slate-100 border border-slate-200 rounded-full text-xs font-semibold text-slate-700">
                     {city}
@@ -203,14 +203,14 @@ export default async function ContactPage() {
             </div>
 
             {/* Direct Contact */}
-            <div className="bg-white border border-slate-200 rounded-xl p-10 hover:border-orange-500 transition-all duration-300 shadow-xl hover:shadow-2xl group">
+            <div className="bg-white border border-slate-200 rounded-xl p-10 hover:border-orange-500 transition-all duration-300 shadow-xl hover:shadow-2xl group flex flex-col items-center text-center">
               <div className="w-14 h-14 bg-slate-900 text-white rounded-2xl flex items-center justify-center mb-8 shadow-lg group-hover:bg-orange-500 transition-colors">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
               </div>
               <h2 className="text-2xl font-display font-extrabold text-slate-900 mb-4 uppercase tracking-tight">{dcTitle}</h2>
-              <ul className="space-y-4 text-slate-600 font-light">
+              <ul className="space-y-4 text-slate-600 font-light text-left">
                 <li className="flex items-center gap-3">
                   <span className="font-semibold text-slate-900">Phone:</span>
                   <a href={`tel:${dcPhone}`} className="hover:text-orange-500 transition-colors">{dcPhone}</a>
