@@ -45,8 +45,6 @@ __pycache__/
 /scripts/
 *.py
 
-#qwen
+# Tool-generated directories
 .qwen/
-
-#playwright-mcp
-.playwright/
+.playwright-mcp/
