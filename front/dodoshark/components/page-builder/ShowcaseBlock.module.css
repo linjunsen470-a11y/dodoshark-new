@@ -34,7 +34,6 @@
 
 .slide {
   display: flex;
-  height: auto;
 }
 
 .cardLink {
@@ -114,7 +113,7 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding: 1.5rem 1.5rem 1.625rem;
+  padding: 1rem 1.25rem 1.375rem;
   background: var(--showcase-card-bg);
 }
 
@@ -122,24 +121,26 @@
   display: -webkit-box;
   overflow: hidden;
   color: var(--showcase-title);
-  font-size: 1.55rem;
+  font-size: 1rem;
   font-weight: 700;
-  line-height: 1.2;
-  min-height: calc(1.2em * 2);
+  line-height: 1.35;
+  min-height: calc(1.35em * 2);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
 .description {
   display: -webkit-box;
   overflow: hidden;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
   color: var(--showcase-description);
-  font-size: 0.98rem;
-  line-height: 1.75;
-  min-height: calc(1.75em * 3);
+  font-size: 0.8125rem;
+  line-height: 1.625;
+  min-height: calc(1.625em * 3);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
 }
 
 .inlineCta {
@@ -294,11 +295,11 @@
 
 @media (max-width: 1199px) {
   .title {
-    font-size: 1.35rem;
+    font-size: 0.9375rem;
   }
 
   .description {
-    font-size: 0.93rem;
+    font-size: 0.75rem;
   }
 }
 
@@ -349,13 +350,13 @@
   }
 
   .title {
-    font-size: 1.18rem;
+    font-size: 0.875rem;
   }
 
   .description {
-    margin-top: 0.75rem;
-    font-size: 0.9rem;
-    line-height: 1.65;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1.45;
   }
 
   .inlineCta {

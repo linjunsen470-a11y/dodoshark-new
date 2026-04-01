@@ -19,7 +19,7 @@ import {
 import SectionShell from './SectionShell'
 import SectionHeader from './SectionHeader'
 import SplitHeroArrow from './SplitHeroArrow'
-import { bodyTextClass, cardTitleClass, sectionSubtitleClass } from './sectionStyles'
+import { sectionSubtitleClass } from './sectionStyles'
 import styles from './ShowcaseBlock.module.css'
 import 'swiper/css'
 
@@ -55,10 +55,6 @@ export type ShowcaseBlockData = {
   layout?: 'cardCarousel' | 'splitCarousel'
   backgroundVariant?: SharedBackgroundVariant
   items?: ShowcaseItem[]
-  footerCta?: {
-    label?: string
-    href?: string
-  }
 }
 
 function ArrowRightIcon({ className }: { className?: string }) {
@@ -155,11 +151,9 @@ function ShowcaseCard({ item }: { item: ShowcaseItem }) {
 function SplitCarousel({
   items,
   theme,
-  footerCta,
 }: {
   items: ShowcaseItem[]
   theme: SharedBackgroundTheme
-  footerCta?: ShowcaseBlockData['footerCta']
 }) {
   const [swiper, setSwiper] = useState<SwiperInstance | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -167,8 +161,6 @@ function SplitCarousel({
   const dotsActiveClass = theme.dotActive
   const titleClass = theme.heading
   const bodyClass = theme.body
-  const footerHref = getSafeHref(footerCta?.href)
-  const footerLabel = cleanText(footerCta?.label) || ''
 
   if (items.length === 0) return null
 
@@ -236,11 +228,11 @@ function SplitCarousel({
                 )}
 
                 <div className="order-2 flex md:pt-8 flex-col justify-center md:order-2 lg:order-1">
-                  <h3 className={`${cardTitleClass} ${titleClass}`}>
+                  <h3 className={`${styles.title} ${titleClass}`}>
                     {title}
                   </h3>
                   {description ? (
-                    <p className={`mt-5 ${bodyTextClass} ${bodyClass}`}>
+                    <p className={`${styles.description} ${bodyClass}`}>
                       {description}
                     </p>
                   ) : null}
@@ -321,30 +313,6 @@ function SplitCarousel({
           })}
         </div>
       )}
-
-      {footerLabel && footerHref && (
-        <div className="mt-10 text-center">
-          {isExternalHref(footerHref) ? (
-            <a
-              href={footerHref}
-              target={footerHref.startsWith('http') ? '_blank' : undefined}
-              rel={footerHref.startsWith('http') ? 'noreferrer' : undefined}
-              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#fbbf24] px-8 py-3 font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-[#f59e0b] sm:w-auto"
-            >
-              {footerLabel}
-              <ArrowRightIcon className={styles.footerCtaIcon} />
-            </a>
-          ) : (
-            <Link
-              href={footerHref}
-              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#fbbf24] px-8 py-3 font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-[#f59e0b] sm:w-auto"
-            >
-              {footerLabel}
-              <ArrowRightIcon className={styles.footerCtaIcon} />
-            </Link>
-          )}
-        </div>
-      )}
     </div>
   )
 }
@@ -358,13 +326,6 @@ export default function ShowcaseBlock({ block }: { block: ShowcaseBlockData }) {
   const [canNext, setCanNext] = useState(items.length > 1)
   const variant = block.backgroundVariant ?? 'lightGray'
   const theme = getSharedBackgroundTheme(variant)
-  const footerHref = getSafeHref(block.footerCta?.href)
-  const cardCarouselVars: ShowcaseCssVars = {
-    ...theme.showcaseVars,
-    '--showcase-card-bg': '#ffffff',
-    '--showcase-media-bg': '#ffffff',
-    '--showcase-card-shadow': '0 10px 24px -18px rgb(15 23 42 / 0.12)',
-  }
 
   if (!block.title && !block.subtitle && items.length === 0) return null
 
@@ -389,7 +350,7 @@ export default function ShowcaseBlock({ block }: { block: ShowcaseBlockData }) {
 
       {items.length > 0 && (
         layout === 'splitCarousel' ? (
-          <SplitCarousel items={items} theme={theme} footerCta={block.footerCta} />
+          <SplitCarousel items={items} theme={theme} />
         ) : (
           <div 
             className={`${styles.shell} ${styles.cardCarouselShell}`} 
@@ -474,18 +435,6 @@ export default function ShowcaseBlock({ block }: { block: ShowcaseBlockData }) {
                   {Math.min(currentIndex + 1, items.length)} of {items.length}
                 </p>
               </div>
-
-              {cleanText(block.footerCta?.label) && footerHref ? (
-                <a
-                  href={footerHref}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#fbbf24] px-8 py-3 font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-[#f59e0b] sm:w-auto"
-                >
-                  {renderText(block.footerCta?.label)}
-                  <ArrowRightIcon className={styles.footerCtaIcon} />
-                </a>
-              ) : null}
             </div>
           </div>
         )
