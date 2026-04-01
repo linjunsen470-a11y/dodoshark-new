@@ -172,21 +172,7 @@ export default defineType({
         defineField({name: 'description', title: 'Description', type: 'text', rows: 3}),
       ],
     }),
-    defineField({
-      name: 'cta',
-      title: 'Bottom CTA',
-      type: 'object',
-      group: 'content',
-      fields: [
-        defineField({name: 'eyebrow', title: 'Eyebrow', type: 'string'}),
-        defineField({name: 'title', title: 'Title', type: 'string'}),
-        defineField({name: 'description', title: 'Description', type: 'text', rows: 4}),
-        defineField({name: 'buttonLabel', title: 'Button Label', type: 'string'}),
-        defineField({name: 'buttonHref', title: 'Button Link', type: 'string'}),
-        defineField({name: 'joinUsTitle', title: 'Join Us Title', type: 'string'}),
-        defineField({name: 'joinUsDescription', title: 'Join Us Description', type: 'text', rows: 3}),
-      ],
-    }),
+
     defineField({
       name: 'images',
       title: 'Page Images',
@@ -196,8 +182,6 @@ export default defineType({
         imageField('brandStoryThumbnail', 'Brand Story Video Thumbnail', 'Thumbnail image shown on the brand story video card.'),
         imageField('globalLayoutBackgroundImage', 'Global Layout Background Image', 'Background image used in the global layout section.'),
         imageField('teamImage', 'Team Image', 'Image shown in the elite engineering team card.'),
-        imageField('valuePropositionBackgroundImage', 'Value Proposition Background Image', 'Background image used in the value proposition section.'),
-        imageField('joinUsImage', 'Join Us Image', 'Portrait image shown in the Join Our Journey card.'),
       ],
     }),
   ],
@@ -205,12 +189,11 @@ export default defineType({
     select: {
       title: 'hero.titleLineOne',
       media: 'hero.image',
-      ctaTitle: 'cta.title',
     },
-    prepare({title, media, ctaTitle}) {
+    prepare({title, media}) {
       return {
         title: title || 'About Page',
-        subtitle: ctaTitle || 'About page singleton',
+        subtitle: 'About page singleton',
         media,
       }
     },

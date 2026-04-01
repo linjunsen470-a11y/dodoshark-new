@@ -10,7 +10,7 @@ import type { SanityImage, SeoMeta } from '@/lib/types/sanity'
 import HeroTitle from '@/components/ui/HeroTitle'
 import CMSImage from '@/components/ui/CMSImage'
 
-type RecruitAgentsPageData = {
+type RecruitDistributorPageData = {
   seo?: SeoMeta
   hero?: {
     title?: string
@@ -74,7 +74,7 @@ type SupportSection = {
   items: string[]
 }
 
-const RECRUIT_AGENTS_PAGE_QUERY = `coalesce(
+const RECRUIT_DISTRIBUTOR_PAGE_QUERY = `coalesce(
   *[_id == "recruitAgentsPage"][0],
   *[_type == "recruitAgentsPage"][0]
 ){
@@ -110,30 +110,30 @@ const RECRUIT_AGENTS_PAGE_QUERY = `coalesce(
   }
 }`
 
-async function getRecruitAgentsPageData(stega?: boolean) {
-  return fetchSanityData<RecruitAgentsPageData | null>({
-    query: RECRUIT_AGENTS_PAGE_QUERY,
+async function getRecruitDistributorPageData(stega?: boolean) {
+  return fetchSanityData<RecruitDistributorPageData | null>({
+    query: RECRUIT_DISTRIBUTOR_PAGE_QUERY,
     stega,
   })
 }
 
 
 export async function generateMetadata(): Promise<Metadata> {
-  const pageData = await getRecruitAgentsPageData(false)
+  const pageData = await getRecruitDistributorPageData(false)
   return buildPageMetadata({
     seo: pageData?.seo,
-    fallbackTitle: 'Recruit Agents | DoDoShark Machinery',
+    fallbackTitle: 'Recruit Distributor | DoDoShark Machinery',
     fallbackDescription:
       'Join the DoDoShark global network. We are looking for high-quality partners to share global industrial dividends and set new brand benchmarks.',
   })
 }
 
-export default async function RecruitAgentsPage() {
-  const pageData = await getRecruitAgentsPageData()
+export default async function RecruitDistributorPage() {
+  const pageData = await getRecruitDistributorPageData()
   const heroTitle =
     renderText(pageData?.hero?.title) || 'Partner with DoDoShark Explore Global Blue Oceans'
   const heroEyebrow =
-    renderText(pageData?.hero?.eyebrow) || 'Overseas Partner (Agent) Recruitment Plan'
+    renderText(pageData?.hero?.eyebrow) || 'Overseas Partner (Distributor) Recruitment Plan'
   const heroSubtitle =
     renderText(pageData?.hero?.subtitle) ||
     'In the wave of global manufacturing upgrades, premium mechanical equipment is the core competitiveness. DoDoShark invites you to seize regional market dividends and embark on a new journey of growth together.'
