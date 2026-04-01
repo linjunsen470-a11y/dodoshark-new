@@ -295,7 +295,7 @@ export default function Footer({settings}: FooterProps) {
 
             <div className="footer-social-grid">
               {socialLinks.map((item, index) => (
-                <Link key={item.label} className="footer-social-link" href={item.href || '/'} aria-label={item.label} data-sanity={getSanityDataAttr(`footer.socialLinks[${index}]`)} >
+                <Link key={item.label} className="footer-social-link" href={item.href || '/'} aria-label={item.label} data-sanity={getSanityDataAttr(`footer.socialLinks[${index}]`)} target="_blank" rel="noopener noreferrer">
                   <span className="footer-social-badge">
                     <SocialIcon icon={item.icon} />
                   </span>
