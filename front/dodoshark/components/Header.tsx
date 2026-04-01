@@ -26,7 +26,7 @@ const defaultNavItems: NavItem[] = [
   {label: 'Support', href: '/support'},
   {label: 'About', href: '/about'},
   {label: 'Contact', href: '/contact'},
-  {label: 'Recruit Agents', href: '/recruit-agents'},
+  {label: 'Recruit Distributor', href: '/recruit-distributor'},
 ]
 
 function PromiseIcon() {

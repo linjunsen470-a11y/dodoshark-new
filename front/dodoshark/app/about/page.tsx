@@ -16,8 +16,6 @@ type AboutPageImages = {
   productSystemFoodImage?: SanityImage
   globalLayoutBackgroundImage?: SanityImage
   teamImage?: SanityImage
-  valuePropositionBackgroundImage?: SanityImage
-  joinUsImage?: SanityImage
   timelineStateOwnedHeritageImage?: SanityImage
   timelineBrandFoundationImage?: SanityImage
   timelineMarketRootsImage?: SanityImage
@@ -79,15 +77,6 @@ type AboutPageData = {
   images?: AboutPageImages
   brandStoryTitle?: string
   brandStoryVideoUrl?: string
-  cta?: {
-    eyebrow?: string
-    title?: string
-    description?: string
-    buttonLabel?: string
-    buttonHref?: string
-    joinUsTitle?: string
-    joinUsDescription?: string
-  }
 }
 
 type ProductSystemImageKey =
@@ -205,27 +194,10 @@ const ABOUT_PAGE_QUERY = `coalesce(
     teamImage{
       alt,
       asset
-    },
-    valuePropositionBackgroundImage{
-      alt,
-      asset
-    },
-    joinUsImage{
-      alt,
-      asset
     }
   },
   brandStoryTitle,
-  brandStoryVideoUrl,
-  cta{
-    eyebrow,
-    title,
-    description,
-    buttonLabel,
-    buttonHref,
-    joinUsTitle,
-    joinUsDescription
-  }
+  brandStoryVideoUrl
 }`
 
 async function getAboutPageData(stega?: boolean) {
@@ -308,18 +280,6 @@ export default async function AboutPage() {
   const resolvedTimeline = (pageData?.timeline && pageData.timeline.length > 0) ? pageData.timeline : []
   const timelineClosingTitle = renderText(pageData?.timelineClosing?.title)
   const timelineClosingDescription = renderText(pageData?.timelineClosing?.description)
-
-  const cta = pageData?.cta
-  const ctaEyebrow = renderText(cta?.eyebrow) || 'Value Proposition'
-  const ctaTitle = renderText(cta?.title) || 'Partnerships Beyond Equipment'
-  const ctaDescription = renderText(cta?.description)
-  const ctaButtonLabel = renderText(cta?.buttonLabel) || 'Connect With Us Today'
-  const ctaButtonHref = cleanText(cta?.buttonHref) || '/contact'
-  const joinUsTitle = renderText(cta?.joinUsTitle) || 'Join Our Journey'
-  const joinUsDescription = renderText(cta?.joinUsDescription) || 'Become part of the global DoDoShark ecosystem.'
-
-  const valuePropositionBackgroundImage = pageData?.images?.valuePropositionBackgroundImage
-  const joinUsImage = pageData?.images?.joinUsImage
 
   const heroImageSrc = toImageSrc(heroImage, 1800) || '/assets/images/factory.jpg'
 
@@ -568,65 +528,6 @@ export default async function AboutPage() {
           <div className="mx-auto mt-24 max-w-3xl border-t border-slate-200 pt-16 text-center">
             <p className="mb-4 text-2xl font-black capitalize tracking-tighter text-slate-900">{timelineClosingTitle}</p>
             <p className="font-light text-slate-500">{timelineClosingDescription}</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Value Proposition / CTA */}
-      <section className="relative z-20 bg-white py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="relative overflow-hidden rounded-[1rem] border border-slate-800 bg-slate-900 p-12 text-white shadow-2xl lg:p-16">
-            <div className="absolute inset-0 opacity-30">
-              <Image
-                src={toImageSrc(valuePropositionBackgroundImage, 1800) || '/assets/images/about/value-proposition.jpg'}
-                alt={sanitizeAltText(valuePropositionBackgroundImage?.alt) || 'Value Proposition'}
-                fill
-                className="object-cover"
-              />
-            </div>
-            <div className="pointer-events-none absolute top-0 right-0 h-64 w-64 rounded-full bg-orange-500 opacity-20 blur-[100px]" />
-            <div className="pointer-events-none absolute bottom-0 left-0 h-64 w-64 rounded-full bg-slate-500 opacity-20 blur-[100px]" />
-
-            <div className="relative z-10 flex flex-col items-center gap-12 lg:flex-row">
-              <div className="text-center lg:w-7/12 lg:text-left">
-                <h2 className="mb-4 font-display font-semibold capitalize tracking-[0.2em] text-orange-500 text-xs text-center lg:text-left">
-                  {ctaEyebrow}
-                </h2>
-                <h3 className="mb-8 font-display text-4xl font-extrabold capitalize tracking-tight text-white md:text-5xl">
-                  {ctaTitle}
-                </h3>
-                <p className="mb-10 text-lg leading-relaxed font-light text-slate-300">
-                  {ctaDescription}
-                </p>
-                <div className="flex flex-wrap justify-center gap-4 lg:justify-start">
-                  <Link
-                    href={ctaButtonHref}
-                    className="inline-block rounded-full bg-orange-500 px-10 py-4 text-sm font-black capitalize tracking-widest text-white shadow-xl shadow-orange-500/20 transition-all hover:bg-orange-600"
-                  >
-                    {ctaButtonLabel}
-                  </Link>
-                </div>
-              </div>
-              <div className="lg:w-5/12">
-                <div className="group relative aspect-[4/5] overflow-hidden rounded-2xl border-8 border-white/10 shadow-2xl">
-                  <CMSImage
-                    image={joinUsImage}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                    fallbackAlt="Join Our Journey"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent" />
-                  <div className="absolute bottom-6 left-6 right-6">
-                    <p className="mb-2 text-sm font-black capitalize tracking-widest text-white">
-                      {joinUsTitle}
-                    </p>
-                    <p className="text-xs font-light text-slate-300">
-                      {joinUsDescription}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
