@@ -698,7 +698,7 @@ export default function CardGridBlock({block}: {block: CardGridBlockData}) {
             </style>
           </div>
 
-          <div className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-4 text-center sm:px-6 lg:px-8">
+          <div className="relative z-10 mx-auto flex h-full max-w-7xl items-center pb-20 px-4 text-center sm:px-6 lg:pb-24 lg:px-8">
             <div className="w-full">
               <SectionHeader
                 title={block.title}
