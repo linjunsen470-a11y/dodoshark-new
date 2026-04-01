@@ -78,10 +78,12 @@ export function FeatureListStandaloneCard({
   item,
   theme,
   sizes,
+  isMerged = false,
 }: {
   item: FeatureListItem
   theme: SharedBackgroundTheme
   sizes: string
+  isMerged?: boolean
 }) {
   const {image, isIconFallback} = resolveFeatureMedia(item)
   const imageSrc = resolveImageSrc(
@@ -99,8 +101,9 @@ export function FeatureListStandaloneCard({
     : 'h-full w-full object-cover'
   const placeholderClass = theme.subtitle
   const frameClass = theme.surfaceElevated
-  const contentClass = 'bg-white/95 text-slate-900'
+  const contentClass = `bg-white/95 text-slate-900 ${isMerged ? 'text-center' : ''}`
   const descriptionClass = 'text-slate-700'
+  const itemTitleFontSize = isMerged ? 'text-[13px] md:text-[15px] font-bold' : ''
 
   return (
     <article className={`flex min-h-0 h-full flex-col overflow-hidden rounded-2xl ${frameClass}`}>
@@ -122,9 +125,9 @@ export function FeatureListStandaloneCard({
         )}
       </div>
 
-      <div className={`flex flex-1 flex-col justify-start px-6 py-6 md:px-7 md:py-7 ${contentClass}`}>
+      <div className={`flex flex-col justify-start ${isMerged ? 'flex-none px-4 py-2 md:px-5 md:py-3' : 'flex-1 px-6 py-6 md:px-7 md:py-7'} ${contentClass}`}>
         {item.title && (
-          <h3 className={`mb-3 whitespace-pre-line ${cardTitleClass}`}>
+          <h3 className={`${isMerged ? 'mb-1' : 'mb-3'} whitespace-pre-line ${cardTitleClass} ${itemTitleFontSize}`}>
             {item.title}
           </h3>
         )}

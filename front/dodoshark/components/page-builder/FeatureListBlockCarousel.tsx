@@ -19,6 +19,7 @@ import 'swiper/css'
 type FeatureListBlockCarouselProps = {
   items: FeatureListItem[]
   theme: SharedBackgroundTheme
+  isMerged?: boolean
   showMobileArrows?: boolean
 }
 
@@ -30,6 +31,7 @@ const carouselBreakpoints = {
 export default function FeatureListBlockCarousel({
   items,
   theme,
+  isMerged = false,
   showMobileArrows = false,
 }: FeatureListBlockCarouselProps) {
   const [swiper, setSwiper] = useState<SwiperInstance | null>(null)
@@ -101,6 +103,7 @@ export default function FeatureListBlockCarousel({
                   item={item}
                   theme={theme}
                   sizes={cardSizes}
+                  isMerged={isMerged}
                 />
               </SwiperSlide>
             ))}
