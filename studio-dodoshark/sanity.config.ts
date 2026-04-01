@@ -1,12 +1,13 @@
-import {defineConfig} from 'sanity'
-import {presentationTool} from 'sanity/presentation'
-import {structureTool} from 'sanity/structure'
-import {visionTool} from '@sanity/vision'
-import {codeInput} from '@sanity/code-input'
-import {table} from '@sanity/table'
-import {schemaTypes, singletonTypes} from './schemaTypes'
-import {structure} from './structure'
-import {presentationResolve} from './presentation/resolve'
+import { defineConfig } from 'sanity'
+import { presentationTool } from 'sanity/presentation'
+import { structureTool } from 'sanity/structure'
+import { visionTool } from '@sanity/vision'
+import { codeInput } from '@sanity/code-input'
+import { table } from '@sanity/table'
+import { schemaTypes, singletonTypes } from './schemaTypes'
+import { structure } from './structure'
+import { presentationResolve } from './presentation/resolve'
+import { media } from 'sanity-plugin-media'
 
 function normalizeOrigin(value?: string) {
   return value?.trim().replace(/\/+$/, '')
@@ -38,16 +39,17 @@ export default defineConfig({
         },
       },
     }),
-    structureTool({structure}),
+    structureTool({ structure }),
     visionTool(),
     table(),
     codeInput(),
+    media(),
   ],
 
   document: {
     actions: (prev, context) =>
       singletonTypes.has(context.schemaType)
-        ? prev.filter(({action}) => action !== 'duplicate')
+        ? prev.filter(({ action }) => action !== 'duplicate')
         : prev,
   },
 
