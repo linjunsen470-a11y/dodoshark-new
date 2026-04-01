@@ -40,7 +40,7 @@ export default function PowderMixingSolutionPage() {
               <a href="#products" className="rounded-md border-2 border-orange-500 bg-orange-500 px-8 py-3.5 text-sm font-black tracking-widest text-white shadow-lg shadow-orange-500/25 transition-all hover:bg-orange-600 hover:border-orange-600">
                 View Equipment
               </a>
-              <a href="#contact" className="rounded-md border-2 border-slate-600 bg-transparent px-8 py-3.5 text-sm font-black tracking-widest text-white transition-all hover:border-slate-400 hover:bg-slate-800">
+              <a href="/contact" className="rounded-md border-2 border-slate-600 bg-transparent px-8 py-3.5 text-sm font-black tracking-widest text-white transition-all hover:border-slate-400 hover:bg-slate-800">
                 Contact Us
               </a>
             </div>
@@ -285,7 +285,7 @@ export default function PowderMixingSolutionPage() {
                   <strong>Principle:</strong> The double-cone drum rotates, creating a complex three-dimensional motion that ensures thorough mixing with minimal material damage.<br/><br/>
                   <strong>Application:</strong> Ideal for laboratory testing, small-batch production, and R&D samples.
                 </p>
-                <Link href="/products/lab-drum-mixer" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
+                <Link href="/products" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
                   View Product Details <i className="fas fa-arrow-right" />
                 </Link>
               </div>
@@ -311,7 +311,7 @@ export default function PowderMixingSolutionPage() {
                   <strong>Principle:</strong> Large-capacity double-cone design with optimized rotation speed ensures uniform mixing for bulk production while maintaining gentle handling.<br/><br/>
                   <strong>Application:</strong> Widely used in food, pharmaceutical, and chemical bulk production.
                 </p>
-                <Link href="/products/large-drum-mixer" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
+                <Link href="/products" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
                   View Product Details <i className="fas fa-arrow-right" />
                 </Link>
               </div>
@@ -337,7 +337,7 @@ export default function PowderMixingSolutionPage() {
                   <strong>Principle:</strong> Rotating drum with internal agitator blades provides high-shear mixing action, ideal for materials requiring intensive blending.<br/><br/>
                   <strong>Application:</strong> Perfect for solid-liquid mixing and materials requiring high dispersion.
                 </p>
-                <Link href="/products/drum-agitator" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
+                <Link href="/products" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
                   View Product Details <i className="fas fa-arrow-right" />
                 </Link>
               </div>
@@ -363,7 +363,7 @@ export default function PowderMixingSolutionPage() {
                   <strong>Principle:</strong> Double helical ribbons create axial and radial material movement, achieving rapid and uniform mixing.<br/><br/>
                   <strong>Application:</strong> Suitable for powder-powder and powder-granule mixing.
                 </p>
-                <Link href="/products/ribbon-mixer" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
+                <Link href="/products" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
                   View Product Details <i className="fas fa-arrow-right" />
                 </Link>
               </div>
