@@ -144,6 +144,7 @@ export function FeatureListBlockContent({
     showHeader &&
     block.mergeWithPreviousRichSection !== true &&
     Boolean(renderText(block.title))
+  const isMerged = block.mergeWithPreviousRichSection === true
   const isMergedCards = renderMode === 'mergedCards'
   const useCarousel = renderMode === 'default' || renderMode === 'mergedCarousel'
 
@@ -151,8 +152,9 @@ export function FeatureListBlockContent({
 
   const titleClass = theme.heading
   const itemTitleClass = 'text-gray-900'
+  const itemTitleFontSize = isMerged ? 'text-[13px] md:text-[15px] font-bold' : ''
   const itemDescriptionClass = theme.body
-  const mergedCardClass = `h-full rounded-xl px-4 py-6 text-center sm:px-6 ${theme.surfaceElevated}`
+  const mergedCardClass = `h-full rounded-xl text-center ${isMerged ? 'px-4 py-2 md:py-3 sm:px-5' : 'px-4 py-6 sm:px-6'} ${theme.surfaceElevated}`
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -184,7 +186,7 @@ export function FeatureListBlockContent({
                 <article className={`${mergedCardClass} flex min-h-0 flex-1 flex-col`}>
                   <FeatureMedia item={item} theme={theme} />
                   <h3
-                    className={`mx-auto mb-3 max-w-[14ch] whitespace-pre-line ${cardTitleClass} ${itemTitleClass}`}
+                    className={`mx-auto mb-3 max-w-[14ch] whitespace-pre-line ${cardTitleClass} ${itemTitleFontSize} ${itemTitleClass}`}
                   >
                     {item.title}
                   </h3>
@@ -204,6 +206,7 @@ export function FeatureListBlockContent({
         <FeatureListBlockCarousel
           items={items}
           theme={theme}
+          isMerged={isMerged}
           showMobileArrows={renderMode === 'mergedCarousel'}
         />
       ) : null
