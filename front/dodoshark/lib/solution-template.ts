@@ -29,8 +29,9 @@ export type SolutionHtmlTemplateData = {
 }
 
 export type PreparedSolutionTemplate = {
-  html: string
+  html: string | null
   issues: string[]
+  error?: string
 }
 
 const forbiddenHtmlPatterns = [
@@ -46,57 +47,6 @@ const forbiddenHtmlPatterns = [
 
 const forbiddenCssPatterns = [/@import/i, /expression\s*\(/i]
 const compilerCache = new Map<string, Promise<string>>()
-
-const baseTemplateCss = `
-@import "tailwindcss" source(none);
-
-@theme {
-  --font-sans: Inter, "Segoe UI", Arial, sans-serif;
-  --font-display: Outfit, Inter, "Segoe UI", Arial, sans-serif;
-  --color-brand-300: #fdba74;
-  --color-brand-400: #fb923c;
-  --color-brand-500: #f97316;
-  --color-ink-950: #0f172a;
-  --color-ink-900: #1e293b;
-  --color-ink-700: #334155;
-  --color-ink-500: #64748b;
-  --radius-panel: 0.75rem;
-  --radius-card: 1rem;
-  --shadow-brand-card: 0 20px 40px -12px rgba(15, 23, 42, 0.12);
-}
-
-@layer base {
-  :root {
-    color-scheme: light;
-  }
-
-  html {
-    scroll-behavior: smooth;
-  }
-
-  body {
-    margin: 0;
-    min-height: 100vh;
-    background: #ffffff;
-    color: #334155;
-    font-family: var(--font-sans);
-  }
-
-  *, *::before, *::after {
-    box-sizing: border-box;
-  }
-
-  img, svg, video, canvas {
-    display: block;
-    max-width: 100%;
-    height: auto;
-  }
-
-  a {
-    color: inherit;
-  }
-}
-`
 
 function containsForbiddenPattern(source: string, patterns: RegExp[]) {
   return patterns.some((pattern) => pattern.test(source))
@@ -169,6 +119,11 @@ async function loadTailwindStylesheet(id: string, base: string) {
   }
 }
 
+async function loadBaseTemplateCss() {
+  const filePath = path.join(process.cwd(), 'lib', 'solution-template-base.css')
+  return readFile(filePath, 'utf8')
+}
+
 async function compileTemplateCss(html: string, customCss: string) {
   const candidates = extractTailwindCandidates(html)
   const cacheKey = `${html}\n/*__CSS__*/\n${customCss}`
@@ -176,9 +131,11 @@ async function compileTemplateCss(html: string, customCss: string) {
   let pending = compilerCache.get(cacheKey)
 
   if (!pending) {
-    pending = compile(`${baseTemplateCss}\n${customCss}`, {
-      loadStylesheet: loadTailwindStylesheet,
-    }).then((compiler) => compiler.build(candidates))
+    pending = loadBaseTemplateCss().then((baseTemplateCss) =>
+      compile(`${baseTemplateCss}\n${customCss}`, {
+        loadStylesheet: loadTailwindStylesheet,
+      }).then((compiler) => compiler.build(candidates)),
+    )
 
     compilerCache.set(cacheKey, pending)
   }
@@ -188,11 +145,17 @@ async function compileTemplateCss(html: string, customCss: string) {
 
 export async function prepareSolutionTemplate(
   template: SolutionHtmlTemplateData | null | undefined,
-): Promise<PreparedSolutionTemplate | null> {
+): Promise<PreparedSolutionTemplate> {
   const html = getTemplateSource(template?.html)
   const customCss = getTemplateSource(template?.customCss)
 
-  if (!html) return null
+  if (!html) {
+    return {
+      html: null,
+      issues: ['Template HTML is empty.'],
+      error: 'empty_html',
+    }
+  }
 
   const issues: string[] = []
 
@@ -217,7 +180,11 @@ export async function prepareSolutionTemplate(
   const processedCss = replaceTemplateAssets(customCss, assetMap, issues)
 
   if (issues.length > 0) {
-    return null
+    return {
+      html: null,
+      issues,
+      error: 'invalid_assets_or_content',
+    }
   }
 
   try {
@@ -241,7 +208,14 @@ export async function prepareSolutionTemplate(
       ].join(''),
       issues,
     }
-  } catch {
-    return null
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : 'Unknown template compilation error.'
+
+    return {
+      html: null,
+      issues: [...issues, message],
+      error: 'compile_failed',
+    }
   }
 }

@@ -38,7 +38,6 @@ export default function RelatedVlogsSection({ vlogs }: RelatedVlogsSectionProps)
     <SectionShell sectionClassName="bg-white border-t border-slate-100">
       <SectionHeader
         title="Related Videos"
-        subtitle="Watch our equipment in action and learn more about our processing solutions."
         tone="light"
         className="mb-12"
       />

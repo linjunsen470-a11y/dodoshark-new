@@ -48,6 +48,7 @@ export default defineType({
         {type: 'collectionReferenceBlock'},
         {type: 'machineSelectorBlock'},
         {type: 'showcaseBlock'},
+        {type: 'referenceSpecBlock'},
       ],
     }),
   ],
