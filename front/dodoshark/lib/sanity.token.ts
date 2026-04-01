@@ -1,4 +1,4 @@
-import { SANITY_API_READ_TOKEN } from '@/app/lib/env'
+import { SANITY_API_READ_TOKEN } from '@/lib/env'
 
 export const sanityReadToken = SANITY_API_READ_TOKEN
 

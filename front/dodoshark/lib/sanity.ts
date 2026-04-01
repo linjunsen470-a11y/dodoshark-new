@@ -8,7 +8,7 @@ import {
   SANITY_API_VERSION,
   SANITY_STUDIO_URL,
   SANITY_API_READ_TOKEN,
-} from '@/app/lib/env'
+} from '@/lib/env'
 
 export const studioUrl = SANITY_STUDIO_URL
 

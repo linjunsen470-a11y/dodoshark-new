@@ -269,7 +269,7 @@ export const VIDEO_DEMO_STEPS = [
   },
 ]
 
-// 图标组件 - 两个产品线
+// Icon Components - Two Product Lines
 function CogsIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -279,7 +279,7 @@ function CogsIcon() {
   )
 }
 
-// 图标组件 - 三个生产基地
+// Icon Components - Three Production Bases
 function IndustryIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -288,7 +288,7 @@ function IndustryIcon() {
   )
 }
 
-// 图标组件 - 传承历史
+// Icon Components - Heritage History
 function GemIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

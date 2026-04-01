@@ -1,7 +1,7 @@
 'use client'
 
-import { renderSentenceCase } from '@/app/lib/sanity-utils'
-import { normalizeYouTubeEmbedUrl } from '@/app/lib/video'
+import { renderSentenceCase } from '@/lib/sanity-utils'
+import { normalizeYouTubeEmbedUrl } from '@/lib/video'
 import VideoPreviewTrigger from '@/components/ui/VideoPreviewTrigger'
 import Icon from '@/components/ui/Icon'
 

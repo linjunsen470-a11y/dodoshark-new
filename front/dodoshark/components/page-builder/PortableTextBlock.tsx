@@ -6,9 +6,9 @@ import {
   type PortableTextComponents,
 } from 'next-sanity'
 
-import { getSafeHref, isExternalHref } from '@/app/lib/safeHref'
-import { urlFor } from '@/app/lib/sanity'
-import type { SanityImage } from '@/app/lib/types/sanity'
+import { getSafeHref, isExternalHref } from '@/lib/safeHref'
+import { urlFor } from '@/lib/sanity'
+import type { SanityImage } from '@/lib/types/sanity'
 import Icon from '@/components/ui/Icon'
 import {
   getSharedBackgroundTheme,

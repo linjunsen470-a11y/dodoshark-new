@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 
-import { fetchSanityData } from '@/app/lib/sanity.live'
-import { cleanSlug, cleanText, firstParam, renderText, toImageSrc, type QueryParamValue } from '@/app/lib/sanity-utils'
-import type { SeoMeta, SanityImage } from '@/app/lib/types/sanity'
+import { fetchSanityData } from '@/lib/sanity.live'
+import { cleanSlug, cleanText, firstParam, renderText, toImageSrc, type QueryParamValue } from '@/lib/sanity-utils'
+import type { SeoMeta, SanityImage } from '@/lib/types/sanity'
 import Icon from '@/components/ui/Icon'
 import LandingCardPager, { type LandingCardItem } from '@/components/ui/LandingCardPager'
 import HeroTitle from '@/components/ui/HeroTitle'

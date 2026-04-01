@@ -1,5 +1,5 @@
 import React from 'react'
-import { hasStegaMetadata, renderText } from '@/app/lib/sanity-utils'
+import { hasStegaMetadata, renderText } from '@/lib/sanity-utils'
 
 interface HeroTitleProps {
   title?: string

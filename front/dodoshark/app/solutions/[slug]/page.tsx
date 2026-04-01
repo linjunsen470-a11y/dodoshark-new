@@ -6,13 +6,13 @@ import {createDataAttribute} from 'next-sanity'
 import type {ReactNode} from 'react'
 
 import dynamic from 'next/dynamic'
-import { fetchSanityData } from '@/app/lib/sanity.live'
-import {cleanSlug, cleanText, hasStegaMetadata, renderText, toImageSrc} from '@/app/lib/sanity-utils'
+import { fetchSanityData } from '@/lib/sanity.live'
+import {cleanSlug, cleanText, hasStegaMetadata, renderText, toImageSrc} from '@/lib/sanity-utils'
 import {
   prepareSolutionTemplate,
   type SolutionHtmlTemplateData,
-} from '@/app/lib/solution-template'
-import type {SanityImage, SeoMeta} from '@/app/lib/types/sanity'
+} from '@/lib/solution-template'
+import type {SanityImage, SeoMeta} from '@/lib/types/sanity'
 
 const CardGridBlock = dynamic(() => import('@/components/page-builder/CardGridBlock'))
 const CollectionReferenceBlock = dynamic(() => import('@/components/page-builder/CollectionReferenceBlock'))

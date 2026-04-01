@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
-import { getSafeHref, isExternalHref } from '@/app/lib/safeHref'
-import { renderText } from '@/app/lib/sanity-utils'
+import { getSafeHref, isExternalHref } from '@/lib/safeHref'
+import { renderText } from '@/lib/sanity-utils'
 import LeadInquiryForm from '@/components/forms/LeadInquiryForm'
 
 import SectionShell from './SectionShell'

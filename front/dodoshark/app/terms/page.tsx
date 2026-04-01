@@ -3,10 +3,10 @@ import Link from 'next/link'
 
 import {PortableText, type PortableTextBlock} from 'next-sanity'
 
-import {fetchSanityData} from '@/app/lib/sanity.live'
-import {buildPageMetadata} from '@/app/lib/seo'
-import {cleanText, renderText} from '@/app/lib/sanity-utils'
-import type {SeoMeta} from '@/app/lib/types/sanity'
+import {fetchSanityData} from '@/lib/sanity.live'
+import {buildPageMetadata} from '@/lib/seo'
+import {cleanText, renderText} from '@/lib/sanity-utils'
+import type {SeoMeta} from '@/lib/types/sanity'
 
 type TermsPageData = {
   seo?: SeoMeta

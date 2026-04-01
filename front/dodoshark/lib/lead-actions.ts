@@ -3,7 +3,7 @@
 import { headers } from 'next/headers'
 import { Resend } from 'resend'
 
-import type { InquiryType } from '@/app/lib/mvp-data'
+import type { InquiryType } from '@/lib/mvp-data'
 
 export type LeadInquiry = {
   inquiryType: InquiryType

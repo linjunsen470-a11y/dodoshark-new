@@ -3,12 +3,12 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import dynamic from 'next/dynamic'
-import { fetchSanityData } from '@/app/lib/sanity.live'
-import { urlFor } from '@/app/lib/sanity'
-import { buildPageMetadata } from '@/app/lib/seo'
-import { normalizeYouTubeEmbedUrl, resolveYouTubeThumbnailUrl } from '@/app/lib/video'
-import type { SeoMeta, SanityImage } from '@/app/lib/types/sanity'
-import { cleanSlug, cleanText, renderText } from '@/app/lib/sanity-utils'
+import { fetchSanityData } from '@/lib/sanity.live'
+import { urlFor } from '@/lib/sanity'
+import { buildPageMetadata } from '@/lib/seo'
+import { normalizeYouTubeEmbedUrl, resolveYouTubeThumbnailUrl } from '@/lib/video'
+import type { SeoMeta, SanityImage } from '@/lib/types/sanity'
+import { cleanSlug, cleanText, renderText } from '@/lib/sanity-utils'
 
 const DeferredHeroCarousel = dynamic(() => import('@/components/home/DeferredHeroCarousel'))
 const DeferredHomeBlogCarousel = dynamic(() => import('@/components/home/DeferredHomeBlogCarousel'))
@@ -24,7 +24,7 @@ import {
   ABOUT_FEATURES,
   CHOOSE_CONFIDENCE_CARDS,
   MVP_CATEGORIES,
-} from '@/app/lib/mvp-data'
+} from '@/lib/mvp-data'
 
 type HomeSanityImage = SanityImage & {
   imageUrl?: string

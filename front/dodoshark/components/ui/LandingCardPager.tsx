@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useEffectEvent, useState } from 'react'
 
-import { renderSentenceCase } from '@/app/lib/sanity-utils'
+import { renderSentenceCase } from '@/lib/sanity-utils'
 import Icon from '@/components/ui/Icon'
 
 export type LandingCardItem = {

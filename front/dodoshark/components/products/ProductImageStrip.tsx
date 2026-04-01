@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import Image from 'next/image'
 
-import type { ProductImageAsset } from '@/app/lib/mvp-data'
+import type { ProductImageAsset } from '@/lib/mvp-data'
 
 type ProductImageStripProps = {
   images: ProductImageAsset[]

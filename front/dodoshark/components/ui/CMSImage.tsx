@@ -1,8 +1,8 @@
 import Image from 'next/image'
 import type { ComponentProps } from 'react'
 
-import { renderText, toImageSrc } from '@/app/lib/sanity-utils'
-import type { SanityImage } from '@/app/lib/types/sanity'
+import { renderText, toImageSrc } from '@/lib/sanity-utils'
+import type { SanityImage } from '@/lib/types/sanity'
 
 type CMSImageProps = Omit<ComponentProps<typeof Image>, 'src' | 'alt'> & {
   image?: SanityImage

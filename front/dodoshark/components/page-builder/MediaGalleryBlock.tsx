@@ -7,9 +7,9 @@ import { A11y, Keyboard } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import type { Swiper as SwiperInstance } from 'swiper'
 
-import { getSafeHref, isExternalHref } from '@/app/lib/safeHref'
-import { urlFor } from '@/app/lib/sanity'
-import { cleanText, renderText } from '@/app/lib/sanity-utils'
+import { getSafeHref, isExternalHref } from '@/lib/safeHref'
+import { urlFor } from '@/lib/sanity'
+import { cleanText, renderText } from '@/lib/sanity-utils'
 import Icon from '@/components/ui/Icon'
 import {
   getSharedSurfaceClasses,

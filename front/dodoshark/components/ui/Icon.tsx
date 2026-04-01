@@ -390,4 +390,4 @@ export default function Icon({ icon, className, title }: IconProps) {
     </svg>
   )
 }
-import { cleanText } from '@/app/lib/sanity-utils'
+import { cleanText } from '@/lib/sanity-utils'

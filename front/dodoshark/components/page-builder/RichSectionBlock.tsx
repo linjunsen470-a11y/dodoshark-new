@@ -5,8 +5,8 @@ import {
   type PortableTextComponents,
 } from 'next-sanity'
 
-import { getSafeHref, isExternalHref } from '@/app/lib/safeHref'
-import { cleanText, renderText } from '@/app/lib/sanity-utils'
+import { getSafeHref, isExternalHref } from '@/lib/safeHref'
+import { cleanText, renderText } from '@/lib/sanity-utils'
 import {
   getSharedBackgroundTheme,
   type SharedBackgroundTheme,

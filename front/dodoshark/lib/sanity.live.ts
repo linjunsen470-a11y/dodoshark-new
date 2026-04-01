@@ -1,8 +1,8 @@
 import {defineLive} from 'next-sanity/live'
 import type {ClientPerspective, QueryParams} from 'next-sanity'
 
-import {client} from '@/app/lib/sanity'
-import {sanityReadToken} from '@/app/lib/sanity.token'
+import {client} from '@/lib/sanity'
+import {sanityReadToken} from '@/lib/sanity.token'
 
 export const {sanityFetch, SanityLive} = defineLive({
   client,

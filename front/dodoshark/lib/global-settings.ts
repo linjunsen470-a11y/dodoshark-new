@@ -1,5 +1,5 @@
-import {sanityFetch} from '@/app/lib/sanity.live'
-import type {SanityImage} from '@/app/lib/types/sanity'
+import {sanityFetch} from '@/lib/sanity.live'
+import type {SanityImage} from '@/lib/types/sanity'
 
 export type GlobalNavItem = {
   label?: string

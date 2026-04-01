@@ -1,4 +1,4 @@
-import { cleanText } from '@/app/lib/sanity-utils'
+import { cleanText } from '@/lib/sanity-utils'
 import { FeatureListBlockContent, type FeatureListBlockData } from './FeatureListBlock'
 import { getSharedBackgroundTheme } from './backgroundTheme'
 import {

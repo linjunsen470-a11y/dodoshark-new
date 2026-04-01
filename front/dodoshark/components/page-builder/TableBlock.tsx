@@ -150,11 +150,7 @@ function normalizeCellLines(value: string) {
 function getListItemValue(line: string) {
   const trimmed = line.trim()
 
-  if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
-    return trimmed.slice(2).trim()
-  }
-
-  if (trimmed.startsWith('• ')) {
+  if (trimmed.startsWith('- ') || trimmed.startsWith('* ') || trimmed.startsWith('•')) {
     return trimmed.slice(2).trim()
   }
 

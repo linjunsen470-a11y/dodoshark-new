@@ -1,7 +1,7 @@
 import Image from 'next/image'
 
-import { urlFor } from '@/app/lib/sanity'
-import { cleanText, renderText } from '@/app/lib/sanity-utils'
+import { urlFor } from '@/lib/sanity'
+import { cleanText, renderText } from '@/lib/sanity-utils'
 
 import {
   getSharedSurfaceClasses,

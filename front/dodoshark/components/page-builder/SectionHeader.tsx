@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { renderText } from '@/app/lib/sanity-utils'
+import { renderText } from '@/lib/sanity-utils'
 
 import {
   eyebrowClass,

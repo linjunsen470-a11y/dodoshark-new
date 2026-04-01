@@ -1,4 +1,4 @@
-import { renderText } from '@/app/lib/sanity-utils'
+import { renderText } from '@/lib/sanity-utils'
 
 export default function AccentTitle({
   title,

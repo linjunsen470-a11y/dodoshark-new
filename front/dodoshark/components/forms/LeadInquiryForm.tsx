@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 
-import { submitLeadInquiry, type LeadActionResult } from '@/app/lib/lead-actions'
-import type { InquiryType } from '@/app/lib/mvp-data'
+import { submitLeadInquiry, type LeadActionResult } from '@/lib/lead-actions'
+import type { InquiryType } from '@/lib/mvp-data'
 
 type LeadInquiryFormProps = {
   inquiryType: InquiryType
