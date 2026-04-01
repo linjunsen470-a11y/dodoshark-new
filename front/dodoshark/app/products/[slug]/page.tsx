@@ -19,6 +19,7 @@ const MergedRichFeatureSection = dynamic(() => import('@/components/page-builder
 const MachineSelectorBlock = dynamic(() => import('@/components/page-builder/MachineSelectorBlock'))
 const MetricsBlock = dynamic(() => import('@/components/page-builder/MetricsBlock'))
 const PortableTextBlock = dynamic(() => import('@/components/page-builder/PortableTextBlock'))
+const ReferenceSpecBlock = dynamic(() => import('@/components/page-builder/ReferenceSpecBlock'))
 const RichSectionBlock = dynamic(() => import('@/components/page-builder/RichSectionBlock'))
 const ShowcaseBlock = dynamic(() => import('@/components/page-builder/ShowcaseBlock'))
 const TableBlock = dynamic(() => import('@/components/page-builder/TableBlock'))
@@ -32,6 +33,7 @@ import type { MediaGalleryBlockData } from '@/components/page-builder/MediaGalle
 import type { MachineSelectorBlockData } from '@/components/page-builder/MachineSelectorBlock'
 import type { MetricsBlockData } from '@/components/page-builder/MetricsBlock'
 import type { PortableTextBlockData } from '@/components/page-builder/PortableTextBlock'
+import type { ReferenceSpecBlockData } from '@/components/page-builder/ReferenceSpecBlock'
 import type { RichSectionBlockData } from '@/components/page-builder/RichSectionBlock'
 import type { ShowcaseBlockData } from '@/components/page-builder/ShowcaseBlock'
 import type { TableBlockData } from '@/components/page-builder/TableBlock'
@@ -89,6 +91,7 @@ type ProductBlock =
   | PortableTextBlockData
   | CollectionReferenceBlockData
   | ShowcaseBlockData
+  | ReferenceSpecBlockData
   | FeatureGridBlockData
   | VideoGalleryBlockData
   | { _type?: string; _key?: string }
@@ -132,6 +135,10 @@ const productQuery = `*[_type == "product" && slug.current == $slug][0] {
       asset
     },
     media {
+      ...,
+      asset
+    },
+    referenceImage {
       ...,
       asset
     },
@@ -448,6 +455,13 @@ function renderPageBuilderGroup(group: PageBuilderRenderGroup<ProductBlock>, doc
       return wrapBlockForPresentation(documentId, block._key, key, <CtaBlock key={key} block={block as CtaBlockData} />)
     case 'portableTextBlock':
       return wrapBlockForPresentation(documentId, block._key, key, <PortableTextBlock key={key} block={block as PortableTextBlockData} />)
+    case 'referenceSpecBlock':
+      return wrapBlockForPresentation(
+        documentId,
+        block._key,
+        key,
+        <ReferenceSpecBlock key={key} block={block as ReferenceSpecBlockData} />
+      )
     case 'collectionReferenceBlock':
       return wrapBlockForPresentation(
         documentId,

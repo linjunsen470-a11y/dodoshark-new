@@ -24,6 +24,7 @@ const MergedRichFeatureSection = dynamic(() => import('@/components/page-builder
 const MachineSelectorBlock = dynamic(() => import('@/components/page-builder/MachineSelectorBlock'))
 const MetricsBlock = dynamic(() => import('@/components/page-builder/MetricsBlock'))
 const PortableTextBlock = dynamic(() => import('@/components/page-builder/PortableTextBlock'))
+const ReferenceSpecBlock = dynamic(() => import('@/components/page-builder/ReferenceSpecBlock'))
 const RichSectionBlock = dynamic(() => import('@/components/page-builder/RichSectionBlock'))
 const ShowcaseBlock = dynamic(() => import('@/components/page-builder/ShowcaseBlock'))
 const TableBlock = dynamic(() => import('@/components/page-builder/TableBlock'))
@@ -37,6 +38,7 @@ import type { MediaGalleryBlockData } from '@/components/page-builder/MediaGalle
 import type { MachineSelectorBlockData } from '@/components/page-builder/MachineSelectorBlock'
 import type { MetricsBlockData } from '@/components/page-builder/MetricsBlock'
 import type { PortableTextBlockData } from '@/components/page-builder/PortableTextBlock'
+import type { ReferenceSpecBlockData } from '@/components/page-builder/ReferenceSpecBlock'
 import type { RichSectionBlockData } from '@/components/page-builder/RichSectionBlock'
 import type { ShowcaseBlockData } from '@/components/page-builder/ShowcaseBlock'
 import type { TableBlockData } from '@/components/page-builder/TableBlock'
@@ -104,6 +106,7 @@ type SolutionBlock =
   | PortableTextBlockData
   | CollectionReferenceBlockData
   | ShowcaseBlockData
+  | ReferenceSpecBlockData
   | FeatureGridBlock
   | VideoGalleryBlock
 
@@ -210,6 +213,10 @@ async function getSolution(slug: string, stega?: boolean) {
         }
       },
       media {
+        ...,
+        asset
+      },
+      referenceImage {
         ...,
         asset
       },
@@ -444,6 +451,10 @@ function renderSolutionGroup(group: PageBuilderRenderGroup<SolutionBlock>, docum
 
   if (block._type === 'portableTextBlock') {
     return wrapSolutionBlockForPresentation(documentId, block._key, <PortableTextBlock key={key} block={block} />)
+  }
+
+  if (block._type === 'referenceSpecBlock') {
+    return wrapSolutionBlockForPresentation(documentId, block._key, <ReferenceSpecBlock key={key} block={block} />)
   }
 
   if (block._type === 'collectionReferenceBlock') {
@@ -714,8 +725,40 @@ export default async function SolutionPage({params}: SolutionPageProps) {
     )
   }
 
+  if (
+    process.env.NODE_ENV !== 'production' &&
+    solution.detailRenderMode === 'htmlTemplate' &&
+    preparedTemplate &&
+    !preparedTemplate.html
+  ) {
+    console.error('[solution-template] Failed to prepare htmlTemplate', {
+      slug,
+      issues: preparedTemplate.issues,
+      error: preparedTemplate.error,
+    })
+  }
+
   return (
     <div className="bg-white text-slate-900">
+      {process.env.NODE_ENV !== 'production' &&
+        solution.detailRenderMode === 'htmlTemplate' &&
+        preparedTemplate &&
+        !preparedTemplate.html && (
+          <section className="border-b border-amber-200 bg-amber-50 px-4 py-4 text-amber-950">
+            <div className="mx-auto max-w-7xl">
+              <p className="font-bold">Template render fallback</p>
+              <p className="mt-1 text-sm">
+                slug: {slug}
+                {preparedTemplate.error ? ` | error: ${preparedTemplate.error}` : ''}
+              </p>
+              {preparedTemplate.issues.length > 0 && (
+                <pre className="mt-3 overflow-x-auto rounded bg-white p-3 text-xs leading-relaxed">
+                  {preparedTemplate.issues.join('\n')}
+                </pre>
+              )}
+            </div>
+          </section>
+        )}
       {!hasBuilderHero && renderSolutionHero(solution)}
       <div id="solution-content">{renderGroups.map((group) => renderSolutionGroup(group, solution._id))}</div>
       <RelatedProductsSection products={solution.relatedProducts || []} />
