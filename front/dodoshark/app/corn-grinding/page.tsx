@@ -41,7 +41,7 @@ export default function CornMillingSolutionPage() {
               <a href="#products" className="rounded-md border-2 border-orange-500 bg-orange-500 px-8 py-3.5 text-sm font-black tracking-widest text-white shadow-lg shadow-orange-500/25 transition-all hover:bg-orange-600 hover:border-orange-600">
                 View Equipment
               </a>
-              <a href="#contact" className="rounded-md border-2 border-slate-600 bg-transparent px-8 py-3.5 text-sm font-black tracking-widest text-white transition-all hover:border-slate-400 hover:bg-slate-800">
+              <a href="/contact" className="rounded-md border-2 border-slate-600 bg-transparent px-8 py-3.5 text-sm font-black tracking-widest text-white transition-all hover:border-slate-400 hover:bg-slate-800">
                 Contact Us
               </a>
             </div>
@@ -290,7 +290,7 @@ export default function CornMillingSolutionPage() {
                   <strong>Principle:</strong> Two pressure rollers with toothed surfaces rotate relative to each other, using shear, extrusion, and tearing force.<br/><br/>
                   <strong>Application:</strong> Mainly used for coarse crushing of corn as feed for livestock, improving starch digestion efficiency.
                 </p>
-                <Link href="/products/roller-crusher" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
+                <Link href="/products" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
                   View Product Details <i className="fas fa-arrow-right" />
                 </Link>
               </div>
@@ -316,7 +316,7 @@ export default function CornMillingSolutionPage() {
                   <strong>Principle:</strong> Uses kinetic energy from high-speed rotating hammer pieces to impact, shear, and friction the material.<br/><br/>
                   <strong>Application:</strong> Most widely used high-efficiency impact equipment in feed and grain processing.
                 </p>
-                <Link href="/products/hammer-mill" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
+                <Link href="/products" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
                   View Product Details <i className="fas fa-arrow-right" />
                 </Link>
               </div>
@@ -342,7 +342,7 @@ export default function CornMillingSolutionPage() {
                   <strong>Principle:</strong> Strong impact, shear, and grinding between rotating moving teeth and fixed teeth, discharged via screen mesh.<br/><br/>
                   <strong>Application:</strong> Wider application range and higher efficiency for processing fine powder than hammer mills.
                 </p>
-                <Link href="/products/claw-mill" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
+                <Link href="/products" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
                   View Product Details <i className="fas fa-arrow-right" />
                 </Link>
               </div>
@@ -368,7 +368,7 @@ export default function CornMillingSolutionPage() {
                   <strong>Principle:</strong> Built-in air classification system. Unqualified fine powder returns to the milling chamber for re-milling.<br/><br/>
                   <strong>Application:</strong> High added-value ultrafine milling for chemical, pharmaceutical, food, and non-metallic minerals.
                 </p>
-                <Link href="/products/ultrafine-mill" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
+                <Link href="/products" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
                   View Product Details <i className="fas fa-arrow-right" />
                 </Link>
               </div>

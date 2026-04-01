@@ -46,7 +46,7 @@ export default function SoakedRiceSolutionPage() {
               <a href="#products" className="rounded-md border-2 border-blue-500 bg-blue-500 px-8 py-3.5 text-sm font-black tracking-widest text-white shadow-lg shadow-blue-500/25 transition-all hover:bg-blue-600 hover:border-blue-600">
                 Explore Wet Mills
               </a>
-              <a href="#contact" className="rounded-md border-2 border-slate-600 bg-transparent px-8 py-3.5 text-sm font-black tracking-widest text-white transition-all hover:border-slate-400 hover:bg-slate-800">
+              <a href="/contact" className="rounded-md border-2 border-slate-600 bg-transparent px-8 py-3.5 text-sm font-black tracking-widest text-white transition-all hover:border-slate-400 hover:bg-slate-800">
                 Contact Us
               </a>
             </div>
@@ -303,7 +303,7 @@ export default function SoakedRiceSolutionPage() {
                   <strong>Principle:</strong> Shear and impact in a widened chamber designed to prevent wet rice sticking, ensuring continuous high-volume output.<br/><br/>
                   <strong>Application:</strong> The benchmark for professional rice noodle and rice cake factories worldwide.
                 </p>
-                <Link href="/products/soaked-rice-mill" className="text-blue-500 font-bold hover:text-blue-600 inline-flex items-center gap-2">
+                <Link href="/products" className="text-blue-500 font-bold hover:text-blue-600 inline-flex items-center gap-2">
                   View Product Details <i className="fas fa-arrow-right" />
                 </Link>
               </div>

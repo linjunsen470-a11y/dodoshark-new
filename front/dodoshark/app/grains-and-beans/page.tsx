@@ -40,7 +40,7 @@ export default function GrainsBeansSolutionPage() {
               <a href="#products" className="rounded-md border-2 border-orange-500 bg-orange-500 px-8 py-3.5 text-sm font-black tracking-widest text-white shadow-lg shadow-orange-500/25 transition-all hover:bg-orange-600 hover:border-orange-600">
                 View Grinding Range
               </a>
-              <a href="#contact" className="rounded-md border-2 border-slate-600 bg-transparent px-8 py-3.5 text-sm font-black tracking-widest text-white transition-all hover:border-slate-400 hover:bg-slate-800">
+              <a href="/contact" className="rounded-md border-2 border-slate-600 bg-transparent px-8 py-3.5 text-sm font-black tracking-widest text-white transition-all hover:border-slate-400 hover:bg-slate-800">
                 Contact Us
               </a>
             </div>
@@ -275,7 +275,7 @@ export default function GrainsBeansSolutionPage() {
                   <strong>Principle:</strong> Shear, impact, and friction between moving and fixed teeth, with integrated centrifugal fan for cooling.<br/><br/>
                   <strong>Application:</strong> Fully dust-free food-grade collection system for processing delicate grain flours.
                 </p>
-                <Link href="/products/ss-claw-mill" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
+                <Link href="/products" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
                   View Product Details <i className="fas fa-arrow-right" />
                 </Link>
               </div>
@@ -301,7 +301,7 @@ export default function GrainsBeansSolutionPage() {
                   <strong>Principle:</strong> High-speed rotating teeth impact the material combined with a high-pressure airvortex for efficient heat dissipation.<br/><br/>
                   <strong>Application:</strong> Robust standard for high-volume grain crushing and agricultural pulse processing.
                 </p>
-                <Link href="/products/iron-claw-mill" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
+                <Link href="/products" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
                   View Product Details <i className="fas fa-arrow-right" />
                 </Link>
               </div>
@@ -327,7 +327,7 @@ export default function GrainsBeansSolutionPage() {
                   <strong>Principle:</strong> Grinding-style milling with built-in air classification feedback loops to ensure particles reach the target micron range.<br/><br/>
                   <strong>Application:</strong> The flagship for super-fine mixed grain powder and high-end nutritional flour.
                 </p>
-                <Link href="/products/grinding-ultrafine-mill" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
+                <Link href="/products" className="text-orange-500 font-bold hover:text-orange-600 inline-flex items-center gap-2">
                   View Product Details <i className="fas fa-arrow-right" />
                 </Link>
               </div>
