@@ -48,3 +48,6 @@ __pycache__/
 # Tool-generated directories
 .qwen/
 .playwright-mcp/
+
+# Temp files
+/tmp/*

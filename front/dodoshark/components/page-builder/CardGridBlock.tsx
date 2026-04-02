@@ -547,7 +547,7 @@ function GroupGrid({
   const desktopColumns = getStaticDesktopColumns(validCards.length)
   const mobileButtonClassName = `${theme.control} ${theme.controlHover}`
 
-  if (validCards.length < 2) return null
+  if (validCards.length === 0) return null
 
   return (
     <section className={`pt-0 pb-8 ${sectionClassName ?? ''}`.trim()}>
@@ -622,6 +622,17 @@ function GroupGrid({
           theme={theme}
           disableCardFrameEffect={disableCardFrameEffect}
         />
+      ) : validCards.length === 1 ? (
+        <div className="hidden md:flex md:justify-center">
+          <div className="w-full max-w-xl">
+            <GridCard
+              item={validCards[0]}
+              size={desktopCardSize}
+              theme={theme}
+              disableCardFrameEffect={disableCardFrameEffect}
+            />
+          </div>
+        </div>
       ) : (
         <div className={`hidden gap-6 md:grid ${staticColumnClassMap[desktopColumns]}`}>
           {validCards.map((item, index) => (
@@ -649,7 +660,7 @@ export default function CardGridBlock({block}: {block: CardGridBlockData}) {
         ...row,
         cards: (row.cards ?? []).filter(hasCardData),
       }))
-      .filter((row) => (row.cards?.length ?? 0) >= 2) ?? []
+      .filter((row) => (row.cards?.length ?? 0) >= 1) ?? []
   const hasRows = rows.length > 0
   const disableCardFrameEffect = Boolean(block.disableCardFrameEffect)
   const bannerImageSrc = resolveImageSrc(block.bannerImage, {width: 2000, height: 900, fit: 'crop'})

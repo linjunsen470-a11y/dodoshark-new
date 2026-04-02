@@ -333,7 +333,7 @@ export default defineType({
     defineField({
       name: 'rows',
       title: 'Rows',
-      description: 'Add one or more card rows. Each row supports an optional title and 2 to 12 cards.',
+      description: 'Add one or more card rows. Each row supports an optional title and 1 to 12 cards.',
       type: 'array',
       of: [
         {
@@ -351,7 +351,7 @@ export default defineType({
               title: 'Cards',
               type: 'array',
               of: [{type: 'object', fields: cardFields, preview: cardPreview}],
-              validation: (rule) => rule.required().min(2).max(12),
+              validation: (rule) => rule.required().min(1).max(12),
             }),
           ],
           preview: rowPreview,
