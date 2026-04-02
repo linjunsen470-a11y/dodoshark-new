@@ -190,11 +190,8 @@ export default defineType({
     defineField({
       name: 'renderedHtml',
       title: 'Rendered HTML Artifact',
-      type: 'code',
-      options: {
-        language: 'html',
-        languageAlternatives: [{title: 'HTML', value: 'html'}],
-      },
+      type: 'text',
+      rows: 12,
       description: 'Generated automatically on publish. The frontend serves this artifact directly in production.',
       readOnly: true,
     }),

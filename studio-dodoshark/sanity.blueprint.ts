@@ -5,9 +5,13 @@ export default defineBlueprint({
     defineDocumentFunction({
       name: 'render-solution-template',
       event: {
-        on: ['publish'],
+        on: ['create', 'update'],
         filter: '_type == "solution" && detailRenderMode == "htmlTemplate"',
         projection: '{_id, _type, title, slug, detailRenderMode, htmlTemplate}',
+        resource: {
+          type: 'dataset',
+          id: 'nljl95h9.production',
+        },
       },
     }),
   ],
