@@ -30,6 +30,7 @@ export type SolutionHtmlTemplateData = {
 
 export type PreparedSolutionTemplate = {
   html: string | null
+  signature: string
   issues: string[]
   error?: string
 }
@@ -47,6 +48,17 @@ const forbiddenHtmlPatterns = [
 
 const forbiddenCssPatterns = [/@import/i, /expression\s*\(/i]
 const compilerCache = new Map<string, Promise<string>>()
+
+function hashTemplateContent(value: string) {
+  let hash = 2166136261
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index)
+    hash = Math.imul(hash, 16777619)
+  }
+
+  return (hash >>> 0).toString(16)
+}
 
 function containsForbiddenPattern(source: string, patterns: RegExp[]) {
   return patterns.some((pattern) => pattern.test(source))
@@ -152,6 +164,7 @@ export async function prepareSolutionTemplate(
   if (!html) {
     return {
       html: null,
+      signature: 'empty',
       issues: ['Template HTML is empty.'],
       error: 'empty_html',
     }
@@ -182,6 +195,7 @@ export async function prepareSolutionTemplate(
   if (issues.length > 0) {
     return {
       html: null,
+      signature: hashTemplateContent(`${processedHtml}\n/*__CSS__*/\n${processedCss}`),
       issues,
       error: 'invalid_assets_or_content',
     }
@@ -189,23 +203,25 @@ export async function prepareSolutionTemplate(
 
   try {
     const compiledCss = await compileTemplateCss(processedHtml, processedCss)
+    const finalHtml = [
+      '<!DOCTYPE html>',
+      '<html lang="en">',
+      '<head>',
+      '<meta charset="utf-8" />',
+      '<meta name="viewport" content="width=device-width, initial-scale=1" />',
+      '<style>',
+      compiledCss,
+      '</style>',
+      '</head>',
+      '<body>',
+      processedHtml,
+      '</body>',
+      '</html>',
+    ].join('')
 
     return {
-      html: [
-        '<!DOCTYPE html>',
-        '<html lang="en">',
-        '<head>',
-        '<meta charset="utf-8" />',
-        '<meta name="viewport" content="width=device-width, initial-scale=1" />',
-        '<style>',
-        compiledCss,
-        '</style>',
-        '</head>',
-        '<body>',
-        processedHtml,
-        '</body>',
-        '</html>',
-      ].join(''),
+      html: finalHtml,
+      signature: hashTemplateContent(finalHtml),
       issues,
     }
   } catch (error) {
@@ -214,6 +230,7 @@ export async function prepareSolutionTemplate(
 
     return {
       html: null,
+      signature: hashTemplateContent(`${processedHtml}\n/*__CSS__*/\n${processedCss}`),
       issues: [...issues, message],
       error: 'compile_failed',
     }
