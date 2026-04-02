@@ -742,6 +742,7 @@ export default async function SolutionPage({params}: SolutionPageProps) {
     return (
       <main className="bg-white text-slate-900">
         <SolutionHtmlTemplateFrame
+          templateKey={`${solution._id}:${preparedTemplate.signature}`}
           title={cleanText(solution.title) || 'Solution template'}
           srcDoc={preparedTemplate.html}
         />

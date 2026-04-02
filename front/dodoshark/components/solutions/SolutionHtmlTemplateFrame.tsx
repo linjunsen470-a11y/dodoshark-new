@@ -4,17 +4,21 @@ import {useEffect, useRef, useState} from 'react'
 
 type SolutionHtmlTemplateFrameProps = {
   srcDoc: string
+  templateKey: string
   title?: string
 }
 
 export default function SolutionHtmlTemplateFrame({
   srcDoc,
+  templateKey,
   title,
 }: SolutionHtmlTemplateFrameProps) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null)
   const [height, setHeight] = useState(640)
 
   useEffect(() => {
+    setHeight(640)
+
     const frame = iframeRef.current
     if (!frame) return
 
@@ -82,21 +86,19 @@ export default function SolutionHtmlTemplateFrame({
       cancelAnimationFrame(animationFrame)
       imageListeners.forEach(({image, handler}) => image.removeEventListener('load', handler))
     }
-  }, [srcDoc])
+  }, [srcDoc, templateKey])
 
   return (
     <div className="bg-white">
-      <style>
-        {`#solution-frame { height: ${height}px; }`}
-      </style>
       <iframe
+        key={templateKey}
         ref={iframeRef}
-        id="solution-frame"
         title={title || 'Solution template'}
         srcDoc={srcDoc}
         sandbox="allow-same-origin"
         scrolling="no"
         className="block w-full border-0 bg-white"
+        style={{height}}
       />
     </div>
   )
