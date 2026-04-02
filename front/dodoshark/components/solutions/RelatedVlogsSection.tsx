@@ -17,14 +17,18 @@ type RelatedVlogDoc = {
 }
 
 type RelatedVlogsSectionProps = {
-  vlogs: RelatedVlogDoc[]
+  vlogs: Array<RelatedVlogDoc | null | undefined>
 }
 
 export default function RelatedVlogsSection({ vlogs }: RelatedVlogsSectionProps) {
   if (!vlogs || vlogs.length === 0) return null
 
+  const validVlogs = vlogs.filter((vlog): vlog is RelatedVlogDoc => Boolean(vlog?._id))
+
+  if (validVlogs.length === 0) return null
+
   // Transform vlogs into the format expected by VlogVideoGrid
-  const vlogItems: VlogVideoCardItem[] = vlogs.map((vlog) => ({
+  const vlogItems: VlogVideoCardItem[] = validVlogs.map((vlog) => ({
     id: vlog._id,
     title: vlog.title || 'Untitled Video',
     excerpt: vlog.excerpt || 'Watch the full video demonstration.',

@@ -93,6 +93,26 @@ type VideoGalleryBlock = {
   videos?: VideoItem[]
 }
 
+type RelatedProductDoc = {
+  _id: string
+  _type: 'product'
+  title?: string
+  name?: string
+  modelName?: string
+  slug?: {current?: string}
+  shortDescription?: string
+  mainImage?: SanityImage
+}
+
+type RelatedVlogDoc = {
+  _id: string
+  title?: string
+  excerpt?: string
+  youtubeUrl?: string
+  thumbnail?: SanityImage
+  category?: {title?: string}
+}
+
 type SolutionBlock =
   | HeroBlockData
   | RichSectionBlockData
@@ -121,8 +141,8 @@ type SolutionData = {
   detailRenderMode?: 'pageBuilder' | 'htmlTemplate'
   htmlTemplate?: SolutionHtmlTemplateData
   contentBlocks?: SolutionBlock[]
-  relatedProducts?: any[]
-  relatedVlogs?: any[]
+  relatedProducts?: Array<RelatedProductDoc | null>
+  relatedVlogs?: Array<RelatedVlogDoc | null>
 }
 
 function splitTitle(title?: string) {
@@ -705,6 +725,12 @@ export default async function SolutionPage({params}: SolutionPageProps) {
   const contentBlocks = (solution.contentBlocks && solution.contentBlocks.length > 0)
     ? solution.contentBlocks.filter((block) => Boolean(block))
     : []
+  const relatedProducts = solution.relatedProducts?.filter(
+    (product): product is RelatedProductDoc => Boolean(product?._id)
+  ) ?? []
+  const relatedVlogs = solution.relatedVlogs?.filter(
+    (vlog): vlog is RelatedVlogDoc => Boolean(vlog?._id)
+  ) ?? []
   const renderGroups = groupPageBuilderBlocks(contentBlocks)
   const hasBuilderHero = solution.contentBlocks?.some((block) => block?._type === 'heroBlock')
   const preparedTemplate =
@@ -719,8 +745,8 @@ export default async function SolutionPage({params}: SolutionPageProps) {
           title={cleanText(solution.title) || 'Solution template'}
           srcDoc={preparedTemplate.html}
         />
-        <RelatedProductsSection products={solution.relatedProducts || []} />
-        <RelatedVlogsSection vlogs={solution.relatedVlogs || []} />
+        <RelatedProductsSection products={relatedProducts} />
+        <RelatedVlogsSection vlogs={relatedVlogs} />
       </main>
     )
   }
@@ -761,8 +787,8 @@ export default async function SolutionPage({params}: SolutionPageProps) {
         )}
       {!hasBuilderHero && renderSolutionHero(solution)}
       <div id="solution-content">{renderGroups.map((group) => renderSolutionGroup(group, solution._id))}</div>
-      <RelatedProductsSection products={solution.relatedProducts || []} />
-      <RelatedVlogsSection vlogs={solution.relatedVlogs || []} />
+      <RelatedProductsSection products={relatedProducts} />
+      <RelatedVlogsSection vlogs={relatedVlogs} />
     </div>
   )
 }
