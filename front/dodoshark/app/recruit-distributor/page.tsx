@@ -5,7 +5,7 @@ import type { ReactNode } from 'react'
 
 import { fetchSanityData } from '@/lib/sanity.live'
 import { buildPageMetadata } from '@/lib/seo'
-import { cleanText, renderText, toImageSrc } from '@/lib/sanity-utils'
+import { cleanText, renderText } from '@/lib/sanity-utils'
 import type { SanityImage, SeoMeta } from '@/lib/types/sanity'
 import HeroTitle from '@/components/ui/HeroTitle'
 import CMSImage from '@/components/ui/CMSImage'
@@ -219,8 +219,6 @@ export default async function RecruitDistributorPage() {
   const ctaDescription =
     renderText(pageData?.cta?.description) ||
     "We believe that combining DoDoShark's excellent products with your localized advantages will create miracles. If you are ready to start a new chapter, contact us today."
-  const ctaButtonLabel = renderText(pageData?.cta?.buttonLabel) || 'Contact Us To Apply'
-  const ctaButtonHref = cleanText(pageData?.cta?.buttonHref) || '/contact'
 
   return (
     <main className="bg-[#fcfdfd] text-slate-900 font-sans selection:bg-orange-100 selection:text-orange-900">

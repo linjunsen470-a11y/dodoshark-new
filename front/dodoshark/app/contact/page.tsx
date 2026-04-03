@@ -121,7 +121,6 @@ export default async function ContactPage() {
   const dcWebUrl = renderText(pageData?.directContact?.websiteUrl) || contact.websiteUrl || 'https://www.dodoshark.com'
 
   const showroomTitle = renderText(pageData?.showroom?.title) || 'Our Showroom'
-  const showroomDescription = renderText(pageData?.showroom?.description) || 'Visit our facility in Nanjing to see our high-precision machinery in action and discuss your production needs with our experts.'
   const showroomImage = pageData?.showroom?.image
 
   const inquiryTitle = renderText(pageData?.inquiryPanel?.title) || 'Send Inquiry'
@@ -249,14 +248,6 @@ export default async function ContactPage() {
                   fallbackAlt={showroomTitle}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent opacity-80" />
-                {/* <div className="absolute bottom-8 left-8 right-8">
-                  <h2 className="text-2xl lg:text-3xl font-display font-extrabold text-white tracking-tight mb-3">
-                    {showroomTitle}
-                  </h2>
-                  <p className="text-slate-200 text-sm font-light leading-relaxed">
-                    {showroomDescription}
-                  </p>
-                </div> */}
               </div>
 
               {/* Right Column: The Form */}

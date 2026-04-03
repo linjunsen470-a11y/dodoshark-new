@@ -4,11 +4,12 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import CMSImage from '@/components/ui/CMSImage'
 import { sanitizeAltText } from '@/lib/sanity-utils'
+import type { SanityImage } from '@/lib/types/sanity'
 
 export type HeroCarouselImage = {
   src: string
   alt: string
-  sanityImage?: any
+  sanityImage?: SanityImage
 }
 
 export type HeroCarouselProps = {

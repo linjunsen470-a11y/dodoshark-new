@@ -173,17 +173,6 @@ function resolveYouTubePreviewThumbnail(url?: string, quality: 'default' | 'hqde
   return `https://i.ytimg.com/vi/${videoId}/${quality}.jpg`
 }
 
-function isYouTubePreviewThumbnail(src?: string) {
-  if (!src) return false
-
-  try {
-    const parsed = new URL(src)
-    return parsed.hostname === 'i.ytimg.com' || parsed.hostname === 'img.youtube.com'
-  } catch {
-    return false
-  }
-}
-
 function resolveVideoEmbedSrc(url?: string) {
   const raw = url?.trim()
   if (!raw) return undefined
@@ -581,7 +570,7 @@ function ThumbnailGallery({
       behavior: 'smooth',
       block: 'nearest',
       inline: 'nearest',
-    })
+      })
   }, [clampedActiveIndex])
 
   if (items.length === 0) return null
@@ -658,8 +647,6 @@ function HomeStyleVideoCard({
   const previewSrc = resolveGalleryItemPreviewSrc(item, 960)
   const youtubeFallbackSrc = item.type === 'videoUrl' ? resolveYouTubePreviewThumbnail(item.videoUrl) : undefined
   const resolvedPreviewSrc = previewSrc || youtubeFallbackSrc
-  const shouldUseNativeImage = !previewSrc && isYouTubePreviewThumbnail(youtubeFallbackSrc)
-  const { width, height } = getGalleryItemDimensions(item, 960, 720)
   const blurDataURL = getGalleryItemBlurDataUrl(item)
   const hasLqip = Boolean(blurDataURL)
   const isVideo = item.type === 'videoUrl'
@@ -670,25 +657,15 @@ function HomeStyleVideoCard({
     <>
       <div className="relative h-56 overflow-hidden md:h-48">
         {resolvedPreviewSrc ? (
-          shouldUseNativeImage ? (
-            <img
-              src={resolvedPreviewSrc}
-              alt={resolveGalleryItemAlt(item)}
-              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-              loading="lazy"
-            />
-          ) : (
-            <Image
-              src={resolvedPreviewSrc}
-              alt={resolveGalleryItemAlt(item)}
-              width={width}
-              height={height}
-              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-              placeholder={hasLqip ? 'blur' : 'empty'}
-              blurDataURL={blurDataURL}
-              sizes="(max-width: 767px) 100vw, (max-width: 1199px) 50vw, 25vw"
-            />
-          )
+          <Image
+            src={resolvedPreviewSrc}
+            alt={resolveGalleryItemAlt(item)}
+            fill
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+            placeholder={hasLqip ? 'blur' : 'empty'}
+            blurDataURL={blurDataURL}
+            sizes="(max-width: 767px) 100vw, (max-width: 1199px) 50vw, 25vw"
+          />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-slate-200 text-slate-500">
             <Icon icon={isVideo ? 'film' : 'image'} className="h-10 w-10" />
@@ -829,9 +806,9 @@ function VideoCardCarousel({
           <MediaGalleryCtaLink cta={cta} />
         </div>
       )}
-	    </>
-	  )
-	}
+    </>
+  )
+}
 
 export default function MediaGalleryBlock({ block }: { block: MediaGalleryBlockData }) {
   const variant = block.backgroundVariant ?? 'white'

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 import type { VideoOrientation } from '@/lib/video'
@@ -15,8 +15,13 @@ type VideoLightboxProps = {
 export default function VideoLightbox({ src, title, orientation = 'landscape', onClose }: VideoLightboxProps) {
   const [mounted, setMounted] = useState(false)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!mounted) return
     const previousOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
 
@@ -30,7 +35,7 @@ export default function VideoLightbox({ src, title, orientation = 'landscape', o
       document.body.style.overflow = previousOverflow
       document.removeEventListener('keydown', onKeyDown)
     }
-  }, [onClose])
+  }, [mounted, onClose])
 
   if (!mounted) return null
 

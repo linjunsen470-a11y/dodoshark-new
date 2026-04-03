@@ -1,46 +1,22 @@
 import type { Metadata } from "next";
-import { draftMode } from "next/headers";
-import { VisualEditing } from "next-sanity/visual-editing";
 import { Inter, Outfit } from "next/font/google";
-import "./globals.css";
-import Header from "@/components/Header";
+import { VisualEditing } from "next-sanity/visual-editing";
+import { draftMode } from "next/headers";
+
+import { fetchSanityData } from "@/lib/sanity.live";
+import { buildPageMetadata } from "@/lib/seo";
+import { SanityImage } from "@/lib/types/sanity";
+import { type GlobalSettingsData } from "@/lib/global-settings";
 import Footer from "@/components/Footer";
-import { getGlobalSettings } from "@/lib/global-settings";
-import { SanityLive } from "@/lib/sanity.live";
-import { studioUrl } from "@/lib/sanity";
+import Header from "@/components/Header";
+import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const outfit = Outfit({
-  variable: "--font-outfit",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const FALLBACK_FAVICON_URL = "/favicon-fallback.png";
-
-const defaultMetadata: Metadata = {
-  title: "DoDoShark - Industrial Milling Systems",
-  description: "Professional Crushing & Grinding Equipment Manufacturer",
-};
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const globalSettings = await getGlobalSettings();
-  const faviconUrl =
-    globalSettings?.favicon?.asset?.url?.trim() || FALLBACK_FAVICON_URL;
-
-  return {
-    ...defaultMetadata,
-    icons: {
-      icon: faviconUrl,
-      shortcut: faviconUrl,
-      apple: faviconUrl,
-    },
-  };
+  const globalSettings = await fetchSanityData<GlobalSettingsData | null>({ query: `*[_id == "globalSettings"][0]` });
+  return buildPageMetadata(globalSettings?.seo);
 }
 
 export default async function RootLayout({
@@ -48,21 +24,25 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const draft = await draftMode();
-  const globalSettings = await getGlobalSettings();
+  const globalSettings = await fetchSanityData<GlobalSettingsData | null>({ query: `*[_id == "globalSettings"][0]{..., logo{..., asset->}}` });
+  const { isEnabled: isDraftMode } = await draftMode();
 
-  const VisualEditingAny = VisualEditing as any;
+  const faviconUrl = globalSettings?.logo
+    ? (globalSettings.logo as SanityImage).asset?.url || "/favicon.ico"
+    : "/favicon.ico";
 
   return (
-    <html lang="en" className="scroll-smooth">
-      <body
-        className={`${inter.variable} ${outfit.variable} antialiased font-sans`}
-      >
-        <Header settings={globalSettings} />
-        {children}
-        <Footer settings={globalSettings} />
-        <SanityLive />
-        {draft.isEnabled && <VisualEditingAny studioUrl={studioUrl} />}
+    <html lang="en" className={`${inter.variable} ${outfit.variable} scroll-smooth`}>
+      <head>
+        <link rel="icon" href={faviconUrl} sizes="any" />
+      </head>
+      <body className="antialiased selection:bg-orange-100 selection:text-orange-900">
+        <Header />
+        <main id="main-content" className="relative min-h-[60vh] overflow-hidden">
+          {children}
+        </main>
+        <Footer />
+        {isDraftMode && <VisualEditing />}
       </body>
     </html>
   );
