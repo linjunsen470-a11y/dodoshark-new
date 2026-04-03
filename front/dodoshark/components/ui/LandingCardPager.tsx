@@ -128,7 +128,7 @@ export default function LandingCardPager({
     syncViewportMode()
     window.addEventListener('resize', syncViewportMode)
     return () => window.removeEventListener('resize', syncViewportMode)
-  }, [syncViewportMode])
+  }, [])
 
   useEffect(() => {
     setCurrentPage(initialPage)

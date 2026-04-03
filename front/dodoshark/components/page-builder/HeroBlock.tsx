@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
-import { cleanText, renderText, sanitizeAltText } from '@/lib/sanity-utils'
+import { renderText, sanitizeAltText } from '@/lib/sanity-utils'
 import { getSafeHref, isExternalHref } from '@/lib/safeHref'
 import { urlFor } from '@/lib/sanity'
 import {

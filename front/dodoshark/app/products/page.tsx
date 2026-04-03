@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { fetchSanityData } from '@/lib/sanity.live'
+import { getProductsLandingMetadata, getProductsPageData } from '@/lib/sanity/data/products'
 import { buildPageMetadata } from '@/lib/seo'
 import { cleanSlug, cleanText, firstParam, renderText, sanitizeAltText, toImageSrc, type QueryParamValue } from '@/lib/sanity-utils'
 import type { SeoMeta, SanityImage } from '@/lib/types/sanity'
@@ -42,53 +42,11 @@ type ProductsPageProps = {
   searchParams: Promise<Record<string, QueryParamValue>>
 }
 
-const productLandingQuery = `coalesce(
-  *[_id == "productPage"][0],
-  *[_type == "productPage"][0]
-){
-  seo,
-  hero{
-    badge,
-    title,
-    subtitle,
-    image{
-      alt,
-      asset
-    }
-  },
-  productCategories[]->{
-    _id,
-    title,
-    slug{current}
-  }
-}`
-
-const productListQuery = `*[
-  _type == "product"
-  && defined(slug.current)
-  && ($category == "" || category->slug.current == $category)
-] | order(_createdAt desc){
-  _id,
-  title,
-  slug{current},
-  shortDescription,
-  seriesTag,
-  mainImage{
-    alt,
-    asset
-  },
-  category->{
-    _id,
-    title,
-    slug{current}
-  }
-}`
-
-const allCategoriesQuery = `*[_type == "category"] | order(title asc){
-  _id,
-  title,
-  slug{current}
-}`
+type ProductsPageData = {
+  landing?: ProductLandingData | null
+  items?: ProductCard[]
+  fallbackCategories?: CategoryItem[]
+}
 
 function parsePositiveInt(value: string | undefined, fallback = 1) {
   const parsed = Number.parseInt(value ?? '', 10)
@@ -111,10 +69,7 @@ function buildHref({
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const landing = await fetchSanityData<ProductLandingData | null>({
-    query: productLandingQuery,
-    stega: false,
-  })
+  const landing = await getProductsLandingMetadata<ProductLandingData>()
   return buildPageMetadata({
     seo: landing?.seo,
     fallbackTitle: 'Product Catalog | DoDoShark',
@@ -127,19 +82,10 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   const category = cleanText(firstParam(params.category)) || ''
   const initialPage = parsePositiveInt(firstParam(params.page), 1)
 
-  const landing = await fetchSanityData<ProductLandingData | null>({
-    query: productLandingQuery,
-  })
-
-  const [productsData, fallbackCategories] = await Promise.all([
-    fetchSanityData<ProductCard[]>({
-      query: productListQuery,
-      params: { category },
-    }),
-    fetchSanityData<CategoryItem[]>({
-      query: allCategoriesQuery,
-    }),
-  ])
+  const pageData = await getProductsPageData<ProductsPageData>(category)
+  const landing = pageData?.landing ?? null
+  const productsData = pageData?.items ?? []
+  const fallbackCategories = pageData?.fallbackCategories ?? []
 
   const products = (productsData && productsData.length > 0) ? productsData : []
   const configuredCategories = (landing?.productCategories && landing.productCategories.length > 0) ? landing.productCategories.filter((item) => cleanSlug(item?.slug)) : []

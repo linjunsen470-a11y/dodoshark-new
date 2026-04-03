@@ -1,7 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import type { ReactNode } from 'react'
 
 import { fetchSanityData } from '@/lib/sanity.live'
 import { buildPageMetadata } from '@/lib/seo'
@@ -79,43 +78,8 @@ type AboutPageData = {
   brandStoryVideoUrl?: string
 }
 
-type ProductSystemImageKey =
-  | 'productSystemAgricultureImage'
-  | 'productSystemFoodImage'
+// Removed unused legacy type definitions: ProductSystemImageKey, TimelineImageKey, ProductSystem, StoryCard, TimelineItem
 
-type TimelineImageKey =
-  | 'timelineStateOwnedHeritageImage'
-  | 'timelineBrandFoundationImage'
-  | 'timelineMarketRootsImage'
-  | 'timelineDualTrackExpansionImage'
-  | 'timelineAutomationUpgradeImage'
-  | 'timelineFutureOutlookImage'
-
-type ProductSystem = {
-  title: string
-  description: string
-  icon: ReactNode
-  tags: string[]
-  image?: SanityImage
-  imageKey: ProductSystemImageKey
-  fallbackImageSrc: string
-}
-
-type StoryCard = {
-  title: string
-  subtitle?: string
-  description: string
-}
-
-type TimelineItem = {
-  year: string
-  phase: string
-  title: string
-  desc: string
-  image?: SanityImage
-  imageKey: TimelineImageKey
-  fallbackImageSrc: string
-}
 
 const ABOUT_PAGE_QUERY = `coalesce(
   *[_id == "aboutPage"][0],
@@ -207,9 +171,8 @@ async function getAboutPageData(stega?: boolean) {
   })
 }
 
-function isNonNullable<T>(value: T): value is NonNullable<T> {
-  return value != null
-}
+// Removed unused isNonNullable utility
+
 
 const PRODUCT_SYSTEMS_ICONS = [
   (

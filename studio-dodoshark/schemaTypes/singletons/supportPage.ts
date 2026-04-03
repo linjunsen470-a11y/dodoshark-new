@@ -1,6 +1,5 @@
 import {BulbOutlineIcon} from '@sanity/icons'
 import {defineArrayMember, defineField, defineType} from 'sanity'
-import {joinPreview, pickText} from '../shared/studio'
 
 function imageField(name: string, title: string, description: string) {
   return defineField({

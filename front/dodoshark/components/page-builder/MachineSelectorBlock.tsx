@@ -7,7 +7,7 @@ import type { Swiper as SwiperInstance } from 'swiper'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
 import { urlFor } from '@/lib/sanity'
-import { cleanText, renderText, sanitizeAltText } from '@/lib/sanity-utils'
+import { renderText, sanitizeAltText } from '@/lib/sanity-utils'
 import Icon from '@/components/ui/Icon'
 import {
   getSharedBackgroundTheme,

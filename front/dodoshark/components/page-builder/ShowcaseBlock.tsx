@@ -9,10 +9,9 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 
 import { getSafeHref, isExternalHref } from '@/lib/safeHref'
 import { urlFor } from '@/lib/sanity'
-import { cleanText, renderText, sanitizeAltText } from '@/lib/sanity-utils'
+import { renderText, sanitizeAltText } from '@/lib/sanity-utils'
 import {
   getSharedBackgroundTheme,
-  type ShowcaseCssVars,
   type SharedBackgroundTheme,
   type SharedBackgroundVariant,
 } from './backgroundTheme'

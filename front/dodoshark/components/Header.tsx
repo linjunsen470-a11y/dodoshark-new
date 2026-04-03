@@ -49,7 +49,7 @@ function ClockIcon() {
   )
 }
 
-function toNavItems(settings?: GlobalSettingsData | null) {
+function toNavItems() {
   // Navigation items are now strictly hardcoded per user request for stability
   return defaultNavItems
 }
@@ -60,7 +60,8 @@ export default function Header({settings}: HeaderProps) {
   const [homeIsScrolled, setHomeIsScrolled] = useState(false)
   const [isDesktopViewport, setIsDesktopViewport] = useState(false)
 
-  const navItems = toNavItems(settings)
+  const navItems = toNavItems()
+
   const logoSrc = toImageSrc(settings?.logo, 400) || '/assets/images/brand/dodoshark-logo.png'
   const logoAlt = sanitizeAltText(settings?.logo?.alt, renderText(settings?.siteName)) || 'DoDoShark'
   
@@ -108,7 +109,7 @@ export default function Header({settings}: HeaderProps) {
     syncScrolled()
     window.addEventListener('scroll', syncScrolled, {passive: true})
     return () => window.removeEventListener('scroll', syncScrolled)
-  }, [isHome, syncScrolled])
+  }, [isHome])
 
   useEffect(() => {
     syncDesktopViewport()
@@ -116,7 +117,7 @@ export default function Header({settings}: HeaderProps) {
     const mediaQuery = window.matchMedia('(min-width: 1280px)')
     mediaQuery.addEventListener('change', syncDesktopViewport)
     return () => mediaQuery.removeEventListener('change', syncDesktopViewport)
-  }, [syncDesktopViewport])
+  }, [])
 
   const isScrolled = !isHome || homeIsScrolled
   const desktopFloating = isHome && !isScrolled

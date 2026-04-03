@@ -1,30 +1,13 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import type { ReactNode } from 'react'
 
 import { fetchSanityData } from '@/lib/sanity.live'
 import { buildPageMetadata } from '@/lib/seo'
-import { cleanText, renderText, toImageSrc } from '@/lib/sanity-utils'
+import { renderText } from '@/lib/sanity-utils'
 import type { SanityImage, SeoMeta } from '@/lib/types/sanity'
 import HeroTitle from '@/components/ui/HeroTitle'
 import CMSImage from '@/components/ui/CMSImage'
 
-type ServiceStageImageKey =
-  | 'preSalesStageImage'
-  | 'midSalesStageImage'
-  | 'afterSalesStageImage'
-
-type ServiceStage = {
-  id: string
-  phase: string
-  title: string
-  description: string
-  features: string[]
-  image?: SanityImage
-  imageKey: ServiceStageImageKey
-  fallbackImageSrc: string
-  icon: ReactNode
-}
 
 type SupportPageData = {
   seo?: SeoMeta
