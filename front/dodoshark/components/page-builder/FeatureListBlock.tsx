@@ -1,7 +1,7 @@
 import Image from 'next/image'
 
 import {urlFor} from '@/lib/sanity'
-import { cleanText, renderText, sanitizeAltText } from '@/lib/sanity-utils'
+import { renderText, sanitizeAltText } from '@/lib/sanity-utils'
 
 import AccentTitle from './AccentTitle'
 import FeatureListBlockCarousel from './FeatureListBlockCarousel'

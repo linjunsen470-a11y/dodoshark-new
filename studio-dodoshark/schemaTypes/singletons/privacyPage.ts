@@ -1,17 +1,5 @@
 import {DocumentTextIcon} from '@sanity/icons'
 import {defineArrayMember, defineField, defineType} from 'sanity'
-import {itemCount, pickText} from '../shared/studio'
-
-const sectionFields = [
-  defineField({name: 'title', title: 'Title', type: 'string', validation: (rule) => rule.required()}),
-  defineField({
-    name: 'body',
-    title: 'Paragraphs',
-    type: 'array',
-    of: [defineArrayMember({type: 'text', rows: 3})],
-    validation: (rule) => rule.min(1),
-  }),
-]
 
 export default defineType({
   name: 'privacyPage',

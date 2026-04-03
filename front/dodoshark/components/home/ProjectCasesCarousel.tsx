@@ -4,6 +4,7 @@ import Image from 'next/image'
 
 import Link from 'next/link'
 import { useState } from 'react'
+import type { SanityImage } from '@/lib/types/sanity'
 import CMSImage from '@/components/ui/CMSImage'
 import { A11y, Keyboard } from 'swiper/modules'
 import type { Swiper as SwiperInstance } from 'swiper'
@@ -16,9 +17,9 @@ type ProjectCaseItem = {
   title: string
   description: string
   image: string
-  sanityImage?: any
+  sanityImage?: SanityImage
   logo?: string | null
-  logoImage?: any
+  logoImage?: SanityImage
   href: string
 }
 

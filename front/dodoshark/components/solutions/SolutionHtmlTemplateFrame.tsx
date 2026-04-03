@@ -33,11 +33,19 @@ export default function SolutionHtmlTemplateFrame({
       ? `${src}${src.includes('?') ? '&' : '?'}attempt=${attempt}`
       : src
 
-  useEffect(() => {
+  // Adjusting state when props change pattern to avoid cascading renders
+  const [prevKey, setPrevKey] = useState(templateKey)
+  const [prevSrc, setPrevSrc] = useState(frameSrc)
+
+  if (templateKey !== prevKey || frameSrc !== prevSrc) {
+    setPrevKey(templateKey)
+    setPrevSrc(frameSrc)
     setHeight(640)
     setIsLoaded(false)
     setHasTimedOut(false)
+  }
 
+  useEffect(() => {
     const frame = iframeRef.current
     if (!frame) return
 
