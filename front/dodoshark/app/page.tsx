@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 import dynamic from 'next/dynamic'
 import DeferredHeroCarousel from '@/components/home/DeferredHeroCarousel'
-import { fetchSanityData } from '@/lib/sanity.live'
+import { getHomeMetadataData, getHomePageData } from '@/lib/sanity/data/home'
 import { buildPageMetadata } from '@/lib/seo'
 import { normalizeYouTubeEmbedUrl, resolveYouTubeThumbnailUrl } from '@/lib/video'
 import type { SeoMeta, SanityImage } from '@/lib/types/sanity'
@@ -178,166 +178,6 @@ type HomeAdvantage = {
   sanityImage?: HomeSanityImage
 }
 
-const homeQuery = `coalesce(
-  *[_type == "homePage" && _id == "homePage"][0],
-  *[_type == "homePage"][0]
-){
-  seo {
-    title,
-    description,
-    keywords,
-    ogImage{
-      alt,
-      asset
-    },
-    canonicalUrl,
-    noIndex
-  },
-  heroEyebrow,
-  heroTitle,
-  heroSubtitle,
-  heroDescription,
-  heroBackgrounds[] {
-    asset,
-    alt,
-    "imageUrl": asset->url
-  },
-  stats[]{
-    label,
-    value,
-    suffix
-  },
-  aboutFeatures[]{
-    title,
-    description,
-    image{
-      asset,
-      alt,
-      "imageUrl": asset->url
-    }
-  },
-  confidenceSection{
-    titleLineOne,
-    titleLineTwo,
-    description,
-    cards[]{
-      title,
-      subtitle,
-      points,
-      image{
-        asset,
-        alt,
-        "imageUrl": asset->url
-      }
-    }
-  },
-  featuredAgriProducts[]->{
-    _id,
-    title,
-    slug{current},
-    shortDescription,
-    seriesTag,
-    mainImage{
-      asset,
-      alt,
-      "imageUrl": asset->url
-    },
-    category->{
-      title
-    }
-  },
-  featuredFoodProducts[]->{
-    _id,
-    title,
-    slug{current},
-    shortDescription,
-    seriesTag,
-    mainImage{
-      asset,
-      alt,
-      "imageUrl": asset->url
-    },
-    category->{
-      title
-    }
-  },
-  featuredSolutions[]->{
-    _id,
-    title,
-    slug{current},
-    summary,
-    heroImage{
-      asset,
-      alt,
-      "imageUrl": asset->url
-    }
-  },
-  featuredCases[]->{
-    _id,
-    title,
-    slug{current},
-    excerpt,
-    coverImage{
-      asset,
-      alt,
-      "imageUrl": asset->url
-    },
-    clientLogo{
-      asset,
-      alt,
-      "imageUrl": asset->url
-    }
-  },
-  advantagesSection{
-    title,
-    items[]{
-      title,
-      description,
-      image{
-        asset,
-        alt,
-        "imageUrl": asset->url
-      }
-    }
-  },
-  featuredHomeVideos[]->{
-    _id,
-    title,
-    youtubeUrl,
-    publishedAt,
-    status,
-    coverImage{
-      asset,
-      alt,
-      "imageUrl": asset->url
-    },
-    tags[]->{
-      title
-    }
-  },
-  whyChooseUsVideoUrl,
-  whyChooseUsVideoCoverImage{
-    asset,
-    alt,
-    "imageUrl": asset->url
-  },
-  productsBannerImage {
-    asset,
-    alt,
-    "imageUrl": asset->url
-  },
-  solutionsBackgroundImage {
-    asset,
-    alt,
-    "imageUrl": asset->url
-  },
-  aboutUsLogoImage {
-    asset,
-    alt,
-    "imageUrl": asset->url
-  }
-}`
-
 // Removed hardcoded contents (stats, aboutFeatures, confidenceCards, agriProducts, foodProducts, grindingSolutions, mixingSolutions, projectCaseItems, advantages) 
 // as they are now fully managed by Sanity CMS.
 
@@ -466,19 +306,8 @@ function SolutionCard({
   )
 }
 
-async function getHomePageData(preview = false) {
-  try {
-    return await fetchSanityData<HomePageData | null>({
-      query: homeQuery,
-      stega: preview ? undefined : false,
-    })
-  } catch {
-    return null
-  }
-}
-
 export async function generateMetadata(): Promise<Metadata> {
-  const data = await getHomePageData()
+  const data = await getHomeMetadataData<HomePageData>()
   return buildPageMetadata({
     seo: data?.seo,
     fallbackTitle: 'DoDoShark - Professional Crushing & Grinding Equipment Manufacturer',
@@ -488,7 +317,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const data = await getHomePageData(true)
+  const data = await getHomePageData<HomePageData>(true)
 
   const heroSlidesParsed: HeroCarouselImage[] = (data?.heroBackgrounds && data.heroBackgrounds.length > 0)
     ? data.heroBackgrounds
@@ -732,7 +561,7 @@ export default async function HomePage() {
     <main className="bg-white text-slate-700">
       <section className="relative flex min-h-[620px] items-center overflow-hidden md:min-h-[700px] xl:-mt-[72px] xl:pt-[72px]">
         <DeferredHeroCarousel images={heroSlides} autoplayMs={5500} pauseOnHover showDots showArrows />
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-[1] hidden h-[220px] bg-gradient-to-b from-slate-950/68 via-slate-950/34 to-transparent xl:block" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-1 hidden h-[220px] bg-gradient-to-b from-slate-950/68 via-slate-950/34 to-transparent xl:block" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-slate-950/70 via-slate-950/35 to-transparent" />
 
         <div className="relative z-10 mx-auto flex w-full max-w-7xl items-center px-4 py-20 sm:px-6 lg:px-8">

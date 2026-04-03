@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { createDataAttribute } from 'next-sanity'
 import type { ReactNode } from 'react'
 
-import { fetchSanityData } from '@/lib/sanity.live'
+import { getProductDetailBySlug, getProductMetadataBySlug } from '@/lib/sanity/data/products'
 import { cleanSlug, cleanText, renderText, sanitizeAltText, toImageSrc } from '@/lib/sanity-utils'
 import type { SanityImage, SeoMeta } from '@/lib/types/sanity'
 
@@ -104,215 +104,6 @@ type ProductData = {
   slug?: { current?: string }
   mainImage?: SanityImage
   contentBlocks?: ProductBlock[]
-}
-
-const productQuery = `*[_type == "product" && slug.current == $slug][0] {
-  _id,
-  seo {
-    title,
-    description,
-    keywords,
-    canonicalUrl,
-    noIndex,
-    ogImage {
-      ...,
-      asset
-    }
-  },
-  title,
-  seriesTag,
-  shortDescription,
-  slug { current },
-  mainImage {
-    ...,
-    asset
-  },
-  contentBlocks[] {
-    ...,
-    backgroundImage {
-      ...,
-      asset
-    },
-    media {
-      ...,
-      asset
-    },
-    referenceImage {
-      ...,
-      asset
-    },
-    mediaItems[] {
-      ...,
-      image {
-        ...,
-        asset
-      }
-    },
-    images[] {
-      ...,
-      asset
-    },
-    items[] {
-      ...,
-      icon {
-        ...,
-        asset
-      },
-      image {
-        ...,
-        asset
-      },
-      logo {
-        ...,
-        asset
-      },
-      videoThumbnail {
-        ...,
-        asset
-      }
-    },
-    footerCta {
-      ...
-    },
-    videos[] {
-      ...,
-      thumbnail {
-        ...,
-        asset
-      }
-    },
-    content[] {
-      ...,
-      _type == "image" => {
-        ...,
-        asset
-      },
-      _type == "productReference" => {
-        ...,
-        product->{
-          _id,
-          _type,
-          title,
-          name,
-          modelName,
-          slug { current },
-          shortDescription,
-          description,
-          excerpt,
-          mainImage { ..., asset },
-          image { ..., asset },
-          coverImage { ..., asset },
-          heroImage { ..., asset }
-        }
-      }
-    },
-    references[] {
-      ...,
-      reference->{
-        _id,
-        _type,
-        title,
-        name,
-        modelName,
-        slug { current },
-        shortDescription,
-        description,
-        excerpt,
-        mainImage { ..., asset },
-        image { ..., asset },
-        coverImage { ..., asset },
-        heroImage { ..., asset }
-      }
-    },
-    enableBannerOverlap,
-	    bannerImage {
-	      ...,
-	      asset
-	    },
-	    bannerOverlayColor,
-	    groups[] {
-	      ...,
-	      items[] {
-	        ...,
-	        productVariant->{
-	          _id,
-	          modelName,
-	          shortDescription,
-	          image {
-	            ...,
-	            asset
-	          }
-	        }
-	      }
-	    },
-	    defaultGroupIndex,
-	    maxItemsPerRow,
-	    showModelDescription,
-	    footerText,
-    rows[] {
-      ...,
-      cards[] {
-        ...,
-	        reference->{
-	          _id,
-	          _type,
-	          title,
-	          name,
-	          modelName,
-	          slug { current },
-	          shortDescription,
-	          description,
-	          excerpt,
-	          mainImage { ..., asset },
-	          image { ..., asset },
-	          coverImage { ..., asset },
-	          heroImage { ..., asset }
-        },
-        inlineCard {
-          ...,
-          image { ..., asset }
-        }
-      }
-    }
-  }
-}`
-
-const productMetadataQuery = `*[_type == "product" && slug.current == $slug][0] {
-  _id,
-  seo {
-    title,
-    description,
-    keywords,
-    canonicalUrl,
-    noIndex,
-    ogImage {
-      ...,
-      asset
-    }
-  },
-  title,
-  shortDescription,
-  slug { current },
-  mainImage {
-    ...,
-    asset
-  }
-}`
-
-async function getProduct(slug: string, stega?: boolean) {
-  return fetchSanityData<ProductData | null>({
-    query: productQuery,
-    params: { slug },
-    stega,
-  })
-}
-
-async function getProductMetadata(slug: string) {
-  return fetchSanityData<ProductData | null>({
-    query: productMetadataQuery,
-    params: { slug },
-    stega: false,
-  })
 }
 
 function renderLegacyFeatureGrid(block: FeatureGridBlockData, key: string | number) {
@@ -485,7 +276,7 @@ function renderPageBuilderGroup(group: PageBuilderRenderGroup<ProductBlock>, doc
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
 
   const { slug } = await params
-  const product = await getProductMetadata(slug)
+  const product = await getProductMetadataBySlug<ProductData>(slug)
 
   if (!product) {
     return {
@@ -528,7 +319,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params
-  const product = await getProduct(slug)
+  const product = await getProductDetailBySlug<ProductData>(slug)
 
   if (!product) {
     notFound()
