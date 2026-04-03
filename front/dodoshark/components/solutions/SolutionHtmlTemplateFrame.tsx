@@ -6,12 +6,14 @@ const LOAD_TIMEOUT_MS = 12000
 
 type SolutionHtmlTemplateFrameProps = {
   src: string
+  srcdoc?: string
   templateKey: string
   title?: string
 }
 
 export default function SolutionHtmlTemplateFrame({
   src,
+  srcdoc,
   templateKey,
   title,
 }: SolutionHtmlTemplateFrameProps) {
@@ -21,6 +23,10 @@ export default function SolutionHtmlTemplateFrame({
   const [attempt, setAttempt] = useState(0)
   const [isLoaded, setIsLoaded] = useState(false)
   const [hasTimedOut, setHasTimedOut] = useState(false)
+
+  // When srcdoc is provided the HTML is inline — no network request needed.
+  // Fall back to src-based loading only when srcdoc is absent.
+  const useSrcdoc = Boolean(srcdoc)
 
   const frameSrc =
     attempt > 0
@@ -105,9 +111,14 @@ export default function SolutionHtmlTemplateFrame({
     }
 
     window.addEventListener('resize', requestMeasure)
-    timeoutRef.current = window.setTimeout(() => {
-      setHasTimedOut(true)
-    }, LOAD_TIMEOUT_MS)
+
+    // Only set a load timeout when fetching over the network (src mode).
+    // srcdoc inlines the HTML so it loads synchronously — no timeout needed.
+    if (!useSrcdoc) {
+      timeoutRef.current = window.setTimeout(() => {
+        setHasTimedOut(true)
+      }, LOAD_TIMEOUT_MS)
+    }
 
     return () => {
       frame.removeEventListener('load', handleLoad)
@@ -117,11 +128,17 @@ export default function SolutionHtmlTemplateFrame({
       clearTimeoutRef()
       imageListeners.forEach(({image, handler}) => image.removeEventListener('load', handler))
     }
-  }, [frameSrc, templateKey])
+  }, [useSrcdoc, frameSrc, templateKey])
+
+  // When using srcdoc and the iframe hasn't fired its load event yet within
+  // the first paint, show a minimal skeleton instead of the full loading card.
+  // srcdoc content is inline so it renders almost immediately; the brief
+  // skeleton avoids a flash rather than hiding a long network wait.
+  const showLoadingPanel = !useSrcdoc && (!isLoaded || hasTimedOut)
 
   return (
     <div className="bg-white">
-      {(!isLoaded || hasTimedOut) && (
+      {showLoadingPanel && (
         <div className="border-b border-slate-200 bg-slate-50 px-4 py-10 sm:px-6">
           <div className="mx-auto max-w-4xl rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
             <p className="text-xs font-black uppercase tracking-[0.22em] text-orange-600">
@@ -165,7 +182,8 @@ export default function SolutionHtmlTemplateFrame({
         key={`${templateKey}:${attempt}`}
         ref={iframeRef}
         title={title || 'Solution template'}
-        src={frameSrc}
+        srcDoc={useSrcdoc ? srcdoc : undefined}
+        src={useSrcdoc ? undefined : frameSrc}
         sandbox="allow-same-origin"
         scrolling="no"
         className="block w-full border-0 bg-white"
