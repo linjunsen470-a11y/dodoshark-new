@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 
 interface LiteYouTubeProps {
   videoId: string
@@ -72,11 +73,11 @@ export default function LiteYouTube({
         >
           {/* 缩略图 */}
           {isIntersecting && (
-            <img
+            <Image
               src={posterUrl}
               alt={title}
+              fill
               className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-              loading="lazy"
             />
           )}
           {/* 渐变遮罩 */}

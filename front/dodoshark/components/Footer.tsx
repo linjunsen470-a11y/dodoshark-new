@@ -3,7 +3,7 @@ import Link from 'next/link'
 import {createDataAttribute} from 'next-sanity'
 
 import type {GlobalSettingsData} from '@/lib/global-settings'
-import {cleanText, renderText, toImageSrc} from '@/lib/sanity-utils'
+import {cleanText, renderText} from '@/lib/sanity-utils'
 import CMSImage from '@/components/ui/CMSImage'
 import {SANITY_DATASET, SANITY_PROJECT_ID} from '@/lib/env'
 import {studioUrl} from '@/lib/sanity'
@@ -131,7 +131,6 @@ export default function Footer({settings}: FooterProps) {
   const websiteUrl = cleanText(settings?.contact?.websiteUrl) || 'https://www.dodoshark.com'
   const headquartersKicker = renderText(settings?.footer?.headquartersKicker) || 'Headquarters'
   const headquartersTitle = renderText(settings?.footer?.headquartersTitle) || renderText(settings?.siteName) || 'DoDoShark'
-  const logoSrc = toImageSrc(settings?.logo, 360)
   const headquartersBody =
     renderText(settings?.footer?.headquartersBody) ||
     'Located in Nanjing, Jiangsu, China.\nDoDoShark is a brand of Nanjing Heici Machinery Co., Ltd.'

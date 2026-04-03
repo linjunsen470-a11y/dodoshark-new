@@ -1,5 +1,5 @@
 import {sanityFetch} from '@/lib/sanity.live'
-import type {SanityImage} from '@/lib/types/sanity'
+import type {SanityImage, SeoMeta} from '@/lib/types/sanity'
 
 export type GlobalNavItem = {
   label?: string
@@ -62,9 +62,10 @@ export type GlobalSettingsData = {
     footerLinks?: GlobalNavItem[]
     copyrightText?: string
   }
+  seo?: SeoMeta
 }
 
-const GLOBAL_SETTINGS_QUERY = `*[_id == "globalSettings"][0]{
+export const GLOBAL_SETTINGS_QUERY = `*[_id == "globalSettings"][0]{
   _id,
   siteName,
   favicon{
@@ -146,7 +147,8 @@ const GLOBAL_SETTINGS_QUERY = `*[_id == "globalSettings"][0]{
       label,
       href
     },
-    copyrightText
+    copyrightText,
+    seo
   }
 }`
 
