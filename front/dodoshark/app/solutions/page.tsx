@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { fetchSanityData } from '@/lib/sanity.live'
+import { getSolutionsLandingMetadata, getSolutionsPageData } from '@/lib/sanity/data/solutions'
 import { buildPageMetadata } from '@/lib/seo'
 import { cleanSlug, cleanText, firstParam, renderText, sanitizeAltText, toImageSrc, type QueryParamValue } from '@/lib/sanity-utils'
 import type { SeoMeta, SanityImage } from '@/lib/types/sanity'
@@ -41,52 +41,11 @@ type SolutionsPageProps = {
   searchParams: Promise<Record<string, QueryParamValue>>
 }
 
-const solutionsLandingQuery = `coalesce(
-  *[_id == "solutionsPage"][0],
-  *[_type == "solutionsPage"][0]
-){
-  seo,
-  hero{
-    badge,
-    title,
-    subtitle,
-    image{
-      alt,
-      asset
-    }
-  },
-  solutionCategories[]->{
-    _id,
-    title,
-    slug{current}
-  }
-}`
-
-const solutionsListQuery = `*[
-  _type == "solution"
-  && defined(slug.current)
-  && ($category == "" || category->slug.current == $category)
-] | order(_createdAt desc){
-  _id,
-  title,
-  slug{current},
-  summary,
-  heroImage{
-    alt,
-    asset
-  },
-  category->{
-    _id,
-    title,
-    slug{current}
-  }
-}`
-
-const allCategoriesQuery = `*[_type == "category"] | order(title asc){
-  _id,
-  title,
-  slug{current}
-}`
+type SolutionsPageData = {
+  landing?: SolutionsLandingData | null
+  items?: SolutionCard[]
+  fallbackCategories?: CategoryItem[]
+}
 
 function parsePositiveInt(value: string | undefined, fallback = 1) {
   const parsed = Number.parseInt(value ?? '', 10)
@@ -109,10 +68,7 @@ function buildHref({
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const landing = await fetchSanityData<SolutionsLandingData | null>({
-    query: solutionsLandingQuery,
-    stega: false,
-  })
+  const landing = await getSolutionsLandingMetadata<SolutionsLandingData>()
   return buildPageMetadata({
     seo: landing?.seo,
     fallbackTitle: 'Industrial Solutions | DoDoShark',
@@ -125,19 +81,10 @@ export default async function SolutionsPage({ searchParams }: SolutionsPageProps
   const category = cleanText(firstParam(params.category)) || ''
   const initialPage = parsePositiveInt(firstParam(params.page), 1)
 
-  const landing = await fetchSanityData<SolutionsLandingData | null>({
-    query: solutionsLandingQuery,
-  })
-
-  const [solutions, fallbackCategories] = await Promise.all([
-    fetchSanityData<SolutionCard[]>({
-      query: solutionsListQuery,
-      params: { category },
-    }),
-    fetchSanityData<CategoryItem[]>({
-      query: allCategoriesQuery,
-    }),
-  ])
+  const pageData = await getSolutionsPageData<SolutionsPageData>(category)
+  const landing = pageData?.landing ?? null
+  const solutions = pageData?.items ?? []
+  const fallbackCategories = pageData?.fallbackCategories ?? []
 
   const configuredCategories = (landing?.solutionCategories && landing.solutionCategories.length > 0)
     ? landing.solutionCategories.filter((item) => cleanSlug(item?.slug))

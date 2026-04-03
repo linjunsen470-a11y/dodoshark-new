@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation'
 import { PortableText, type PortableTextBlock, type PortableTextComponents } from 'next-sanity'
 
 import { getSafeHref, isExternalHref } from '@/lib/safeHref'
-import { fetchSanityData } from '@/lib/sanity.live'
+import { getCaseDetailBySlug, getCaseMetadataBySlug } from '@/lib/sanity/data/cases'
 import { cleanSlug, cleanText, renderSentenceCase, renderText, sanitizeAltText, toImageSrc } from '@/lib/sanity-utils'
 import type { SanityAsset, SanityImage, SeoMeta } from '@/lib/types/sanity'
 import Icon from '@/components/ui/Icon'
@@ -61,84 +61,6 @@ type CaseStudyData = {
   metrics?: CaseMetric[]
   body?: PortableTextBlock[]
   usedEquipment?: CaseEquipment[]
-}
-
-const caseBySlugQuery = `*[_type == "caseStudy" && slug.current == $slug][0]{
-  _id,
-  title,
-  slug{current},
-  excerpt,
-  location,
-  seo{
-    title,
-    description,
-    keywords,
-    canonicalUrl,
-    noIndex,
-    ogImage{
-      ...,
-      asset
-    }
-  },
-  coverImage{
-    ...,
-    asset
-  },
-  clientLogo{
-    alt,
-    asset->{
-      _id,
-      url,
-      metadata{
-        dimensions{
-          width,
-          height
-        }
-      }
-    }
-  },
-  tags[]->{
-    _id,
-    title,
-    slug{current}
-  },
-  metrics[]{
-    label,
-    value
-  },
-  body[]{
-    ...,
-    _type == "image" => {
-      ...,
-      asset
-    }
-  },
-  usedEquipment[]->{
-    _id,
-    title,
-    modelName,
-    slug{current},
-    shortDescription,
-    description,
-    excerpt,
-    "image": coalesce(mainImage, image, coverImage, heroImage){
-      ...,
-      asset
-    }
-  }
-}`
-
-async function getCaseBySlug(slug: string, stega?: boolean) {
-  try {
-    return await fetchSanityData<CaseStudyData | null>({
-      query: caseBySlugQuery,
-      params: { slug },
-      stega,
-    })
-  } catch (error) {
-    console.error('Error fetching case study:', error)
-    return null
-  }
 }
 
 function buildPortableTextComponents(): PortableTextComponents {
@@ -241,7 +163,7 @@ function buildPortableTextComponents(): PortableTextComponents {
 
 export async function generateMetadata({ params }: CaseDetailPageProps): Promise<Metadata> {
   const { slug } = await params
-  const caseStudy = await getCaseBySlug(slug, false)
+  const caseStudy = await getCaseMetadataBySlug<CaseStudyData>(slug)
 
   if (!caseStudy) {
     return {
@@ -282,7 +204,7 @@ export async function generateMetadata({ params }: CaseDetailPageProps): Promise
 
 export default async function CaseDetailPage({ params }: CaseDetailPageProps) {
   const { slug } = await params
-  const caseStudy = await getCaseBySlug(slug)
+  const caseStudy = await getCaseDetailBySlug<CaseStudyData>(slug)
 
   if (!caseStudy) {
     notFound()

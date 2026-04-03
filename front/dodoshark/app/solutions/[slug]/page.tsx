@@ -5,7 +5,7 @@ import {notFound} from 'next/navigation'
 import {createDataAttribute} from 'next-sanity'
 import type {ReactNode} from 'react'
 
-import { fetchSanityData } from '@/lib/sanity.live'
+import { getSolutionDetailBySlug, getSolutionMetadataBySlug } from '@/lib/sanity/data/solutions'
 import {cleanSlug, cleanText, hasStegaMetadata, renderText, sanitizeAltText, toImageSrc} from '@/lib/sanity-utils'
 import {
   buildSolutionTemplateFrameSrc,
@@ -158,246 +158,6 @@ function splitTitle(title?: string) {
     head: parts.slice(0, middle).join(' '),
     tail: parts.slice(middle).join(' '),
   }
-}
-
-async function getSolution(slug: string, stega?: boolean) {
-  const query = `*[_type == "solution" && slug.current == $slug][0] {
-    _id,
-    seo {
-      title,
-      description,
-      keywords,
-      canonicalUrl,
-      noIndex,
-      ogImage {
-        ...,
-        asset
-      }
-    },
-    title,
-    slug { current },
-    summary,
-    detailRenderMode,
-    htmlTemplate {
-      renderedHtml,
-      renderedSignature,
-      renderedAt,
-      renderStatus,
-      renderError
-    },
-    category -> {
-      _id,
-      title,
-      slug { current }
-    },
-    heroImage {
-      ...,
-      asset
-    },
-    contentBlocks[] {
-      ...,
-      backgroundImage {
-        ...,
-        asset
-      },
-      content[] {
-        ...,
-        _type == "image" => {
-          ...,
-          asset
-        },
-        _type == "productReference" => {
-          ...,
-          titleOverride,
-          product->{
-            _id,
-            _type,
-            title,
-            name,
-            modelName,
-            slug { current },
-            shortDescription,
-            description,
-            excerpt,
-            mainImage { ..., asset },
-            image { ..., asset },
-            coverImage { ..., asset },
-            heroImage { ..., asset }
-          }
-        }
-      },
-      media {
-        ...,
-        asset
-      },
-      referenceImage {
-        ...,
-        asset
-      },
-      mediaItems[] {
-        ...,
-        image {
-          ...,
-          asset
-        }
-      },
-      images[] {
-        ...,
-        asset
-      },
-      items[] {
-        ...,
-        icon {
-          ...,
-          asset
-        },
-        image {
-          ...,
-          asset
-        },
-        logo {
-          ...,
-          asset
-        },
-        videoThumbnail {
-          ...,
-          asset
-        }
-      },
-      footerCta {
-        ...
-      },
-      videos[] {
-        ...,
-        thumbnail {
-          ...,
-          asset
-        }
-      },
-      references[] {
-        ...,
-        reference->{
-          _id,
-          _type,
-          title,
-          name,
-          modelName,
-          slug { current },
-          shortDescription,
-          description,
-          excerpt,
-          mainImage { ..., asset },
-          image { ..., asset },
-          coverImage { ..., asset },
-          heroImage { ..., asset }
-        }
-      },
-      enableBannerOverlap,
-      bannerImage {
-        ...,
-        asset
-      },
-      bannerOverlayColor,
-      groups[] {
-        ...,
-        items[] {
-          ...,
-          productVariant->{
-            _id,
-            modelName,
-            shortDescription,
-            image {
-              ...,
-              asset
-            }
-          }
-        }
-      },
-      defaultGroupIndex,
-      maxItemsPerRow,
-      showModelDescription,
-      footerText,
-      rows[] {
-        ...,
-        cards[] {
-          ...,
-          reference->{
-            _id,
-            _type,
-            title,
-            name,
-            modelName,
-            slug { current },
-            shortDescription,
-            description,
-            excerpt,
-            mainImage { ..., asset },
-            image { ..., asset },
-            coverImage { ..., asset },
-            heroImage { ..., asset }
-          },
-          inlineCard {
-            ...,
-            image { ..., asset }
-          }
-        }
-      }
-    },
-    relatedProducts[]->{
-      _id,
-      _type,
-      title,
-      name,
-      modelName,
-      slug { current },
-      shortDescription,
-      mainImage { ..., asset }
-    },
-    relatedVlogs[]->{
-      _id,
-      title,
-      excerpt,
-      youtubeUrl,
-      thumbnail { ..., asset },
-      category->{ title }
-    }
-  }`
-
-  return fetchSanityData<SolutionData | null>({
-    query,
-    params: {slug},
-    stega,
-  })
-}
-
-async function getSolutionMetadata(slug: string) {
-  const query = `*[_type == "solution" && slug.current == $slug][0] {
-    _id,
-    seo {
-      title,
-      description,
-      keywords,
-      canonicalUrl,
-      noIndex,
-      ogImage {
-        ...,
-        asset
-      }
-    },
-    title,
-    slug { current },
-    summary,
-    heroImage {
-      ...,
-      asset
-    }
-  }`
-
-  return fetchSanityData<SolutionData | null>({
-    query,
-    params: {slug},
-    stega: false,
-  })
 }
 
 function wrapSolutionBlockForPresentation(documentId: string, blockKey: string | undefined, element: ReactNode) {
@@ -713,7 +473,7 @@ export async function generateMetadata({
   params,
 }: SolutionPageProps): Promise<Metadata> {
   const {slug} = await params
-  const solution = await getSolutionMetadata(slug)
+  const solution = await getSolutionMetadataBySlug<SolutionData>(slug)
 
   if (!solution) {
     return {
@@ -760,7 +520,7 @@ export async function generateMetadata({
 
 export default async function SolutionPage({params}: SolutionPageProps) {
   const {slug} = await params
-  const solution = await getSolution(slug)
+  const solution = await getSolutionDetailBySlug<SolutionData>(slug)
 
   if (!solution) {
     notFound()
