@@ -179,6 +179,7 @@ async function getSolution(slug: string, stega?: boolean) {
     summary,
     detailRenderMode,
     htmlTemplate {
+      renderedHtml,
       renderedSignature,
       renderedAt,
       renderStatus,
@@ -781,6 +782,10 @@ export default async function SolutionPage({params}: SolutionPageProps) {
   const templateRenderStatus = cleanText(solution.htmlTemplate?.renderStatus) || 'pending'
   const templateRenderError = cleanText(solution.htmlTemplate?.renderError)
   const templateIsReady = templateRenderStatus === 'ready' && Boolean(templateSignature)
+  const templateRenderedHtml =
+    templateIsReady && typeof solution.htmlTemplate?.renderedHtml === 'string'
+      ? solution.htmlTemplate.renderedHtml
+      : undefined
   const templateSrc = templateSignature
     ? buildSolutionTemplateFrameSrc(solutionSlug, templateSignature)
     : ''
@@ -802,6 +807,7 @@ export default async function SolutionPage({params}: SolutionPageProps) {
         {templateIsReady ? (
           <SolutionHtmlTemplateFrame
             src={templateSrc}
+            srcdoc={templateRenderedHtml}
             templateKey={`${solution._id}:${templateSignature}`}
             title={cleanText(solution.title) || 'Solution template'}
           />
