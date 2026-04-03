@@ -65,7 +65,7 @@ export type GlobalSettingsData = {
   seo?: SeoMeta
 }
 
-const GLOBAL_SETTINGS_QUERY = `*[_id == "globalSettings"][0]{
+export const GLOBAL_SETTINGS_QUERY = `*[_id == "globalSettings"][0]{
   _id,
   siteName,
   favicon{
@@ -147,7 +147,8 @@ const GLOBAL_SETTINGS_QUERY = `*[_id == "globalSettings"][0]{
       label,
       href
     },
-    copyrightText
+    copyrightText,
+    seo
   }
 }`
 

@@ -6,7 +6,7 @@ import { draftMode } from "next/headers";
 import { fetchSanityData } from "@/lib/sanity.live";
 import { buildPageMetadata } from "@/lib/seo";
 import { SanityImage } from "@/lib/types/sanity";
-import { type GlobalSettingsData } from "@/lib/global-settings";
+import { type GlobalSettingsData, GLOBAL_SETTINGS_QUERY } from "@/lib/global-settings";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import "./globals.css";
@@ -15,7 +15,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const globalSettings = await fetchSanityData<GlobalSettingsData | null>({ query: `*[_id == "globalSettings"][0]` });
+  const globalSettings = await fetchSanityData<GlobalSettingsData | null>({ query: GLOBAL_SETTINGS_QUERY });
   return buildPageMetadata({
     seo: globalSettings?.seo,
     fallbackTitle: 'DoDoShark - Professional Crushing & Grinding Equipment Manufacturer',
@@ -28,7 +28,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const globalSettings = await fetchSanityData<GlobalSettingsData | null>({ query: `*[_id == "globalSettings"][0]{..., logo{..., asset->}}` });
+  const globalSettings = await fetchSanityData<GlobalSettingsData | null>({ query: GLOBAL_SETTINGS_QUERY });
   const { isEnabled: isDraftMode } = await draftMode();
 
   const faviconUrl = globalSettings?.logo
@@ -41,11 +41,11 @@ export default async function RootLayout({
         <link rel="icon" href={faviconUrl} sizes="any" />
       </head>
       <body className="antialiased selection:bg-orange-100 selection:text-orange-900">
-        <Header />
+        <Header settings={globalSettings} />
         <main id="main-content" className="relative min-h-[60vh] overflow-hidden">
           {children}
         </main>
-        <Footer />
+        <Footer settings={globalSettings} />
         {isDraftMode && <VisualEditing />}
       </body>
     </html>
