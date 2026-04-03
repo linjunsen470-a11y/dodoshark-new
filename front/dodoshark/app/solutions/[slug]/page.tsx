@@ -659,6 +659,56 @@ function renderSolutionHero(solution: SolutionData) {
   )
 }
 
+function renderTemplateArtifactState({
+  status,
+  error,
+  slug,
+}: {
+  status: string
+  error?: string
+  slug: string
+}) {
+  const isPending = status === 'pending'
+  const title = isPending ? 'Template is being prepared' : 'Template is temporarily unavailable'
+  const message = isPending
+    ? 'This solution page is still generating its deployment-ready template. Please check back shortly.'
+    : 'We could not load this template artifact right now. Please retry later or contact the team if the issue persists.'
+
+  return (
+    <section className="border-b border-slate-200 bg-slate-50 px-4 py-16 sm:px-6">
+      <div className="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+        <div className="flex items-start gap-4">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-orange-100 text-orange-600">
+            <Icon icon={isPending ? 'clock' : 'gear'} className="h-5 w-5" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-orange-600">
+              HTML Template Status
+            </p>
+            <h2 className="mt-2 text-2xl font-display font-black tracking-tight text-slate-900">
+              {title}
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">{message}</p>
+            <div className="mt-6 flex flex-wrap gap-3 text-sm">
+              <span className="rounded-full bg-slate-100 px-4 py-2 font-semibold text-slate-700">
+                status: {status}
+              </span>
+              <span className="rounded-full bg-slate-100 px-4 py-2 font-semibold text-slate-700">
+                slug: {slug}
+              </span>
+            </div>
+            {error ? (
+              <p className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+                Latest render error: {error}
+              </p>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 export async function generateMetadata({
   params,
 }: SolutionPageProps): Promise<Metadata> {
@@ -728,15 +778,18 @@ export default async function SolutionPage({params}: SolutionPageProps) {
   const renderGroups = groupPageBuilderBlocks(contentBlocks)
   const hasBuilderHero = solution.contentBlocks?.some((block) => block?._type === 'heroBlock')
   const solutionSlug = cleanSlug(solution.slug) || slug
-  const templateSignature = cleanText(solution.htmlTemplate?.renderedSignature) || 'missing'
+  const templateSignature = cleanText(solution.htmlTemplate?.renderedSignature)
   const templateRenderStatus = cleanText(solution.htmlTemplate?.renderStatus) || 'pending'
   const templateRenderError = cleanText(solution.htmlTemplate?.renderError)
-  const templateSrc = buildSolutionTemplateFrameSrc(solutionSlug, templateSignature)
+  const templateIsReady = templateRenderStatus === 'ready' && Boolean(templateSignature)
+  const templateSrc = templateSignature
+    ? buildSolutionTemplateFrameSrc(solutionSlug, templateSignature)
+    : ''
 
   if (solution.detailRenderMode === 'htmlTemplate') {
     return (
       <main className="bg-white text-slate-900">
-        {process.env.NODE_ENV !== 'production' && templateRenderStatus !== 'ready' && (
+        {process.env.NODE_ENV !== 'production' && !templateIsReady && (
           <section className="border-b border-amber-200 bg-amber-50 px-4 py-4 text-amber-950">
             <div className="mx-auto max-w-7xl">
               <p className="font-bold">Template render artifact not ready</p>
@@ -747,11 +800,19 @@ export default async function SolutionPage({params}: SolutionPageProps) {
             </div>
           </section>
         )}
-        <SolutionHtmlTemplateFrame
-          src={templateSrc}
-          templateKey={`${solution._id}:${templateSignature}`}
-          title={cleanText(solution.title) || 'Solution template'}
-        />
+        {templateIsReady ? (
+          <SolutionHtmlTemplateFrame
+            src={templateSrc}
+            templateKey={`${solution._id}:${templateSignature}`}
+            title={cleanText(solution.title) || 'Solution template'}
+          />
+        ) : (
+          renderTemplateArtifactState({
+            status: templateRenderStatus,
+            error: templateRenderError,
+            slug: solutionSlug,
+          })
+        )}
         <RelatedProductsSection products={relatedProducts} />
         <RelatedVlogsSection vlogs={relatedVlogs} />
       </main>
