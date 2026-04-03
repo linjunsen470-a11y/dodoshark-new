@@ -16,7 +16,11 @@ const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export async function generateMetadata(): Promise<Metadata> {
   const globalSettings = await fetchSanityData<GlobalSettingsData | null>({ query: `*[_id == "globalSettings"][0]` });
-  return buildPageMetadata(globalSettings?.seo);
+  return buildPageMetadata({
+    seo: globalSettings?.seo,
+    fallbackTitle: 'DoDoShark - Professional Crushing & Grinding Equipment Manufacturer',
+    fallbackDescription: 'DoDoShark Machinery, 20 years of focus on industrial crushing, grinding, and mixing equipment, serving 100+ countries.'
+  });
 }
 
 export default async function RootLayout({
