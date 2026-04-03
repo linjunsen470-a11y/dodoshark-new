@@ -28,25 +28,25 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const draft = await draftMode();
   const globalSettings = await fetchSanityData<GlobalSettingsData | null>({ query: GLOBAL_SETTINGS_QUERY });
-  const { isEnabled: isDraftMode } = await draftMode();
 
   const faviconUrl = globalSettings?.logo
     ? (globalSettings.logo as SanityImage).asset?.url || "/favicon.ico"
     : "/favicon.ico";
 
   return (
-    <html lang="en" className={`${inter.variable} ${outfit.variable} scroll-smooth`}>
+    <html lang="en" className="scroll-smooth">
       <head>
         <link rel="icon" href={faviconUrl} sizes="any" />
       </head>
-      <body className="antialiased selection:bg-orange-100 selection:text-orange-900">
+      <body
+        className={`${inter.variable} ${outfit.variable} antialiased font-sans`}
+      >
         <Header settings={globalSettings} />
-        <main id="main-content" className="relative min-h-[60vh] overflow-hidden">
-          {children}
-        </main>
+        {children}
         <Footer settings={globalSettings} />
-        {isDraftMode && <VisualEditing />}
+        {draft.isEnabled && <VisualEditing />}
       </body>
     </html>
   );
