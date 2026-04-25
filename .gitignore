@@ -37,6 +37,11 @@ Thumbs.db
 *.rar
 *.bak
 
+# AI-generated audit/security notes
+audit_report.md
+*audit_report*.md
+*MCP*指南*.md
+
 # Media and large files (Optional/Aggressive - keeping as per previous setup)
 *.mp4
 *.pdf
